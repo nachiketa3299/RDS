@@ -6,7 +6,7 @@
 RDS_BEGIN
 using namespace std;
 
-void __rds_assert(bool exp, const char* exp_str, const char* file_str, long int line)
+void _rds_assert(bool exp, const char* exp_str, const char* file_str, long int line)
 {
     if (exp)
         return;
