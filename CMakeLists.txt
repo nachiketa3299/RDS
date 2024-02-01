@@ -1,39 +1,25 @@
-CMAKE_MINIMUM_REQUIRED(
+cmake_minimum_required(
     VERSION 3.27
 )
 
-PROJECT(RDS
+project(RDS
     VERSION 0.1.0
-    DESCRIPTION "C++ Data Structures by RZN"
+    DESCRIPTION "C++ Data Structures Library written by RZN"
     LANGUAGES CXX
 )
 
-SET(
-    SRC_VECTORS
-        src/Vectors/Vector2.cpp
-        src/Vectors/Vector3.cpp
+# Main RDS Library Linking
+add_library(${PROJECT_NAME}
+    src/Assertion/Assertion.cpp
+    src/Vector2/Vector2.cpp
+    src/Vector3/Vector3.cpp
 )
 
-SET(
-    INC_VECTORS
-        include/Vectors/
-)
-SET(
-    INC_VECTORS_P
-        src/Vectors/
-)
+# Main RDS include directories
+target_include_directories(${PROJECT_NAME}
 
-ADD_LIBRARY(
-    ${PROJECT_NAME}
-        ${SRC_VECTORS}
-)
-
-TARGET_INCLUDE_DIRECTORIES(
-    ${PROJECT_NAME}
-        PUBLIC ${INC_VECTORS}
-        PRIVATE ${INC_VECTORS_P}
-
-    PRIVATE src
+    PRIVATE src/ src/Assertion/ src/Vector2/ src/Vector3/
+    PUBLIC include/ include/Assertion/ include/Vector2/ include/Vector3/
 )
 
 # === Adding `Google Test` for library test
@@ -47,13 +33,11 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 enable_testing()
-add_executable(
-    Vectors_test test/Vectors_test.cpp
-)
-target_link_libraries(
-    Vectors_test
-        GTest::gtest_main
-)
+
+# === TEST SETTINGS
+add_executable(vector2_test test/Vector2/Vector2_test.cpp)
+target_link_libraries(vector2_test ${PROJECT_NAME} GTest::gtest_main)
+target_include_directories(vector2_test PRIVATE include/Vector2/ src/ src/Vector2/)
 
 include(GoogleTest)
-gtest_discover_tests(Vectors_test)
+gtest_discover_tests(vector2_test)
