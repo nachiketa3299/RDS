@@ -3,16 +3,16 @@
 
 #include "RDS_CoreDefs.h"
 
+RDS_BEGIN
+
 // clang-format off
 
 /// @brief Macro function for assertion in RDS library
 /// @param[in] Expression bool-evaluated expresion to assert
 /// @see @ref __rds_assert(bool, const char*, const char*, long int*)
-#define RDS_Assert(Expression) rds::_rds_assert(Expression, #Expression, __FILE__, __LINE__)
+#define RDS_Assert(Expression) __rds_assert(Expression, #Expression, __FILE__, __LINE__)
 
 // clang-format on
-
-RDS_BEGIN
 
 /// @brief Inner assertion function.
 /// @warning Not intended to call directly. Use @ref RDS_Assert instead.
@@ -20,7 +20,7 @@ RDS_BEGIN
 /// @param[in] exp_str string of expression itself
 /// @param[in] file_str name of file ( @p __FILE__ )
 /// @param[in] line line number where this assertion called
-void _rds_assert(bool exp, const char* exp_str, const char* file_str, long int line);
+void __rds_assert(bool exp, const char* exp_str, const char* file_str, long int line);
 
 RDS_END
 
