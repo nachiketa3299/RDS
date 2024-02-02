@@ -13,7 +13,9 @@ add_library(${PROJECT_NAME}
     src/Assertion/Assertion.cpp
     src/Vector2/Vector2.cpp
     src/Vector3/Vector3.cpp
-    src/Array/Array.cpp
+    include/Array/Array.hpp
+    include/Array/Array_ConstIterator.hpp
+    include/Array/Array_Iterator.hpp
 )
 
 # Main RDS include directories
@@ -48,7 +50,7 @@ target_include_directories(Vector3_test PRIVATE include/Vector3/ src/ src/Vector
 # test for Array
 add_executable(Array_test test/Array/Array_test.cpp)
 target_link_libraries(Array_test ${PROJECT_NAME} GTest::gtest_main)
-target_include_directories(Array_test PRIVATE include/Array/ src/ src/Array/)
+target_include_directories(Array_test PRIVATE include/Array/ src/)
 
 include(GoogleTest)
 gtest_discover_tests(Vector2_test)

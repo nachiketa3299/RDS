@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Array.h"
+#include "Array.hpp"
 
 using namespace rds;
 using namespace std;
