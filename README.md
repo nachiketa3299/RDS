@@ -19,6 +19,7 @@
 - [X] [Vector2](/include/Vector2/Vector2.h)
 - [X] [Vector3](/include/Vector3/Vector3.h)
 - [ ] Array
+- [ ] DArray
 - [ ] Adjacent Matrix
 - [ ] List<sup>Doubly linked</sup>
 - [ ] ForwardList<sup>Singly linked</sup>
