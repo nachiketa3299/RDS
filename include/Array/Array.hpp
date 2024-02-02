@@ -95,7 +95,7 @@ public:
     }
     CIt_t CEnd() const
     {
-        return CIt_T(m_ptr, Size_);
+        return CIt_t(m_ptr, Size_);
     }
 
 public:

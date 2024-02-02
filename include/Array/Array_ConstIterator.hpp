@@ -30,7 +30,7 @@ public:
         , m_offset{0}
     {}
     /// @brief Constructor gets head pointer from an array and index
-    Array_ConstIterator(const Val_t* head, Size_t index)
+    Array_ConstIterator(const Val_t* head, Size_t index = 0)
         : m_head(head)
         , m_offset(index)
     {}
@@ -47,7 +47,7 @@ private:
         if (offset > 0)
             RDS_Assert(Size - m_offset >= static_cast<Size_t>(offset));
     }
-    void isCompatible(const Array_ConstIterator& other)
+    void isCompatible(const Array_ConstIterator& other) const
     {
         RDS_Assert(m_head == other.m_head);
         return;
@@ -68,31 +68,31 @@ public:
 
 public:
     /// @brief Prefix increment
-    Val_t& operator++()
+    Array_ConstIterator& operator++()
     {
         /// @todo validation test for head?
         ++m_offset;
-        return operator*();
+        return *this;
     }
     /// @brief Postfix increment
-    Val_t operator++(int)
+    Array_ConstIterator operator++(int)
     {
         const auto temp = *this;
         operator++();
         return temp;
     }
     /// @brief Prefix decrement
-    Val_t& operator--()
+    Array_ConstIterator& operator--()
     {
         --m_offset;
-        return operator*();
+        return *this;
     }
     /// @brief Postfix decrement
-    Val_t operator--(int)
+    Array_ConstIterator operator--(int)
     {
         const auto temp = *this;
         operator--();
-        return operator*();
+        return temp;
     }
 
 public:
@@ -100,18 +100,18 @@ public:
     {
         verifyOffset(offset);
         m_offset += static_cast<Size_t>(offset);
-        return operator*();
+        return *this;
     }
     Array_ConstIterator operator+(const Diff_t& offset) const
     {
-        auto temp = operator*();
+        auto temp = *this;
         return temp.operator+=(offset);
     }
     Array_ConstIterator& operator-=(const Diff_t& offset)
     {
         verifyOffset(offset);
         m_offset -= static_cast<Size_t>(offset);
-        return operator*();
+        return *this;
     }
     Array_ConstIterator operator-(const Diff_t& offset) const
     {
@@ -151,8 +151,8 @@ public:
     }
 
 private:
-    Val_t* m_head;   //< head of array
-    Size_t m_offset; //< offset from head of array
+    const Val_t* m_head;   //< head of array
+    Size_t       m_offset; //< offset from head of array
 };
 
 RDS_END

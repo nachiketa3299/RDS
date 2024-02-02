@@ -40,7 +40,7 @@ public:
     Array_Iterator& operator++()
     {
         Super::operator++();
-        return operator*();
+        return *this;
     }
     Array_Iterator operator++(int)
     {
@@ -51,7 +51,7 @@ public:
     Array_Iterator& operator--()
     {
         Super::operator--();
-        return operator*();
+        return *this();
     }
     Array_Iterator operator--(int)
     {
@@ -62,7 +62,7 @@ public:
     Array_Iterator& operator+=(const Diff_t offset)
     {
         Super::operator+=(offset);
-        return operator*();
+        return *this();
     }
     Array_Iterator operator+(const Diff_t offset) const
     {
@@ -72,11 +72,11 @@ public:
     Array_Iterator& operator-=(const Diff_t offset)
     {
         Super::operator-=(offset);
-        return operator*();
+        return *this();
     }
     Array_Iterator operator-(const Diff_t offset)
     {
-        auto temp = operator*();
+        auto temp = *this;
         return temp.operator-=(offset);
     }
 };
