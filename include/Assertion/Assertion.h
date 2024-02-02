@@ -19,7 +19,7 @@ RDS_BEGIN
 /// @param[in] exp bool-evaluated expression to assert
 /// @param[in] exp_str string of expression itself
 /// @param[in] file_str name of file ( @p __FILE__ )
-/// @param[in] line line number where this assertion called
+/// @param[in] line line number where this assertion called ( @p __LINE__ )
 void __rds_assert(bool exp, const char* exp_str, const char* file_str, long int line);
 
 RDS_END
