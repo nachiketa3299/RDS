@@ -137,10 +137,13 @@ public:
     bool operator==(const Vector3& other) const;
     /// @brief Check against another vector for ineqaulity.
     bool operator!=(const Vector3& other) const;
-    /// @brief Get l-value of  @p index th component of this vector.
-    /// @todo process for default case
+    /// @brief Get l-value of  @p index th component of this vector. @p index is in
+    /// range [0, 3). If @p index is out of bound, it is treated as 0. Internally @p
+    /// index is treated as @ref V3Idx .
     VE_t& operator[](int index);
-    /// @brief Get const l-value of  @p index th component of this vector.
+    /// @brief Get const l-value of  @p index th component of this vector. @p index is
+    /// in range [0, 3). If @p index is out of bound, it is treated as 0. Internally @p
+    /// index is treated as @ref V3Idx .
     const VE_t& operator[](int index) const;
     /// @brief Apply @p pred to all component.
     void Map(VE_pred_t pred);

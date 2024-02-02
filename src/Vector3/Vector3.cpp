@@ -264,14 +264,15 @@ const VE_t& Vector3::operator[](int index) const
 {
     switch (static_cast<V3Idx>(index))
     {
+    default:
     case V3Idx::X:
         return X;
     case V3Idx::Y:
         return Y;
-    default:
     case V3Idx::Z:
         return Z;
     }
+    return X;
 }
 
 void Vector3::Map(VE_pred_t pred)
