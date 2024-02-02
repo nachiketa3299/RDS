@@ -17,7 +17,6 @@ add_library(${PROJECT_NAME}
 
 # Main RDS include directories
 target_include_directories(${PROJECT_NAME}
-
     PRIVATE src/ src/Assertion/ src/Vector2/ src/Vector3/
     PUBLIC include/ include/Assertion/ include/Vector2/ include/Vector3/
 )
