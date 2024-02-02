@@ -12,7 +12,8 @@ RDS_BEGIN
 class Vector3
 {
 public:
-    /// @brief Enum class for notating vector indices.
+    /// @enum V3Idx
+    /// @brief Represents index of each component
     enum class V3Idx
     {
         X = 0,

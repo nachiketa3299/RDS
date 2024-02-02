@@ -14,6 +14,8 @@ class Vector2
 public:
     using VE_t = float;
     using VE_pred_t = std::function<float(float)>;
+    /// @enum V2Idx
+    /// @brief Represents index of each component
     enum class V2Idx
     {
         X = 0,
