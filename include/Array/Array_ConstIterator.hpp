@@ -27,7 +27,7 @@ public:
     /// @brief Default Constructor.
     Array_ConstIterator()
         : m_head{nullptr}
-        , index{0}
+        , m_offset{0}
     {}
     /// @brief Constructor gets head pointer from an array and index
     Array_ConstIterator(const Val_t* head, Size_t index)
@@ -45,7 +45,7 @@ private:
         if (offset < 0)
             RDS_Assert(m_offset >= Size_t{0} - static_cast<Size_t>(offset));
         if (offset > 0)
-            RDS_Assert(Size_t - m_offset >= static_cast<Size_t>(offset));
+            RDS_Assert(Size - m_offset >= static_cast<Size_t>(offset));
     }
     void isCompatible(const Array_ConstIterator& other)
     {

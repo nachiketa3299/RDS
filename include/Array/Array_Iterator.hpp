@@ -13,8 +13,10 @@ class Array_Iterator: public Array_ConstIterator<T, Size>
 {
 public:
     using Super  = Array_ConstIterator<T, Size>;
-    using Val_t  = Super::Val_t;
-    using Diff_t = Super::Diff_t;
+    using Val_t  = typename Super::Val_t;
+    using Diff_t = typename Super::Diff_t;
+    using Size_t = std::size_t;
+    using VE_t   = T;
 
 public:
     /// @brief Default Constructor.
