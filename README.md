@@ -28,7 +28,21 @@
 
 ## Data Structures
 
-### Vectors
+### (Ref) Iterator Categories
+
+| Container | Iterator Category |
+| :-: | :-:|
+| Vector | Random-Access |
+| List | Bidirectional |
+| Deque | Random-Access |
+| Map | Bidirectional |
+| Multimap | Bidirectional |
+| Set | Bidirectional |
+| MultiSet | Bidirectional |
+| Stack | None |
+| Queue | None |
+| Priority-Queue | None |
+
 
 #### Vector2
 
@@ -96,10 +110,12 @@
 
 # Tests
 
-- Vector2 `DOING`
+- Vector2
 - Vector3
 
 
 # References
 
 - [stlmp/stmlp/Github](https://github.com/stlmp/stlmp)
+- [gtest-cmake-example/dmonopoly](https://github.com/dmonopoly/gtest-cmake-example)
+    - 유용한 GTest 예제 (아직 이해하지 못한 부분이 있음)
