@@ -25,10 +25,11 @@ public:
     using CIt_t  = Array_ConstIterator<Val_t, Size_>;
 
 public:
-    /// @brief Default constructor.
+    /// @brief 기본 생성자
+    /// @note 쓰레기 값으로 배열이 차게 된다.
     Array() = default;
 
-    /// @brief Copy constructor
+    /// @brief 복사 생성자
     /// @todo see stl <array>
     Array(const Array& other)
     {
@@ -41,20 +42,24 @@ public:
     {
         return m_ptr[index];
     }
+
     const Val_t& operator[](Size_t index) const
     {
         return m_ptr[index];
     }
+
     Val_t& At(Size_t index)
     {
         RDS_Assert(index < Size_);
         return m_ptr[index];
     }
+
     const Val_t& At(Size_t index) const
     {
         RDS_Assert(index < Size_);
         return m_ptr[index];
     }
+
     Val_t& Front()
     {
         return m_ptr[0];
@@ -73,26 +78,37 @@ public:
     }
 
 public:
+    /// @brief 시작 지점 (index = 0) 에 대한 반복자를 생성하여 반환한다.
     It_t Begin()
     {
         return It_t(m_ptr, 0);
     }
+
+    /// @brief 시작 지점 (index = 0) 에 대한 상수 반복자를 생성하여 반환한다.
     CIt_t Begin() const
     {
         return CIt_t(m_ptr, 0);
     }
+
+    /// @brief 끝 지점 (index = Size_) 에 대한 반복자를 생성하여 반환한다.
     It_t End()
     {
         return It_t(m_ptr, Size_);
     }
+
+    /// @brief 끝 지점 (index = Size_) 에 대한 상수 반복자를 생성하여 반환한다.
     CIt_t End() const
     {
         return CIt_t(m_ptr, Size_);
     }
+
+    /// @brief 시작 지점 (index = 0) 에 대한 반복자를 생성하여 반환한다.
     CIt_t CBegin() const
     {
         return CIt_t(m_ptr, 0);
     }
+
+    /// @brief 끝 지점 (index = Size_) 에 대한 상수 반복자를 생성하여 반환한다.
     CIt_t CEnd() const
     {
         return CIt_t(m_ptr, Size_);

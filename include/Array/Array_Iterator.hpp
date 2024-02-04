@@ -16,7 +16,7 @@ public:
     using Val_t  = typename Super::Val_t;
     using Diff_t = typename Super::Diff_t;
     using Size_t = std::size_t;
-    using VE_t   = T;
+    using Val_t   = T;
 
 public:
     /// @brief Default Constructor.
@@ -29,13 +29,13 @@ public:
     {}
 
 public:
-    VE_t& operator*() const
+    Val_t& operator*() const
     {
-        return const_cast<VE_t&>(Super::operator*());
+        return const_cast<Val_t&>(Super::operator*());
     }
-    VE_t* operator->() const
+    Val_t* operator->() const
     {
-        return const_cast<VE_t*>(Super::operator->());
+        return const_cast<Val_t*>(Super::operator->());
     }
     Array_Iterator& operator++()
     {
