@@ -12,27 +12,19 @@ set(CMAKE_CXX_STANDARD 17)
 # =[Target: Main RDS Lib]=
 add_library(${PROJECT_NAME}
     src/Assertion/Assertion.cpp
-    src/Vector2/Vector2.cpp
-    src/Vector3/Vector3.cpp
+    src/FVector2/FVector2.cpp
+    src/FVector3/FVector3.cpp
     include/Array/Array.hpp
     include/Array/Array_ConstIterator.hpp
     include/Array/Array_Iterator.hpp
+    include/List/List.hpp
 )
 
 # Main RDS include directories
 target_include_directories(${PROJECT_NAME}
-    PRIVATE src/ src/Assertion/ src/Vector2/ src/Vector3/
-    PUBLIC include/ include/Assertion/ include/Vector2/ include/Vector3/ include/Array
+    PRIVATE src/ src/Assertion/ src/FVector2/ src/FVector3/
+    PUBLIC include/ include/Assertion/ include/Vector2/ include/Vector3/ include/Array/ include/List/
 )
-
-# =[Targets: CTests]= CTest Settings
-# Reference: [CTest/freehuni's home](https://freehuni.blogspot.com/2017/12/ctest.html)
-include(CTest)
-add_executable(Array_ctest test/ctest/Array_ctest.cpp)
-target_link_libraries(Array_ctest ${PROJECT_NAME})
-add_dependencies(Array_ctest ${PROJECT_NAME})
-target_include_directories(Array_ctest PRIVATE include/Array/ src/)
-add_test(Array_ctest-0 Array_ctest)
 
 # =[Targets: GTests]== Google Test Settings
 include(FetchContent)
@@ -40,29 +32,26 @@ FetchContent_Declare(
     googletest
     URL https://github.com/google/googletest/archive/03597a01ee50ed33e9dfd640b249b4be3799d395.zip
 )
-
 set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
-
+include(GoogleTest)
 enable_testing()
 
 # === TEST SETTINGS
-# test for Vector2
-add_executable(Vector2_gtest test/gtest/Vector2_gtest.cpp)
-target_link_libraries(Vector2_gtest ${PROJECT_NAME} GTest::gtest_main)
-target_include_directories(Vector2_gtest PRIVATE include/Vector2/ src/ src/Vector2/)
+macro(radd_class_gtest CLASS_NAME)
+    add_executable(${CLASS_NAME}_gtest test/gtest/${CLASS_NAME}_gtest.cpp)
+    target_link_libraries(${CLASS_NAME}_gtest ${PROJECT_NAME} GTest::gtest_main)
+    target_include_directories(${CLASS_NAME}_gtest PRIVATE include/${CLASS_NAME}/ src/ src/${CLASS_NAME}/)
+    gtest_discover_tests(${CLASS_NAME}_gtest)
+endmacro()
 
-# test for Vector3
-add_executable(Vector3_gtest test/gtest/Vector3_gtest.cpp)
-target_link_libraries(Vector3_gtest ${PROJECT_NAME} GTest::gtest_main)
-target_include_directories(Vector3_gtest PRIVATE include/Vector3/ src/ src/Vector3/)
+macro(radd_tclass_gtest TEMPLATED_CLASS_NAME)
+    add_executable(${TEMPLATED_CLASS_NAME}_gtest test/gtest/${TEMPLATED_CLASS_NAME}_gtest.cpp)
+    target_link_libraries(${TEMPLATED_CLASS_NAME}_gtest ${PROJECT_NAME} GTest::gtest_main)
+    target_include_directories(${TEMPLATED_CLASS_NAME}_gtest PRIVATE include/${TEMPLATED_CLASS_NAME}/ src/)
+    gtest_discover_tests(${TEMPLATED_CLASS_NAME}_gtest)
+endmacro()
 
-# test for Array
-add_executable(Array_gtest test/gtest/Array_gtest.cpp)
-target_link_libraries(Array_gtest ${PROJECT_NAME} GTest::gtest_main)
-target_include_directories(Array_gtest PRIVATE include/Array/ src/)
-
-include(GoogleTest)
-gtest_discover_tests(Vector2_gtest)
-gtest_discover_tests(Vector3_gtest)
-gtest_discover_tests(Array_gtest)
+radd_class_gtest(FVector2)
+radd_class_gtest(FVector3)
+radd_tclass_gtest(Array)
