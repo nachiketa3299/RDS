@@ -2,16 +2,18 @@
 
 **사용 도구**
 
-- Visual Studio Code
-- CMake (3.27.0) 
-- MSYS g++
-- Google Test
+- (Text Editor) **Visual Studio Code**
+- (Build Automation) **CMake (3.27.0)**
+- (Compilers) **MSYS g++** / **MSVC**
+- (Test) **Google Test**
+- (Formatting) **clang-format**
+- (Document) **Doxygen**
 
 # Plans
 
 - [ ] Doxygen 사용 설정
-- [ ] VSCode `tasks.json` 에 Cmake 명령어 등록
-- [ ] `Vector2`, `Vector3` 클래스의 이름을 `FVector2`, `FVector3`으로 바꿀 것
+- [ ] VSCode `tasks.json` 에 Cmake 명령어 등록 (걍 하지말까?)
+- [X] `Vector2`, `Vector3` 클래스의 이름을 `FVector2`, `FVector3`으로 바꿀 것
     - 동적 배열 클래스 이름을 `Vector`로 할 거라서 이름이 겹칠 위험이 있음.
     - 의미적으로도 `float` 형을 2, 3개 모아둔 자료형이니 접두어 `F`를 붙이는게 맞을 듯.
 
