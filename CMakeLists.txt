@@ -17,13 +17,18 @@ add_library(${PROJECT_NAME}
     include/Array/Array.hpp
     include/Array/Array_ConstIterator.hpp
     include/Array/Array_Iterator.hpp
+    include/Allocator/MAllocator.hpp
+    include/Allocator/Allocator.hpp
+    include/Arena/Arena.hpp
     include/List/List.hpp
+    include/List/List_ConstIterator.hpp
+    include/List/List_Iterator.hpp
 )
 
 # Main RDS include directories
 target_include_directories(${PROJECT_NAME}
     PRIVATE src/ src/Assertion/ src/FVector2/ src/FVector3/
-    PUBLIC include/ include/Assertion/ include/Vector2/ include/Vector3/ include/Array/ include/List/
+    PUBLIC include/ include/Assertion/ include/FVector2/ include/FVector3/ include/Array/ include/List/ include/Allocator/ include/Arena/
 )
 
 # =[Targets: GTests]== Google Test Settings
@@ -55,3 +60,6 @@ endmacro()
 radd_class_gtest(FVector2)
 radd_class_gtest(FVector3)
 radd_tclass_gtest(Array)
+radd_tclass_gtest(Arena)
+
+radd_tclass_gtest(List)
