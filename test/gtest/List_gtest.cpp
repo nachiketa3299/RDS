@@ -1,30 +1,42 @@
 #include <gtest/gtest.h>
 
-#include <cmath>
+#include <list>
 
 #include "List.hpp"
-#include "List_ConstIterator.hpp"
-#include "List_Iterator.hpp"
 
 using namespace rds;
 using namespace std;
 
-TEST(List_test, Push_Back_basic)
+TEST(List_test, STL_examples)
 {
-    List<int> a;
-    a.PushBack(1);
-    a.PushBack(2);
-    a.PushBack(3);
-    a.PushBack(4);
-    a.PushBack(5);
+    list<int> sfoo;
+    // sfoo.pop_back();
+}
+
+TEST(List_test, PushPop_Back_basic)
+{
+    List<int> foo;
+    foo.PushBack(1);
+    foo.PushBack(2);
+    foo.PushBack(3);
+    foo.PushBack(4);
+    foo.PushBack(5);
+    foo.PopBack();
+    foo.PopBack();
+}
+
+TEST(List_test, Pop_Empty)
+{
+    List<int> foo;
+    foo.PopBack();
 }
 
 TEST(List_test, Push_Front_basic)
 {
-    List<float> a;
-    a.PushFront(1.f);
-    a.PushFront(2.f);
-    a.PushFront(3.f);
-    a.PushFront(4.f);
-    a.PushFront(5.f);
+    List<float> bar;
+    bar.PushFront(1.f);
+    bar.PushFront(2.f);
+    bar.PushFront(3.f);
+    bar.PushFront(4.f);
+    bar.PushFront(5.f);
 }

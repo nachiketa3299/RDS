@@ -4,6 +4,7 @@
 #include <cstddef>
 #include <memory>
 
+#include "Assertion.h"
 #include "List_ConstIterator.hpp"
 #include "List_Iterator.hpp"
 #include "RDS_CoreDefs.h"
@@ -95,29 +96,46 @@ inline List<T>::List()
 template <typename T>
 inline void List<T>::PushBack(const T& val)
 {
-    auto& curr_last_node = *(new DNode_t(val));
-    auto& prev_back_node = *(m_sentinel_node.prev);
+    auto& new_back_node = *(new DNode_t(val));
+    auto& cur_back_node = *(m_sentinel_node.prev);
 
-    curr_last_node.prev = std::addressof(prev_back_node);
-    curr_last_node.next = std::addressof(m_sentinel_node);
+    new_back_node.prev = std::addressof(cur_back_node);
+    new_back_node.next = std::addressof(m_sentinel_node);
 
-    prev_back_node.next  = std::addressof(curr_last_node);
-    m_sentinel_node.prev = std::addressof(curr_last_node);
+    cur_back_node.next   = std::addressof(new_back_node);
+    m_sentinel_node.prev = std::addressof(new_back_node);
 
     ++m_size;
 }
 
 template <typename T>
+inline void List<T>::PopBack()
+{
+    RDS_Assert(static_cast<int>(m_size) - 1 >= 0 &&
+               "List 에 아무것도 존재하지 않으므로 Pop 할 수 없습니다.");
+
+    auto& cur_back_node = *(m_sentinel_node.prev);
+    auto& new_back_node = *(cur_back_node.prev);
+
+    m_sentinel_node.prev = cur_back_node.prev;
+    new_back_node.next   = std::addressof(m_sentinel_node);
+
+    delete std::addressof(cur_back_node);
+
+    --m_size;
+}
+
+template <typename T>
 inline void List<T>::PushFront(const Val_t& val)
 {
-    auto& curr_front_node = *(new DNode_t(val));
-    auto& prev_front_node = *(m_sentinel_node.next);
+    auto& new_front_node = *(new DNode_t(val));
+    auto& cur_front_node = *(m_sentinel_node.next);
 
-    curr_front_node.next = std::addressof(prev_front_node);
-    curr_front_node.prev = std::addressof(m_sentinel_node);
+    new_front_node.next = std::addressof(cur_front_node);
+    new_front_node.prev = std::addressof(m_sentinel_node);
 
-    m_sentinel_node.next = std::addressof(curr_front_node);
-    prev_front_node.prev = std::addressof(curr_front_node);
+    m_sentinel_node.next = std::addressof(new_front_node);
+    cur_front_node.prev  = std::addressof(new_front_node);
 
     ++m_size;
 }
