@@ -157,6 +157,40 @@ inline void List<T>::PopFront()
     --m_size;
 }
 
+template <typename T>
+inline T& List<T>::Front()
+{
+    RDS_Assert(static_cast<int>(m_size) >= 0 && "List 에 아무것도 존재하지 않습니다.");
+
+    return m_sentinel_node.next->val;
+}
+
+template <typename T>
+inline const T& List<T>::Front() const
+{
+    return const_cast<T&>(static_cast<const List&>(*this).Front());
+}
+
+template <typename T>
+inline T& List<T>::Back()
+{
+    RDS_Assert(static_cast<int>(m_size) >= 0 && "List 에 아무것도 존재하지 않습니다.");
+
+    return m_sentinel_node.prev->val;
+}
+
+template <typename T>
+inline const T& List<T>::Back() const
+{
+    return const_cast<T&>(static_cast<const List&>(*this).Front());
+}
+
+template <typename T>
+inline std::size_t List<T>::Size() const
+{
+    return m_size;
+}
+
 RDS_END;
 
 #endif // RDS_LIST_HPP
