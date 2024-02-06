@@ -7,31 +7,19 @@
 using namespace rds;
 using namespace std;
 
-TEST(List_test, STL_examples)
-{
-    list<int> sfoo;
-    // sfoo.pop_back();
-}
-
-TEST(List_test, PushPop_Back_basic)
+TEST(List_test, PopBack_Empty)
 {
     List<int> foo;
-    foo.PushBack(1);
-    foo.PushBack(2);
-    foo.PushBack(3);
-    foo.PushBack(4);
-    foo.PushBack(5);
-    foo.PopBack();
-    foo.PopBack();
+    EXPECT_DEATH(foo.PopBack(), "");
 }
 
-TEST(List_test, Pop_Empty)
+TEST(List_test, PopFront_Empty)
 {
     List<int> foo;
-    foo.PopBack();
+    EXPECT_DEATH(foo.PopFront(), "");
 }
 
-TEST(List_test, Push_Front_basic)
+TEST(List_test, PushPop_Front_basic)
 {
     List<float> bar;
     bar.PushFront(1.f);
@@ -39,4 +27,18 @@ TEST(List_test, Push_Front_basic)
     bar.PushFront(3.f);
     bar.PushFront(4.f);
     bar.PushFront(5.f);
+    bar.PopFront();
+    bar.PopFront();
+}
+
+TEST(List_test, PushPop_Back_basic)
+{
+    List<int> foo;
+    foo.PushFront(1);
+    foo.PushFront(2);
+    foo.PushFront(3);
+    foo.PushFront(4);
+    foo.PushFront(5);
+    foo.PopFront();
+    foo.PopFront();
 }

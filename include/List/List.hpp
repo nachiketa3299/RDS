@@ -117,7 +117,7 @@ inline void List<T>::PopBack()
     auto& cur_back_node = *(m_sentinel_node.prev);
     auto& new_back_node = *(cur_back_node.prev);
 
-    m_sentinel_node.prev = cur_back_node.prev;
+    m_sentinel_node.prev = std::addressof(new_back_node);
     new_back_node.next   = std::addressof(m_sentinel_node);
 
     delete std::addressof(cur_back_node);
@@ -138,6 +138,23 @@ inline void List<T>::PushFront(const Val_t& val)
     cur_front_node.prev  = std::addressof(new_front_node);
 
     ++m_size;
+}
+
+template <typename T>
+inline void List<T>::PopFront()
+{
+    RDS_Assert(static_cast<int>(m_size) - 1 >= 0 &&
+               "List 에 아무것도 존재하지 않으므로 Pop 할 수 없습니다.");
+
+    auto& cur_front_node = *(m_sentinel_node.next);
+    auto& new_front_node = *(cur_front_node.next);
+
+    m_sentinel_node.next = std::addressof(new_front_node);
+    new_front_node.prev  = std::addressof(m_sentinel_node);
+
+    delete std::addressof(cur_front_node);
+
+    --m_size;
 }
 
 RDS_END;
