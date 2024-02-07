@@ -5,6 +5,7 @@
 - (Text Editor) **Visual Studio Code**
 - (Build Automation) **CMake (3.27.0)**
 - (Compilers) **MSYS g++** / **MSVC**
+- (Static Analysis) **Clang-tidy**
 - (Test) **Google Test**
 - (Formatting) **clang-format**
 - (Document) **Doxygen**
@@ -21,6 +22,18 @@
 - 모두 `rds` 네임스페이스에 선언 및 정의되어 있음.
 - 템플릿 클래스의 경우 확장자 `*.hpp` 로 표현하며, 한 파일에 선언과 구현이 모두 들어있다.
 - 파일의 이름은 모두 파일이 보유하고 있는 클래스 이름과 정확히 일치한다.
+
+자료구조 템플릿 클래스의 경우 다음의 순으로 멤버를 정의  
+
+1. Type Alias
+2. Inner Class/Struct
+3. Ctor/Dtor
+5. Element Access
+6. Iterators
+7. Capacity
+8. Modifiers
+9. Operations
+10. Members
 
 ## Utilities
 
