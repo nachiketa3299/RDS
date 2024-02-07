@@ -16,13 +16,13 @@ RDS_BEGIN
 
 /// @brief Template class of doubly-linked list
 /// @tparam T Type of element in list.
-/// @todo Examine @p T 's initialization method. What if it does not have default ctor?
+/// @todo Examine @p _T 's initialization method. What if it does not have default ctor?
 /// (deleted default ctor)
-template <class T>
+template <class _T>
 class List
 {
 public:
-    using Val_t   = T;
+    using Val_t   = _T;
     using Size_t  = std::size_t;
     using DNode_t = Node_D<Val_t>;
 
@@ -101,15 +101,15 @@ RDS_END
 
 RDS_BEGIN
 
-template <typename T>
-inline List<T>::List()
+template <class _T>
+inline List<_T>::List()
 {
     m_sentinel_node.next = std::addressof(m_sentinel_node);
     m_sentinel_node.prev = std::addressof(m_sentinel_node);
 }
 
-template <class T>
-inline List<T>::List(std::size_t size, const T& init_val)
+template <class _T>
+inline List<_T>::List(std::size_t size, const _T& init_val)
 {
     m_sentinel_node.next = std::addressof(m_sentinel_node);
     m_sentinel_node.prev = std::addressof(m_sentinel_node);
@@ -118,8 +118,8 @@ inline List<T>::List(std::size_t size, const T& init_val)
         PushBack(init_val);
 }
 
-template <class T>
-inline List<T>::List(const std::initializer_list<T>& init_list)
+template <class _T>
+inline List<_T>::List(const std::initializer_list<_T>& init_list)
 {
     m_sentinel_node.next = std::addressof(m_sentinel_node);
     m_sentinel_node.prev = std::addressof(m_sentinel_node);
@@ -128,8 +128,8 @@ inline List<T>::List(const std::initializer_list<T>& init_list)
         PushBack(e);
 }
 
-template <typename T>
-inline List<T>::~List()
+template <class _T>
+inline List<_T>::~List()
 {
     auto* c = m_sentinel_node.next;
 
@@ -143,8 +143,8 @@ inline List<T>::~List()
     }
 }
 
-template <typename T>
-inline void List<T>::PushBack(const T& val)
+template <class _T>
+inline void List<_T>::PushBack(const _T& val)
 {
     auto& new_back_node = *(new DNode_t(val));
     auto& cur_back_node = *(m_sentinel_node.prev);
@@ -158,8 +158,8 @@ inline void List<T>::PushBack(const T& val)
     ++m_size;
 }
 
-template <typename T>
-inline void List<T>::PopBack()
+template <class _T>
+inline void List<_T>::PopBack()
 {
     RDS_Assert(static_cast<int>(m_size) - 1 >= 0 && "Cannot pop back empty list.");
 
@@ -174,8 +174,8 @@ inline void List<T>::PopBack()
     --m_size;
 }
 
-template <typename T>
-inline void List<T>::PushFront(const Val_t& val)
+template <class _T>
+inline void List<_T>::PushFront(const Val_t& val)
 {
     auto& new_front_node = *(new DNode_t(val));
     auto& cur_front_node = *(m_sentinel_node.next);
@@ -189,8 +189,8 @@ inline void List<T>::PushFront(const Val_t& val)
     ++m_size;
 }
 
-template <typename T>
-inline void List<T>::PopFront()
+template <class _T>
+inline void List<_T>::PopFront()
 {
     RDS_Assert(static_cast<int>(m_size) - 1 >= 0 && "Cannot pop front empty list.");
 
@@ -205,72 +205,72 @@ inline void List<T>::PopFront()
     --m_size;
 }
 
-template <typename T>
-inline T& List<T>::Front()
+template <class _T>
+inline _T& List<_T>::Front()
 {
     RDS_Assert(static_cast<int>(m_size) >= 0 && "Cannot access front in empty list.");
 
     return m_sentinel_node.next->val;
 }
 
-template <typename T>
-inline const T& List<T>::Front() const
+template <class _T>
+inline const _T& List<_T>::Front() const
 {
-    return const_cast<T&>(static_cast<const List&>(*this).Front());
+    return const_cast<_T&>(static_cast<const List&>(*this).Front());
 }
 
-template <typename T>
-inline T& List<T>::Back()
+template <class _T>
+inline _T& List<_T>::Back()
 {
     RDS_Assert(static_cast<int>(m_size) >= 0 && "Cannot access back in empty list.");
 
     return m_sentinel_node.prev->val;
 }
 
-template <typename T>
-inline const T& List<T>::Back() const
+template <class _T>
+inline const _T& List<_T>::Back() const
 {
-    return const_cast<T&>(static_cast<const List&>(*this).Back());
+    return const_cast<_T&>(static_cast<const List&>(*this).Back());
 }
 
-template <typename T>
-inline auto List<T>::Begin() -> Iterator
+template <class _T>
+inline auto List<_T>::Begin() -> Iterator
 {
     return Iterator(m_sentinel_node.next, this);
 }
 
-template <typename T>
-inline auto List<T>::Begin() const -> ConstIterator
+template <class _T>
+inline auto List<_T>::Begin() const -> ConstIterator
 {
     return ConstIterator(m_sentinel_node.next, this);
 }
 
-template <typename T>
-inline auto List<T>::End() -> Iterator
+template <class _T>
+inline auto List<_T>::End() -> Iterator
 {
     return Iterator(m_sentinel_node.prev, this);
 }
 
-template <typename T>
-inline auto List<T>::End() const -> ConstIterator
+template <class _T>
+inline auto List<_T>::End() const -> ConstIterator
 {
     return ConstIterator(m_sentinel_node.prev, this);
 }
 
-template <typename T>
-inline auto List<T>::CBegin() const -> ConstIterator
+template <class _T>
+inline auto List<_T>::CBegin() const -> ConstIterator
 {
     return Begin();
 }
 
-template <typename T>
-inline auto List<T>::CEnd() const -> ConstIterator
+template <class _T>
+inline auto List<_T>::CEnd() const -> ConstIterator
 {
     return End();
 }
 
-template <typename T>
-inline auto List<T>::Size() const -> Size_t
+template <class _T>
+inline auto List<_T>::Size() const -> Size_t
 {
     return m_size;
 }
