@@ -20,6 +20,7 @@ add_library(${PROJECT_NAME}
     include/Allocator/MAllocator.hpp
     include/Allocator/Allocator.hpp
     include/Arena/Arena.hpp
+    include/Node_D/Node_D.hpp
     include/List/List.hpp
     include/List/List_ConstIterator.hpp
     include/List/List_Iterator.hpp
@@ -28,7 +29,7 @@ add_library(${PROJECT_NAME}
 # Main RDS include directories
 target_include_directories(${PROJECT_NAME}
     PRIVATE src/ src/Assertion/ src/FVector2/ src/FVector3/
-    PUBLIC include/ include/Assertion/ include/FVector2/ include/FVector3/ include/Array/ include/List/ include/Allocator/ include/Arena/
+    PUBLIC include/ include/Assertion/ include/FVector2/ include/FVector3/ include/Array/ include/List/ include/Allocator/ include/Arena/ include/Node_D/
 )
 
 # =[Targets: GTests]== Google Test Settings
