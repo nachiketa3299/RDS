@@ -7,13 +7,15 @@
 
 RDS_BEGIN
 
-/// @brief 두 개의 링크를 소유한 구조체 (Double Link Node)
-template <class T>
-    requires std::default_initializable<T>
+/// @brief 두 개의 링크(자신을 향한 포인터, @p next, @p pref ) 를 소유한 구조체
+/// @tparam _T 기본 생성자가 정의되어 있는 형식
+/// @note 기본적으로 @p next 와 @p prev 는 @p nullptr 로 초기화된다.
+template <class _T>
+    requires std::default_initializable<_T>
 struct Node_D
 {
 public:
-    using Val_t = T;
+    using Val_t = _T;
 
 public:
     Node_D()
