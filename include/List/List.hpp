@@ -31,6 +31,7 @@ public:
 
 public:
     List();
+    List(Size_t size, const Val_t& init_val);
     ~List();
 
 public: // Element Access
@@ -103,6 +104,16 @@ inline List<T>::List()
 {
     m_sentinel_node.next = std::addressof(m_sentinel_node);
     m_sentinel_node.prev = std::addressof(m_sentinel_node);
+}
+
+template <class T>
+inline List<T>::List(std::size_t size, const T& init_val)
+{
+    m_sentinel_node.next = std::addressof(m_sentinel_node);
+    m_sentinel_node.prev = std::addressof(m_sentinel_node);
+
+    for (std::size_t i = 0; i < size; ++i)
+        PushBack(init_val);
 }
 
 template <typename T>

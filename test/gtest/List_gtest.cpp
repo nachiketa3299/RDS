@@ -33,6 +33,12 @@ TEST_F(IntList_test, EmptyList_PopFront)
     EXPECT_EXIT(l_empty.PopFront(), testing::ExitedWithCode(EXIT_FAILURE), "");
 }
 
+TEST(List_test, ctor_n_val)
+{
+    List<int> li(10, 10);
+    EXPECT_EQ(0, 0);
+}
+
 TEST(List_test, PushPop_Front_basic)
 {
     EXPECT_EQ(0, 0);
