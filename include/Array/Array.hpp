@@ -13,23 +13,22 @@ RDS_BEGIN
 /// @brief Static-sized array template class
 /// @tparam type of array's each element
 /// @tparam Size size of array
-template <typename T, std::size_t Size_>
+template <class _T, std::size_t Size_>
 class Array
 {
 public:
-    /// @brief Array's element type.
-    using Val_t  = T;
-    /// @brief Array's size type
+    /// @brief Element type
+    using Val_t  = _T;
     using Size_t = std::size_t;
-    using It_t   = Array_Iterator<Val_t, Size_>;
-    using CIt_t  = Array_ConstIterator<Val_t, Size_>;
 
 public:
-    /// @brief 기본 생성자
-    /// @note 쓰레기 값으로 배열이 차게 된다.
+    using Iterator      = Array_Iterator<Val_t, Size_>;
+    using ConstIterator = Array_ConstIterator<Val_t, Size_>;
+
+public:
     Array() = default;
 
-    /// @brief 복사 생성자
+    /// @brief Copy Constructor
     /// @todo see stl <array>
     Array(const Array& other)
     {
@@ -37,16 +36,9 @@ public:
             m_ptr[i] = other[i];
     }
 
-public:
-    Val_t& operator[](Size_t index)
-    {
-        return m_ptr[index];
-    }
-
-    const Val_t& operator[](Size_t index) const
-    {
-        return m_ptr[index];
-    }
+public: // Element Access
+    Val_t&       operator[](Size_t index);
+    const Val_t& operator[](Size_t index) const;
 
     Val_t& At(Size_t index)
     {
@@ -64,14 +56,17 @@ public:
     {
         return m_ptr[0];
     }
+
     const Val_t& Front() const
     {
         return m_ptr[0];
     }
+
     Val_t& Back()
     {
         return m_ptr[Size_ - 1];
     }
+
     const Val_t& Back() const
     {
         return m_ptr[Size_ - 1];
@@ -79,39 +74,39 @@ public:
 
 public:
     /// @brief 시작 지점 (index = 0) 에 대한 반복자를 생성하여 반환한다.
-    It_t Begin()
+    Iterator Begin()
     {
-        return It_t(m_ptr, 0);
+        return Iterator(m_ptr, 0);
     }
 
     /// @brief 시작 지점 (index = 0) 에 대한 상수 반복자를 생성하여 반환한다.
-    CIt_t Begin() const
+    ConstIterator Begin() const
     {
-        return CIt_t(m_ptr, 0);
+        return ConstIterator(m_ptr, 0);
     }
 
     /// @brief 끝 지점 (index = Size_) 에 대한 반복자를 생성하여 반환한다.
-    It_t End()
+    Iterator End()
     {
-        return It_t(m_ptr, Size_);
+        return Iterator(m_ptr, Size_);
     }
 
     /// @brief 끝 지점 (index = Size_) 에 대한 상수 반복자를 생성하여 반환한다.
-    CIt_t End() const
+    ConstIterator End() const
     {
-        return CIt_t(m_ptr, Size_);
+        return ConstIterator(m_ptr, Size_);
     }
 
     /// @brief 시작 지점 (index = 0) 에 대한 반복자를 생성하여 반환한다.
-    CIt_t CBegin() const
+    ConstIterator CBegin() const
     {
-        return CIt_t(m_ptr, 0);
+        return ConstIterator(m_ptr, 0);
     }
 
     /// @brief 끝 지점 (index = Size_) 에 대한 상수 반복자를 생성하여 반환한다.
-    CIt_t CEnd() const
+    ConstIterator CEnd() const
     {
-        return CIt_t(m_ptr, Size_);
+        return ConstIterator(m_ptr, Size_);
     }
 
 public:
@@ -119,10 +114,12 @@ public:
     {
         return Size_;
     }
+
     Size_t MaxSize() const
     {
         return Size_;
     }
+
     bool Empty() const
     {
         return false;
@@ -142,6 +139,22 @@ public:
         return true;
     }
 };
+
+RDS_END
+
+RDS_BEGIN
+
+template <class _T, std::size_t Size_>
+inline auto Array<_T, Size_>::operator[](Size_t index) -> Val_t&
+{
+    return const_cast<Val_t&>(static_cast<const Array&>(*this).operator[](index));
+}
+
+template <class _T, std::size_t Size_>
+inline auto Array<_T, Size_>::operator[](Size_t index) const -> const Val_t&
+{
+    return m_ptr[index];
+}
 
 RDS_END
 
