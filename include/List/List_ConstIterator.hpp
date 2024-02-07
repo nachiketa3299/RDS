@@ -15,9 +15,9 @@ template <class _List>
 class List_ConstIterator
 {
 public:
-    using Size_t  = typename _List::Size_t;
-    using Val_t   = typename _List::Val_t;
-    using DNode_t = typename _List::DNode_t;
+    using Size_t   = _List::Size_t;
+    using Val_t    = _List::Val_t;
+    using Node_D_t = _List::Node_D_t;
 
 public:
     List_ConstIterator() noexcept
@@ -25,7 +25,7 @@ public:
         , m_proxy(nullptr)
     {}
 
-    List_ConstIterator(DNode_t* pnode, const _List* plist) noexcept
+    List_ConstIterator(Node_D_t* pnode, const _List* plist) noexcept
         : m_ptr(pnode)
         , m_proxy(plist)
     {}
@@ -42,7 +42,7 @@ public:
     List_ConstIterator  operator--(int) noexcept;
 
 private:
-    DNode_t*     m_ptr;
+    Node_D_t*    m_ptr;
     const _List* m_proxy;
 };
 

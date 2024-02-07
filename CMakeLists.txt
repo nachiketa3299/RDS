@@ -68,3 +68,4 @@ radd_tclass_gtest(Array)
 radd_tclass_gtest(Arena)
 
 radd_tclass_gtest(List)
+radd_tclass_gtest(Node_D)

@@ -22,9 +22,9 @@ template <class _T>
 class List
 {
 public:
-    using Val_t   = _T;
-    using Size_t  = std::size_t;
-    using DNode_t = Node_D<Val_t>;
+    using Val_t    = _T;
+    using Size_t   = std::size_t;
+    using Node_D_t = Node_D<Val_t>;
 
 public:
     using Iterator      = List_Iterator<List>;
@@ -90,9 +90,9 @@ public: // Operations
 
 private:
     /// @brief Sentinel node as ghost head node.
-    DNode_t m_sentinel_node;
+    Node_D_t m_sentinel_node;
     /// @brief Size of list
-    Size_t  m_size{0};
+    Size_t   m_size{0};
 };
 
 RDS_END
@@ -146,7 +146,7 @@ inline List<_T>::~List()
 template <class _T>
 inline void List<_T>::PushBack(const _T& val)
 {
-    auto& new_back_node = *(new DNode_t(val));
+    auto& new_back_node = *(new Node_D_t(val));
     auto& cur_back_node = *(m_sentinel_node.prev);
 
     new_back_node.prev = std::addressof(cur_back_node);
@@ -177,7 +177,7 @@ inline void List<_T>::PopBack()
 template <class _T>
 inline void List<_T>::PushFront(const Val_t& val)
 {
-    auto& new_front_node = *(new DNode_t(val));
+    auto& new_front_node = *(new Node_D_t(val));
     auto& cur_front_node = *(m_sentinel_node.next);
 
     new_front_node.next = std::addressof(cur_front_node);

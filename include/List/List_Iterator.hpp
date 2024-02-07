@@ -11,13 +11,13 @@ template <class _List>
 class List_Iterator: public List_ConstIterator<_List>
 {
 public:
-    using Super   = List_ConstIterator<_List>;
-    using Size_t  = typename List_ConstIterator<_List>::Size_t;
-    using Val_t   = typename List_ConstIterator<_List>::Val_t;
-    using DNode_t = typename List_ConstIterator<_List>::DNode_t;
+    using Super    = List_ConstIterator<_List>;
+    using Size_t   = List_ConstIterator<_List>::Size_t;
+    using Val_t    = List_ConstIterator<_List>::Val_t;
+    using Node_D_t = List_ConstIterator<_List>::Node_D_t;
 
 public:
-    List_Iterator(DNode_t* pnode, const _List* plist) noexcept
+    List_Iterator(Node_D_t* pnode, const _List* plist) noexcept
         : Super(pnode, plist)
     {}
 
