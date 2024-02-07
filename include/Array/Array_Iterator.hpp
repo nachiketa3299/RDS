@@ -13,10 +13,10 @@ class Array_Iterator: public Array_ConstIterator<T, Size>
 {
 public:
     using Super  = Array_ConstIterator<T, Size>;
-    using Val_t  = typename Super::Val_t;
-    using Diff_t = typename Super::Diff_t;
+    using Val_t  = Super::Val_t;
+    using Diff_t = Super::Diff_t;
     using Size_t = std::size_t;
-    using Val_t   = T;
+    using Val_t  = T;
 
 public:
     /// @brief Default Constructor.
@@ -33,47 +33,56 @@ public:
     {
         return const_cast<Val_t&>(Super::operator*());
     }
+
     Val_t* operator->() const
     {
         return const_cast<Val_t*>(Super::operator->());
     }
+
     Array_Iterator& operator++()
     {
         Super::operator++();
         return *this;
     }
+
     Array_Iterator operator++(int)
     {
         const auto temp = operator*();
         Super::operator++();
         return temp;
     }
+
     Array_Iterator& operator--()
     {
         Super::operator--();
         return *this();
     }
+
     Array_Iterator operator--(int)
     {
         const auto temp = operator*();
         Super::operator--();
         return temp;
     }
+
     Array_Iterator& operator+=(const Diff_t offset)
     {
         Super::operator+=(offset);
         return *this();
     }
+
     Array_Iterator operator+(const Diff_t offset) const
     {
         auto temp = operator*();
         return temp.operator+=(offset);
     }
+
     Array_Iterator& operator-=(const Diff_t offset)
     {
         Super::operator-=(offset);
         return *this();
     }
+
     Array_Iterator operator-(const Diff_t offset)
     {
         auto temp = *this;
