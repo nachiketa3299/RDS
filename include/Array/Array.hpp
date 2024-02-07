@@ -39,18 +39,8 @@ public:
 public: // Element Access
     Val_t&       operator[](Size_t index);
     const Val_t& operator[](Size_t index) const;
-
-    Val_t& At(Size_t index)
-    {
-        RDS_Assert(index < Size_);
-        return m_ptr[index];
-    }
-
-    const Val_t& At(Size_t index) const
-    {
-        RDS_Assert(index < Size_);
-        return m_ptr[index];
-    }
+    Val_t&       At(Size_t index);
+    const Val_t& At(Size_t index) const;
 
     Val_t& Front()
     {
@@ -154,6 +144,20 @@ template <class _T, std::size_t Size_>
 inline auto Array<_T, Size_>::operator[](Size_t index) const -> const Val_t&
 {
     return m_ptr[index];
+}
+
+template <class _T, std::size_t Size_>
+inline auto Array<_T, Size_>::At(Size_t index) -> Val_t&
+{
+    RDS_Assert(index < Size_);
+    return const_cast<Val_t&>(static_cast<const Array&>(*this).operator[](index));
+}
+
+template <class _T, std::size_t Size_>
+inline auto Array<_T, Size_>::At(Size_t index) const -> const Val_t&
+{
+    RDS_Assert(index < Size_);
+    return operator[](index);
 }
 
 RDS_END
