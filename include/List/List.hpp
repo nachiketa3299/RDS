@@ -101,8 +101,8 @@ RDS_BEGIN
 template <typename T>
 inline List<T>::List()
 {
-    m_sentinel_node.next = addressof(m_sentinel_node);
-    m_sentinel_node.prev = addressof(m_sentinel_node);
+    m_sentinel_node.next = std::addressof(m_sentinel_node);
+    m_sentinel_node.prev = std::addressof(m_sentinel_node);
 }
 
 template <typename T>
