@@ -212,31 +212,29 @@ inline void List<_T>::PopFront()
 }
 
 template <class _T>
-inline _T& List<_T>::Front()
-{
-    RDS_Assert(static_cast<int>(m_size) >= 0 && "Cannot access front in empty list.");
-
-    return m_sentinel_node.next->val;
-}
-
-template <class _T>
-inline const _T& List<_T>::Front() const
+inline auto List<_T>::Front() -> _T&
 {
     return const_cast<_T&>(static_cast<const List&>(*this).Front());
 }
 
 template <class _T>
-inline _T& List<_T>::Back()
+inline auto List<_T>::Front() const -> const _T&
 {
-    RDS_Assert(static_cast<int>(m_size) >= 0 && "Cannot access back in empty list.");
-
-    return m_sentinel_node.prev->val;
+    RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access front in empty list.");
+    return m_sentinel_node.next->val;
 }
 
 template <class _T>
-inline const _T& List<_T>::Back() const
+inline auto List<_T>::Back() -> _T&
 {
     return const_cast<_T&>(static_cast<const List&>(*this).Back());
+}
+
+template <class _T>
+inline auto List<_T>::Back() const -> const _T&
+{
+    RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access back in empty list.");
+    return m_sentinel_node.prev->val;
 }
 
 template <class _T>
@@ -254,13 +252,13 @@ inline auto List<_T>::Begin() const -> ConstIterator
 template <class _T>
 inline auto List<_T>::End() -> Iterator
 {
-    return Iterator(m_sentinel_node.prev, this);
+    return Iterator(std::addressof(m_sentinel_node), this);
 }
 
 template <class _T>
 inline auto List<_T>::End() const -> ConstIterator
 {
-    return ConstIterator(m_sentinel_node.prev, this);
+    return ConstIterator(std::addressof(m_sentinel_node), this);
 }
 
 template <class _T>

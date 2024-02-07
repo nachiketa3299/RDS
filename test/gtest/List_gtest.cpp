@@ -33,6 +33,17 @@ TEST_F(EmptyList, PopFront)
     EXPECT_EXIT(l_empty.PopFront(), testing::ExitedWithCode(EXIT_FAILURE), "");
 }
 
+TEST_F(EmptyList, Begin)
+{
+    list<int> li;
+    auto      bit = li.begin();
+    auto      eit = li.end();
+    li.push_back(10);
+
+    auto pbit = li.begin();
+    auto peit = li.end();
+}
+
 // Modifiers
 
 TEST(List_modifiers, PushPop_Front_basic)
