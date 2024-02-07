@@ -1,5 +1,5 @@
-#ifndef RDS_LIST_ITERATOR
-#define RDS_LIST_ITERATOR
+#ifndef RDS_LIST_ITERATOR_HPP
+#define RDS_LIST_ITERATOR_HPP
 
 #include "RDS_CoreDefs.h"
 
@@ -60,7 +60,7 @@ inline auto List_Iterator<_List>::operator++() noexcept -> List_Iterator&
 template <typename _List>
 inline auto List_Iterator<_List>::operator++(int) noexcept -> List_Iterator
 {
-    auto temp = *tis;
+    auto temp = *this;
     operator++();
     return temp;
 }
@@ -82,4 +82,4 @@ inline auto List_Iterator<_List>::operator--(int) noexcept -> List_Iterator
 
 RDS_END
 
-#endif // RDS_LIST_ITERATOR
+#endif // RDS_LIST_ITERATOR_HPP
