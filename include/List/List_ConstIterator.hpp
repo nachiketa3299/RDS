@@ -15,8 +15,8 @@ template <class _List>
 class List_ConstIterator
 {
 public:
-    using Size_t   = _List::Size_t;
     using Val_t    = _List::Val_t;
+    using Size_t   = _List::Size_t;
     using Node_D_t = _List::Node_D_t;
 
 public:
@@ -47,6 +47,8 @@ private:
 };
 
 RDS_END
+
+// IMPLEMENTATIONS //
 
 RDS_BEGIN
 

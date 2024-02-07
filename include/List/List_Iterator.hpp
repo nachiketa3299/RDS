@@ -12,8 +12,8 @@ class List_Iterator: public List_ConstIterator<_List>
 {
 public:
     using Super    = List_ConstIterator<_List>;
-    using Size_t   = List_ConstIterator<_List>::Size_t;
     using Val_t    = List_ConstIterator<_List>::Val_t;
+    using Size_t   = List_ConstIterator<_List>::Size_t;
     using Node_D_t = List_ConstIterator<_List>::Node_D_t;
 
 public:
@@ -34,7 +34,7 @@ public:
 
 RDS_END
 
-// IMPLEMTATIONS //
+// IMPLEMENTATIONS //
 
 RDS_BEGIN
 
