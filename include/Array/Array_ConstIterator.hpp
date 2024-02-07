@@ -29,6 +29,7 @@ public:
         : m_head{nullptr}
         , m_offset{0}
     {}
+
     /// @brief Constructor gets head pointer from an array and index
     Array_ConstIterator(const Val_t* head, Size_t index = 0)
         : m_head(head)
@@ -47,6 +48,7 @@ private:
         if (offset > 0)
             RDS_Assert(Size - m_offset >= static_cast<Size_t>(offset));
     }
+
     void isCompatible(const Array_ConstIterator& other) const
     {
         RDS_Assert(m_head == other.m_head);
@@ -59,6 +61,7 @@ public:
     {
         return *(operator->());
     }
+
     const Val_t* operator->() const
     {
         RDS_Assert(m_head != nullptr);
@@ -74,6 +77,7 @@ public:
         ++m_offset;
         return *this;
     }
+
     /// @brief Postfix increment
     Array_ConstIterator operator++(int)
     {
@@ -81,12 +85,14 @@ public:
         operator++();
         return temp;
     }
+
     /// @brief Prefix decrement
     Array_ConstIterator& operator--()
     {
         --m_offset;
         return *this;
     }
+
     /// @brief Postfix decrement
     Array_ConstIterator operator--(int)
     {
@@ -102,49 +108,59 @@ public:
         m_offset += static_cast<Size_t>(offset);
         return *this;
     }
+
     Array_ConstIterator operator+(const Diff_t& offset) const
     {
         auto temp = *this;
         return temp.operator+=(offset);
     }
+
     Array_ConstIterator& operator-=(const Diff_t& offset)
     {
         verifyOffset(offset);
         m_offset -= static_cast<Size_t>(offset);
         return *this;
     }
+
     Array_ConstIterator operator-(const Diff_t& offset) const
     {
         auto temp = operator*();
         return temp.operator-=(offset);
     }
+
     Diff_t operator-(const Array_ConstIterator& other) const
     {
         isCompatible(other);
         return static_cast<Diff_t>(m_offset - other.m_offset);
     }
+
     bool operator==(const Array_ConstIterator& other) const
     {
         isCompatible(other);
         return m_offset == other.m_offset;
     }
+
     bool operator!=(const Array_ConstIterator& other) const
     {
         return !(operator==(other));
     }
+
     bool operator<(const Array_ConstIterator& other) const
     {
         isCompatible(other);
         return m_offset < other.m_offset;
     }
+
     bool operator>(const Array_ConstIterator& other) const
     {
         return other.operator<(*this);
     }
+
     bool operator<=(const Array_ConstIterator& other) const
     {
         return !operator>(other);
     }
+
     bool operator>=(const Array_ConstIterator& other) const
     {
         return !operator<(other);
