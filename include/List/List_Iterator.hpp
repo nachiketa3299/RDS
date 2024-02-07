@@ -10,6 +10,8 @@ RDS_BEGIN
 template <class _List>
 class List_Iterator: public List_ConstIterator<_List>
 {
+    friend _List;
+
 public:
     using Super    = List_ConstIterator<_List>;
     using Val_t    = List_ConstIterator<_List>::Val_t;

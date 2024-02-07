@@ -14,6 +14,8 @@ RDS_BEGIN
 template <class _List>
 class List_ConstIterator
 {
+    friend _List;
+
 public:
     using Val_t    = _List::Val_t;
     using Size_t   = _List::Size_t;

@@ -59,7 +59,13 @@ public: // Capacity
 
 public: // Modifiers
     void Clear();
-    void Insert();
+
+    /// @brief 반복자 @p it_pos 가 가리키는 위치에 @p val 을 삽입한다.
+    void Insert(Iterator it_pos, const Val_t& val);
+
+    /// @brief 반복자 @p it_pos 가 가리키는 위치에 @p val 을 @p count 개 삽입한다.
+    void Insert(Iterator it_pos, Size_t count, const Val_t& val);
+
     void Erase();
 
     /// @brief Push @p val in back of this list.
@@ -97,7 +103,7 @@ private:
 
 RDS_END
 
-// IMPLEMNTATIONS //
+// IMPLEMENTATIONS //
 
 RDS_BEGIN
 
@@ -273,6 +279,37 @@ template <class _T>
 inline auto List<_T>::Size() const -> Size_t
 {
     return m_size;
+}
+
+template <class _T>
+inline auto List<_T>::Insert(Iterator it_pos, const Val_t& val) -> void
+{
+    RDS_Assert(it_pos.m_proxy == this && "List is not compatible.");
+
+    /*
+     * >> Before Inserting:
+                                it_pos.m_ptr
+                                    ↓
+    ...<-p-[prev_node]-n-><-p-[ins_node]-n-><-p-[next_node]-n->...
+
+     * >> After Inserting:
+                                                it_pos.m_ptr
+                                                    ↓
+    ...<-p-[prev_node]-n-><-p-[new_node]-n-><-p-[ins_node]-n-><-p-[next_node]-n->...
+    */
+
+    auto* new_node_ptr = new Node_D_t(val);
+
+    auto* ins_node_ptr  = it_pos.m_ptr;
+    auto* prev_node_ptr = ins_node_ptr->prev;
+
+    new_node_ptr->prev = prev_node_ptr;
+    new_node_ptr->next = ins_node_ptr;
+
+    prev_node_ptr->next = new_node_ptr;
+    ins_node_ptr->prev  = new_node_ptr;
+
+    m_size++;
 }
 
 RDS_END;

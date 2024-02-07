@@ -51,6 +51,35 @@ TEST(List_modifiers, Front_const)
     EXPECT_EQ(0, 0);
 }
 
+TEST(ListModifiers, InsertItVal)
+{
+    List<int> li = {0, 1, 2, 3};
+
+    auto it = li.Begin();
+
+    it.operator++();
+    it.operator++(); // indx 2
+
+    li.Insert(it, 99);
+
+    auto pit = li.Begin();
+    pit.operator++();
+    pit.operator++();
+
+    EXPECT_EQ(pit.operator*(), (it.operator--()).operator*());
+}
+
+TEST(ListModifiers, InsertItValConsecutive)
+{
+    List<int> li = {0, 1};
+    auto      it = li.End();
+    li.Insert(it.operator--(), 99);
+    li.Insert(it, 100);
+    li.Insert(it, 101);
+    li.Insert(it, 102);
+    li.Insert(it, 103);
+}
+
 // Element Access
 
 class FList_element_access: public ::testing::Test
