@@ -2,6 +2,7 @@
 #define RDS_LIST_HPP
 
 #include <cstddef>
+#include <initializer_list>
 #include <memory>
 
 #include "Assertion.h"
@@ -32,6 +33,7 @@ public:
 public:
     List();
     List(Size_t size, const Val_t& init_val);
+    List(const std::initializer_list<Val_t>& init_list);
     ~List();
 
 public: // Element Access
@@ -114,6 +116,16 @@ inline List<T>::List(std::size_t size, const T& init_val)
 
     for (std::size_t i = 0; i < size; ++i)
         PushBack(init_val);
+}
+
+template <class T>
+inline List<T>::List(const std::initializer_list<T>& init_list)
+{
+    m_sentinel_node.next = std::addressof(m_sentinel_node);
+    m_sentinel_node.prev = std::addressof(m_sentinel_node);
+
+    for (const auto& e: init_list)
+        PushBack(e);
 }
 
 template <typename T>
