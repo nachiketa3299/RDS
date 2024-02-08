@@ -1,6 +1,8 @@
 # **RDS** <sub>*Data Structures & Algorithms in C++*</sub>
 
-**사용 도구**
+계획 및 일지는 [여기](.\docs\mds\Plans.md)를 참조
+
+## Tools
 
 - (Text Editor) **Visual Studio Code**
 - (Build Automation) **CMake (3.27.0)**
@@ -10,20 +12,13 @@
 - (Formatting) **clang-format**
 - (Document) **Doxygen**
 
-# Plans
-
-- [ ] Doxygen 사용 설정
-- [X] `Vector2`, `Vector3` 클래스의 이름을 `FVector2`, `FVector3`으로 바꿀 것
-    - 동적 배열 클래스 이름을 `Vector`로 할 거라서 이름이 겹칠 위험이 있음.
-    - 의미적으로도 `float` 형을 2, 3개 모아둔 자료형이니 접두어 `F`를 붙이는게 맞을 듯.
-
 # Implemenation
 
 - 모두 `rds` 네임스페이스에 선언 및 정의되어 있음.
 - 템플릿 클래스의 경우 확장자 `*.hpp` 로 표현하며, 한 파일에 선언과 구현이 모두 들어있다.
 - 파일의 이름은 모두 파일이 보유하고 있는 클래스 이름과 정확히 일치한다.
 
-자료구조 템플릿 클래스의 경우 다음의 순으로 멤버를 정의  
+컨테이너 템플릿 클래스의 경우 다음의 순으로 멤버를 정의  
 
 1. Type Alias
 2. Inner Class/Struct
@@ -43,22 +38,6 @@
 - [X] [Assertion.cpp](/src/Assertion/Assertion.cpp)
 
 ## Data Structures
-
-### (Ref) Iterator Categories
-
-| Container | Iterator Category |
-| :-: | :-:|
-| Vector | Random-Access |
-| List | Bidirectional |
-| Deque | Random-Access |
-| Map | Bidirectional |
-| Multimap | Bidirectional |
-| Set | Bidirectional |
-| MultiSet | Bidirectional |
-| Stack | None |
-| Queue | None |
-| Priority-Queue | None |
-
 
 ### Vector2
 
