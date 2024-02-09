@@ -14,15 +14,15 @@
 
 RDS_BEGIN
 
-/// @brief Template class of doubly-linked list
-/// @tparam T Type of element in list.
-/// @todo Examine @p _T 's initialization method. What if it does not have default ctor?
-/// (deleted default ctor)
-template <class _T>
+/// @brief 동적 이중 연결 리스트에 대한 템플릿 클래스
+/// @tparam T_t 리스트 내 원소에 대한 자료형
+template <class T_t>
 class List
 {
-public:
-    using Val_t    = _T;
+    friend List_ConstIterator<T_t>;
+
+public: // Type Aliases
+    using Val_t    = T_t;
     using Size_t   = std::size_t;
     using Node_D_t = Node_D<Val_t>;
 
@@ -30,7 +30,7 @@ public:
     using Iterator      = List_Iterator<List>;
     using ConstIterator = List_ConstIterator<List>;
 
-public:
+public: // Ctor Dtor
     List();
     List(Size_t size, const Val_t& init_val);
     List(const std::initializer_list<Val_t>& init_list);
@@ -61,10 +61,10 @@ public: // Modifiers
     void Clear();
 
     /// @brief 반복자 @p it_pos 가 가리키는 위치에 @p val 을 삽입한다.
-    void Insert(Iterator it_pos, const Val_t& val);
+    void InsertBefore(Iterator it_pos, const Val_t& val);
 
     /// @brief 반복자 @p it_pos 가 가리키는 위치에 @p val 을 @p count 개 삽입한다.
-    void Insert(Iterator it_pos, Size_t count, const Val_t& val);
+    void InsertBefore(Iterator it_pos, Size_t count, const Val_t& val);
 
     void Erase();
 
@@ -107,15 +107,15 @@ RDS_END
 
 RDS_BEGIN
 
-template <class _T>
-inline List<_T>::List()
+template <class T_t>
+List<T_t>::List()
 {
     m_sentinel_node.next = std::addressof(m_sentinel_node);
     m_sentinel_node.prev = std::addressof(m_sentinel_node);
 }
 
-template <class _T>
-inline List<_T>::List(std::size_t size, const _T& init_val)
+template <class T_t>
+List<T_t>::List(std::size_t size, const T_t& init_val)
 {
     m_sentinel_node.next = std::addressof(m_sentinel_node);
     m_sentinel_node.prev = std::addressof(m_sentinel_node);
@@ -124,8 +124,8 @@ inline List<_T>::List(std::size_t size, const _T& init_val)
         PushBack(init_val);
 }
 
-template <class _T>
-inline List<_T>::List(const std::initializer_list<_T>& init_list)
+template <class T_t>
+List<T_t>::List(const std::initializer_list<T_t>& init_list)
 {
     m_sentinel_node.next = std::addressof(m_sentinel_node);
     m_sentinel_node.prev = std::addressof(m_sentinel_node);
@@ -134,23 +134,22 @@ inline List<_T>::List(const std::initializer_list<_T>& init_list)
         PushBack(e);
 }
 
-template <class _T>
-inline List<_T>::~List()
+template <class T_t>
+List<T_t>::~List()
 {
-    auto* c = m_sentinel_node.next;
-
-    // `delete` allocated nodes while iterate all nodes after sentinel node
-    while (c != std::addressof(m_sentinel_node))
+    auto* ptr = m_sentinel_node.next;
+    // 센티넬 노드 다음부터 시작하여 센티넬 노드까지 순회하며 메모리 해제
+    while (ptr != std::addressof(m_sentinel_node))
     {
-        auto* ct = c;
-        c        = c->next;
+        auto* to_delete = ptr;
+        ptr             = ptr->next;
 
-        delete ct;
+        delete to_delete;
     }
 }
 
-template <class _T>
-inline void List<_T>::PushBack(const _T& val)
+template <class T_t>
+void List<T_t>::PushBack(const T_t& val)
 {
     auto& new_back_node = *(new Node_D_t(val));
     auto& cur_back_node = *(m_sentinel_node.prev);
@@ -164,8 +163,8 @@ inline void List<_T>::PushBack(const _T& val)
     ++m_size;
 }
 
-template <class _T>
-inline void List<_T>::PopBack()
+template <class T_t>
+void List<T_t>::PopBack()
 {
     RDS_Assert(static_cast<int>(m_size) - 1 >= 0 && "Cannot pop back empty list.");
 
@@ -180,8 +179,8 @@ inline void List<_T>::PopBack()
     --m_size;
 }
 
-template <class _T>
-inline void List<_T>::PushFront(const Val_t& val)
+template <class T_t>
+void List<T_t>::PushFront(const Val_t& val)
 {
     auto& new_front_node = *(new Node_D_t(val));
     auto& cur_front_node = *(m_sentinel_node.next);
@@ -195,8 +194,8 @@ inline void List<_T>::PushFront(const Val_t& val)
     ++m_size;
 }
 
-template <class _T>
-inline void List<_T>::PopFront()
+template <class T_t>
+void List<T_t>::PopFront()
 {
     RDS_Assert(static_cast<int>(m_size) - 1 >= 0 && "Cannot pop front empty list.");
 
@@ -211,94 +210,95 @@ inline void List<_T>::PopFront()
     --m_size;
 }
 
-template <class _T>
-inline auto List<_T>::Front() -> _T&
+template <class T_t>
+auto List<T_t>::Front() -> T_t&
 {
-    return const_cast<_T&>(static_cast<const List&>(*this).Front());
+    return const_cast<T_t&>(static_cast<const List&>(*this).Front());
 }
 
-template <class _T>
-inline auto List<_T>::Front() const -> const _T&
+template <class T_t>
+auto List<T_t>::Front() const -> const T_t&
 {
     RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access front in empty list.");
     return m_sentinel_node.next->val;
 }
 
-template <class _T>
-inline auto List<_T>::Back() -> _T&
+template <class T_t>
+auto List<T_t>::Back() -> T_t&
 {
-    return const_cast<_T&>(static_cast<const List&>(*this).Back());
+    return const_cast<T_t&>(static_cast<const List&>(*this).Back());
 }
 
-template <class _T>
-inline auto List<_T>::Back() const -> const _T&
+template <class T_t>
+auto List<T_t>::Back() const -> const T_t&
 {
     RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access back in empty list.");
     return m_sentinel_node.prev->val;
 }
 
-template <class _T>
-inline auto List<_T>::Begin() -> Iterator
+template <class T_t>
+auto List<T_t>::Begin() -> Iterator
 {
-    return Iterator(m_sentinel_node.next, this);
+    return Iterator(this, m_sentinel_node.next);
 }
 
-template <class _T>
-inline auto List<_T>::Begin() const -> ConstIterator
+template <class T_t>
+auto List<T_t>::Begin() const -> ConstIterator
 {
-    return ConstIterator(m_sentinel_node.next, this);
+    return ConstIterator(this, m_sentinel_node.next);
 }
 
-template <class _T>
-inline auto List<_T>::End() -> Iterator
+template <class T_t>
+auto List<T_t>::End() -> Iterator
 {
-    return Iterator(std::addressof(m_sentinel_node), this);
+    return Iterator(this, std::addressof(m_sentinel_node));
 }
 
-template <class _T>
-inline auto List<_T>::End() const -> ConstIterator
+template <class T_t>
+auto List<T_t>::End() const -> ConstIterator
 {
-    return ConstIterator(std::addressof(m_sentinel_node), this);
+    return ConstIterator(this, std::addressof(m_sentinel_node));
 }
 
-template <class _T>
-inline auto List<_T>::CBegin() const -> ConstIterator
+template <class T_t>
+auto List<T_t>::CBegin() const -> ConstIterator
 {
     return Begin();
 }
 
-template <class _T>
-inline auto List<_T>::CEnd() const -> ConstIterator
+template <class T_t>
+auto List<T_t>::CEnd() const -> ConstIterator
 {
     return End();
 }
 
-template <class _T>
-inline auto List<_T>::Size() const -> Size_t
+template <class T_t>
+auto List<T_t>::Size() const -> Size_t
 {
     return m_size;
 }
 
-template <class _T>
-inline auto List<_T>::Insert(Iterator it_pos, const Val_t& val) -> void
+template <class T_t>
+auto List<T_t>::InsertBefore(Iterator it_pos, const Val_t& val) -> void
 {
     RDS_Assert(it_pos.m_proxy == this && "List is not compatible.");
 
     /*
      * >> Before Inserting:
-                                it_pos.m_ptr
+                                it_pos.node_ptr
                                     ↓
     ...<-p-[prev_node]-n-><-p-[ins_node]-n-><-p-[next_node]-n->...
 
      * >> After Inserting:
-                                                it_pos.m_ptr
+                                                it_pos.node_ptr
                                                     ↓
     ...<-p-[prev_node]-n-><-p-[new_node]-n-><-p-[ins_node]-n-><-p-[next_node]-n->...
     */
 
     auto* new_node_ptr = new Node_D_t(val);
 
-    auto* ins_node_ptr  = it_pos.m_ptr;
+    /// @todo List_ConstIterator 를 friend 선언하고 멤버에 직접 접근하는게 맞나?
+    auto* ins_node_ptr  = it_pos.node_ptr;
     auto* prev_node_ptr = ins_node_ptr->prev;
 
     new_node_ptr->prev = prev_node_ptr;
@@ -307,7 +307,7 @@ inline auto List<_T>::Insert(Iterator it_pos, const Val_t& val) -> void
     prev_node_ptr->next = new_node_ptr;
     ins_node_ptr->prev  = new_node_ptr;
 
-    m_size++;
+    ++m_size;
 }
 
 RDS_END;
