@@ -41,13 +41,10 @@ public:
         ::operator delete(ptr, count);
     }
 
-    Allocate()
-    {}
-
-    template <class Obj_t, class... _T>
-    void Construct(Obj_t* const ptr, _T&&... _Args)
+    template <class Obj_t, class... T_t>
+    void Construct(Obj_t* const ptr, T_t&&... _Args)
     {
-        ::new (ptr) Obj_t(std::forward<_T>(_Args)...);
+        ::new (ptr) Obj_t(std::forward<T_t>(_Args)...);
     }
 
 private:
