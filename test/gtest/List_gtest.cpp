@@ -26,10 +26,16 @@ template <typename T_t>
 struct TemplatedStruct { T_t val; };
 struct PlainStruct{ int a, b; };
 
+// clang-format on
+
 TEST(Ctor, InitializerList_CustomTypes)
 {
     List<PlainStruct> ct_empty{};
-    List<PlainStruct> ct_non_empty{{1, 1}, {2, 2}, {3, 3}};
+    List<PlainStruct> ct_non_empty{
+        {1, 1},
+        {2, 2},
+        {3, 3}
+    };
 }
 
 TEST(Ctor, InitializerList_TemplateTypes)

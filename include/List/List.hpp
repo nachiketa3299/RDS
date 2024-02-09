@@ -21,8 +21,6 @@ RDS_BEGIN
 template <class T_t>
 class List
 {
-    friend List_ConstIterator<T_t>;
-
 public: // Type Aliases
     /// @brief 리스트 내 원소에 대한 자료형
     using Val_t    = T_t;
@@ -208,16 +206,7 @@ List<T_t>::~List()
 template <class T_t>
 void List<T_t>::PushBack(const T_t& val)
 {
-    auto& new_back_node = *(new Node_D_t(val));
-    auto& cur_back_node = *(m_sentinel_node.prev);
-
-    new_back_node.prev = std::addressof(cur_back_node);
-    new_back_node.next = std::addressof(m_sentinel_node);
-
-    cur_back_node.next   = std::addressof(new_back_node);
-    m_sentinel_node.prev = std::addressof(new_back_node);
-
-    ++m_size;
+    InsertBefore(End(), val);
 }
 
 template <class T_t>
@@ -239,16 +228,7 @@ void List<T_t>::PopBack()
 template <class T_t>
 void List<T_t>::PushFront(const Val_t& val)
 {
-    auto& new_front_node = *(new Node_D_t(val));
-    auto& cur_front_node = *(m_sentinel_node.next);
-
-    new_front_node.next = std::addressof(cur_front_node);
-    new_front_node.prev = std::addressof(m_sentinel_node);
-
-    m_sentinel_node.next = std::addressof(new_front_node);
-    cur_front_node.prev  = std::addressof(new_front_node);
-
-    ++m_size;
+    InsertBefore(Begin(), val);
 }
 
 template <class T_t>
@@ -344,24 +324,23 @@ auto List<T_t>::Size() const -> Size_t
 template <class T_t>
 auto List<T_t>::InsertBefore(Iterator it_pos, const Val_t& val) -> void
 {
-    RDS_Assert(it_pos.m_proxy == this && "List is not compatible.");
+    RDS_Assert(it_pos.IsCompatible(*this) && "List is not compatible.");
 
     /*
      * >> Before Inserting:
-                                it_pos.node_ptr
+                                it_pos.m_node_ptr
                                     ↓
     ...<-p-[prev_node]-n-><-p-[ins_node]-n-><-p-[next_node]-n->...
 
      * >> After Inserting:
-                                                it_pos.node_ptr
+                                                it_pos.m_node_ptr
                                                     ↓
     ...<-p-[prev_node]-n-><-p-[new_node]-n-><-p-[ins_node]-n-><-p-[next_node]-n->...
     */
 
     auto* new_node_ptr = new Node_D_t(val);
 
-    /// @todo List_ConstIterator 를 friend 선언하고 멤버에 직접 접근하는게 맞나?
-    auto* ins_node_ptr  = it_pos.node_ptr;
+    auto* ins_node_ptr  = it_pos.GetNodePointer();
     auto* prev_node_ptr = ins_node_ptr->prev;
 
     new_node_ptr->prev = prev_node_ptr;

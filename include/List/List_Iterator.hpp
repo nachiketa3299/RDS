@@ -16,8 +16,6 @@ RDS_BEGIN
 template <class List_t>
 class List_Iterator: public List_ConstIterator<List_t>
 {
-    friend List_t;
-
 public:
     /// @brief 이 반복자의 기초 클래스
     using Super    = List_ConstIterator<List_t>;
@@ -59,6 +57,13 @@ public:
     List_Iterator& operator--() noexcept;
     /// @copydoc List_ConstIterator::operator--(int)
     List_Iterator  operator--(int) noexcept;
+
+public:
+    /// @brief 이 반복자가 가리키는 노드의 포인터를 반환한다.
+    /// @return 이 반복자가 가리키는 리스트 내 노드의 포인터
+    /// @details \ref List_ConstIterator 의 \ref m_node_ptr 을 상수성을 제거하여
+    /// 반환한다.
+    Node_D_t* GetNodePointer() const;
 };
 
 RDS_END
@@ -113,6 +118,12 @@ auto List_Iterator<List_t>::operator--(int) noexcept -> List_Iterator
     auto temp = *this;
     operator--();
     return temp;
+}
+
+template <class List_t>
+auto List_Iterator<List_t>::GetNodePointer() const -> Node_D_t*
+{
+    return const_cast<Node_D_t*>(Super::m_node_ptr);
 }
 
 RDS_END

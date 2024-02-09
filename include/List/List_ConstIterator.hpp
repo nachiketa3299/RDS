@@ -15,13 +15,11 @@ RDS_BEGIN
 /// @brief \ref List 컨테이너에 대한 상수 반복자 템플릿 클래스
 /// @tparam List_t 이 상수 반복자가 가리킬 리스트의 자료형
 /// @details 양방향 반복자(Bidirectional Iterator) 이며, 기본적으로 이 상수 반복자가
-/// 가리키는 리스트와 리스트 내부 노드를 포인터(\ref node_ptr, \ref m_proxy)로 저장하고
-/// 있다.
+/// 가리키는 리스트와 리스트 내부 노드를 포인터(\ref m_node_ptr, \ref m_proxy)로
+/// 저장하고 있다.
 template <class List_t>
 class List_ConstIterator
 {
-    friend List_t;
-
 public:
     /// @brief 이 상수 반복자가 가리키는 리스트 원소의 자료형
     using Val_t    = typename List_t::Val_t;
@@ -94,12 +92,17 @@ public:
     List_ConstIterator  operator--(int) noexcept;
 
 public:
-    /// @brief 이 상수 반복자가 가리키는 리스트 내 노드에 대한 상수 포인터
-    const Node_D_t* node_ptr{nullptr};
+    /// @brief 인자로 전달된 리스트에 대한 참조가 이 상수 반복자가 가리키는 리스트와
+    /// 호환되는지 확인한다.
+    /// @param list 이 반복자와 호환성을 확인할 리스트
+    /// @return 호환성 여부. 호환이 되는 경우 true, 그렇지 않으면 false
+    bool IsCompatible(const List_t& list) const;
 
-private:
+protected:
+    /// @brief 이 상수 반복자가 가리키는 리스트 내 노드에 대한 상수 포인터
+    const Node_D_t* m_node_ptr{nullptr};
     /// @brief 반복자가 가리키는 리스트에 대한 상수 포인터
-    const List_t* m_proxy{nullptr};
+    const List_t*   m_proxy{nullptr};
 };
 
 RDS_END
@@ -111,14 +114,14 @@ RDS_BEGIN
 template <class List_t>
 List_ConstIterator<List_t>::List_ConstIterator(const List_t*   list_ptr,
                                                const Node_D_t* node_pos_ptr) noexcept
-    : node_ptr(node_pos_ptr)
+    : m_node_ptr(node_pos_ptr)
     , m_proxy(list_ptr)
 {}
 
 template <class List_t>
 auto List_ConstIterator<List_t>::operator*() const noexcept -> const Val_t&
 {
-    return node_ptr->val;
+    return m_node_ptr->val;
 }
 
 template <typename List_t>
@@ -131,10 +134,10 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator++() noexcept -> List_ConstIterator<List_t>&
 {
     // 현재 노드가 센티넬 노드가 아닌 경우에만 증가 연산을 수행한다.
-    RDS_Assert(node_ptr != std::addressof(m_proxy->GetSentinel()) &&
+    RDS_Assert(m_node_ptr != std::addressof(m_proxy->GetSentinel()) &&
                "Cannot increment end iterator.");
 
-    node_ptr = node_ptr->next;
+    m_node_ptr = m_node_ptr->next;
     return *this;
 }
 
@@ -142,11 +145,11 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator++(int) noexcept -> List_ConstIterator<List_t>
 {
     // 현재 노드가 센티넬 노드가 아닌 경우에만 증가 연산을 수행한다.
-    RDS_Assert(node_ptr != std::addressof(m_proxy->GetSentinel()) &&
+    RDS_Assert(m_node_ptr != std::addressof(m_proxy->GetSentinel()) &&
                "Cannot increment end iterator.");
 
-    auto temp = *this;
-    node_ptr  = node_ptr->next;
+    auto temp  = *this;
+    m_node_ptr = m_node_ptr->next;
     return temp;
 }
 
@@ -154,10 +157,10 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator--() noexcept -> List_ConstIterator<List_t>&
 {
     // 이전 노드가 센티넬 노드가 아닌 경우에만 감소 연산을 수행한다.
-    RDS_Assert(node_ptr->prev != std::addressof(m_proxy->GetSentinel()) &&
+    RDS_Assert(m_node_ptr->prev != std::addressof(m_proxy->GetSentinel()) &&
                "Cannot decrement begin iterator.");
 
-    node_ptr = node_ptr->prev;
+    m_node_ptr = m_node_ptr->prev;
     return *this;
 }
 
@@ -165,12 +168,18 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator--(int) noexcept -> List_ConstIterator<List_t>
 {
     // 이전 노드가 센티넬 노드가 아닌 경우에만 감소 연산을 수행한다.
-    RDS_Assert(node_ptr->prev != std::addressof(m_proxy->GetSentinel()) &&
+    RDS_Assert(m_node_ptr->prev != std::addressof(m_proxy->GetSentinel()) &&
                "Cannot decrement begin iterator.");
 
-    auto temp = *this;
-    node_ptr  = node_ptr->prev;
+    auto temp  = *this;
+    m_node_ptr = m_node_ptr->prev;
     return temp;
+}
+
+template <class List_t>
+auto List_ConstIterator<List_t>::IsCompatible(const List_t& list) const -> bool
+{
+    return std::addressof(list) == m_proxy;
 }
 
 RDS_END
