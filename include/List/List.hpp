@@ -117,7 +117,15 @@ public: // Modifiers
     /// @param[in] count 삽입할 원소의 갯수
     void InsertBefore(Iterator it_pos, Size_t count, const Val_t& val);
 
-    void Erase();
+    /// @brief 인자로 전달된 반복자가 가리키는 위치에 있는 원소를 제거한다.
+    /// @param[in] it_pos 삭제할 위치를 가리키는 반복자. 정확히 이 위치에 있는 원소가
+    /// 삭제된다.
+    /// @test @ref List_Erase_gtest.cpp 에서 테스트한다.\n
+    /// (1) 비어 있는 리스트에서 시작, 끝 반복자를 통해 Erase 메서드를 호출하는 경우
+    /// 비정상 종료함을 확인\n 
+    /// (2) 비어 있지 않은 리스트에서 센티널 노드 위치의 반복자를 통해 Erase 메서드를 호출하는 경우 비정상 종료함을 확인\n 
+    /// (3) 호환되지 않는 리스트의 반복자로 Erase 메서드를 호출하는 경우 비정상 종료
+    void Erase(Iterator it_pos);
 
     /// @brief 인자로 전달된 값을 리스트의 뒤에 추가한다.
     /// @param[in] val 추가할 원소의 값
@@ -210,19 +218,32 @@ void List<T_t>::PushBack(const T_t& val)
 }
 
 template <class T_t>
+auto List<T_t>::Erase(Iterator it_pos) -> void
+{
+    RDS_Assert(it_pos.IsCompatible(*this) && "List is not compatible.");
+    RDS_Assert(m_size > 0 && "Cannot erase from empty list."); // this?
+    RDS_Assert(it_pos.GetNodePointer() != std::addressof(m_sentinel_node) &&
+               "Cannot erase end iterator.");
+
+    auto* erase_node_ptr = it_pos.GetNodePointer();
+
+    auto* prev_node_ptr = erase_node_ptr->prev;
+    auto* next_node_ptr = erase_node_ptr->next;
+
+    erase_node_ptr->next = nullptr;
+    erase_node_ptr->prev = nullptr;
+
+    prev_node_ptr->next = next_node_ptr;
+    next_node_ptr->prev = prev_node_ptr;
+
+    delete erase_node_ptr;
+    --m_size;
+}
+
+template <class T_t>
 void List<T_t>::PopBack()
 {
-    RDS_Assert(static_cast<int>(m_size) - 1 >= 0 && "Cannot pop back empty list.");
-
-    auto* cur_back_node_ptr = m_sentinel_node.prev;
-    auto& new_back_node     = *(cur_back_node_ptr->prev);
-
-    m_sentinel_node.prev = std::addressof(new_back_node);
-    new_back_node.next   = std::addressof(m_sentinel_node);
-
-    delete cur_back_node_ptr;
-
-    --m_size;
+    Erase(End().operator--());
 }
 
 template <class T_t>
@@ -234,17 +255,7 @@ void List<T_t>::PushFront(const Val_t& val)
 template <class T_t>
 void List<T_t>::PopFront()
 {
-    RDS_Assert(static_cast<int>(m_size) - 1 >= 0 && "Cannot pop front empty list.");
-
-    auto* cur_front_node_ptr = m_sentinel_node.next;
-    auto& new_front_node     = *(cur_front_node_ptr->next);
-
-    m_sentinel_node.next = std::addressof(new_front_node);
-    new_front_node.prev  = std::addressof(m_sentinel_node);
-
-    delete cur_front_node_ptr;
-
-    --m_size;
+    Erase(Begin());
 }
 
 template <class T_t>
