@@ -45,20 +45,6 @@ TEST_F(NonEmptyIntListAccess, PC_BeginEndCBeginCEnd_deref)
     EXPECT_NE(C_int_ne.CEnd().operator*(), 13);
 }
 
-TEST(STLList, IteratorTest)
-{
-    std::list<int> li{0};
-
-    auto bit = li.begin();
-    auto eit = li.end();
-
-    auto nbit = ++li.begin(); // null
-    // auto pbit = --li.begin(); // assertion failed
-
-    // auto neit = ++li.end(); // assertion failed
-    auto peit = --li.end();
-}
-
 // 일반 리스트와 상수 리스트에 대해서 Begin을 호출했을 때 어떤 타입의 반복자가
 // 생성되는지 테스트
 // 일반 리스트에서 Begin/End을 호출하면 Iterator가 생성되어야 함

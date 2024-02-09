@@ -51,21 +51,13 @@ public:
     Val_t* operator->() const noexcept;
 
 public:
-    /// @brief 이 반복자가 가리키는 리스트 노드를 리스트의 다음 노드로
-    /// 바꾼다.
-    /// @details 전위 증가 연산자에 대한 오버로드. 부모의 전위 증가 연산자를 호출한다.
+    /// @copydoc List_ConstIterator::operator++()
     List_Iterator& operator++() noexcept;
-    /// @brief 이 반복자가 가리키는 리스트 노드를 리스트의 다음 노드로
-    /// 바꾼다.
-    /// @details 후위 증가 연산자에 대한 오버로드. 부모의 후위 증가 연산자를 호출한다.
+    /// @copydoc List_ConstIterator::operator++(int)
     List_Iterator  operator++(int) noexcept;
-    /// @brief 이 반복자가 가리키는 리스트 노드를 리스트의 이전 노드로
-    /// 바꾼다.
-    /// @details 전위 감소 연산자에 대한 오버로드. 부모의 전위 감소 연산자를 호출한다.
+    /// @copydoc List_ConstIterator::operator--()
     List_Iterator& operator--() noexcept;
-    /// @brief 이 반복자가 가리키는 리스트 노드를 리스트의 이전 노드로
-    /// 바꾼다.
-    /// @details 후위 감소 연산자에 대한 오버로드. 부모의 후위 감소 연산자를 호출한다.
+    /// @copydoc List_ConstIterator::operator--(int)
     List_Iterator  operator--(int) noexcept;
 };
 

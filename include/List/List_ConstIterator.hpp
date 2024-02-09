@@ -11,11 +11,12 @@
 
 RDS_BEGIN
 
-/// @brief @ref List 컨테이너에 대한 상수 반복자 템플릿 클래스
+/// @class List_ConstIterator
+/// @brief \ref List 컨테이너에 대한 상수 반복자 템플릿 클래스
 /// @tparam List_t 이 상수 반복자가 가리킬 리스트의 자료형
 /// @details 양방향 반복자(Bidirectional Iterator) 이며, 기본적으로 이 상수 반복자가
-/// 가리키는 리스트와 리스트 내부 노드를 포인터( @ref List_ConstIterator::m_node_ptr ,
-/// @ref List_ConstIterator::m_proxy)로 저장하고 있다.
+/// 가리키는 리스트와 리스트 내부 노드를 포인터(\ref node_ptr, \ref m_proxy)로 저장하고
+/// 있다.
 template <class List_t>
 class List_ConstIterator
 {
@@ -45,6 +46,7 @@ public:
     /// @brief 이 상수 반복자가 가리키는 리스트 노드내 값 @p val 에 대한
     /// const-lvalue 참조를 반환한다.
     /// @details 역참조 연산자에 대한 오버로드.
+    /// @todo 반복자의 위치가 End() 인 경우, 역참조시 비정상 종료하도록 구현
     const Val_t& operator*() const noexcept;
     /// @brief 이 상수 반복자가 가리키는 리스트 노드내 값 @p val 에 대한 상수
     /// 포인터를 반환한다.
@@ -52,30 +54,52 @@ public:
     /// 전역 화살표 연산자가 해당 반환값에 대해 다시 한 번 적용된다.
     const Val_t* operator->() const noexcept;
 
-    /// @todo 이하 모든 증감 연산에 대해서 센티넬 노드에 대한 처리가 필요함
 public:
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 다음 노드로
     /// 바꾼다.
-    /// @details 전위 증가 연산자에 대한 오버로드
+    /// @return 이 반복자에 대한 lvalue 참조
+    /// @details 전위 증가 연산자에 대한 오버로드. 현재 반복자가 가리키는
+    /// 노드가 센티넬 노드가 아닌 경우에만 수행된다.@n 만일 다음 노드가 센티넬 노드라면,
+    /// @ref List::End() 의 다음으로 가는 것과 같으며, Assertion Failed이다.
+    /// @test 반복자가 현재 센티넬 노드를 가리키고 있을 때, 이 연산을 수행하면 비정상
+    /// 종료하는지 확인.
     List_ConstIterator& operator++() noexcept;
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 다음 노드로
     /// 바꾼다.
-    /// @details 후위 증가 연산자에 대한 오버로드
+    /// @return 이 반복자에 대한 연산 전의 사본
+    /// @details 후위 증가 연산자에 대한 오버로드. 현재 반복자가 가리키는
+    /// 노드가 센티넬 노드가 아닌 경우에만 수행된다.@n 만일 다음 노드가 센티넬 노드라면,
+    /// @ref List::End() 의 다음으로 가는 것과 같으며, Assertion Failed이다.
+    /// @test 반복자가 현재 센티넬 노드를 가리키고 있을 때, 이 연산을 수행하면 비정상
+    /// 종료하는지 확인.
     List_ConstIterator  operator++(int) noexcept;
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 이전 노드로
     /// 바꾼다.
-    /// @details 전위 감소 연산자에 대한 오버로드
+    /// @return 이 반복자에 대한 lvalue 참조
+    /// @details 전위 감소 연산자에 대한 오버로드. 현재 반복자가 가리키는 노드의 이전
+    /// 노드가 센티넬 노드가 아닌 경우에만 수행된다. @n 만일 이전 노드가 센티넬
+    /// 노드라면, \ref List::Begin() 혹은 \ref List::CBegin() 의 이전으로 가는 것과
+    /// 같으며, Assertion Failed이다.
+    /// @test 반복자가 현재 센티넬 노드 바로 다음 노드를 가리키고 있을 때, 이 연산을
+    /// 수행하면 비정상 종료하는지 확인.
     List_ConstIterator& operator--() noexcept;
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 이전 노드로
     /// 바꾼다.
-    /// @details 후위 감소 연산자에 대한 오버로드
+    /// @return 이 반복자에 대한 연산 전의 사본
+    /// @details 후위 감소 연산자에 대한 오버로드. 현재 반복자가 가리키는 노드의 이전
+    /// 노드가 센티넬 노드가 아닌 경우에만 수행된다. @n 만일 이전 노드가 센티넬
+    /// 노드라면, @ref List::Begin()의 이전으로 가는 것과 같으며, Assertion Failed이다.
+    /// @test 반복자가 현재 센티넬 노드 바로 다음 노드를 가리키고 있을 때, 이 연산을
+    /// 수행하면 비정상 종료하는지 확인.
     List_ConstIterator  operator--(int) noexcept;
 
-private:
+public:
     /// @brief 이 상수 반복자가 가리키는 리스트 내 노드에 대한 상수 포인터
     const Node_D_t* node_ptr{nullptr};
+
+private:
     /// @brief 반복자가 가리키는 리스트에 대한 상수 포인터
-    const List_t*   m_proxy{nullptr};
+    const List_t* m_proxy{nullptr};
 };
 
 RDS_END
@@ -85,39 +109,41 @@ RDS_END
 RDS_BEGIN
 
 template <class List_t>
-inline List_ConstIterator<List_t>::List_ConstIterator(
-    const List_t* list_ptr, const Node_D_t* node_pos_ptr) noexcept
+List_ConstIterator<List_t>::List_ConstIterator(const List_t*   list_ptr,
+                                               const Node_D_t* node_pos_ptr) noexcept
     : node_ptr(node_pos_ptr)
     , m_proxy(list_ptr)
 {}
 
 template <class List_t>
-inline auto List_ConstIterator<List_t>::operator*() const noexcept -> const Val_t&
+auto List_ConstIterator<List_t>::operator*() const noexcept -> const Val_t&
 {
     return node_ptr->val;
 }
 
 template <typename List_t>
-inline auto List_ConstIterator<List_t>::operator->() const noexcept -> const Val_t*
+auto List_ConstIterator<List_t>::operator->() const noexcept -> const Val_t*
 {
     return std::pointer_traits<const typename List_t::Val_t*>::pointer_to(operator*());
 }
 
 template <typename List_t>
-inline auto List_ConstIterator<List_t>::operator++() noexcept
-    -> List_ConstIterator<List_t>&
+auto List_ConstIterator<List_t>::operator++() noexcept -> List_ConstIterator<List_t>&
 {
-    RDS_Assert(node_ptr->next != m_proxy->m_sentinel_node);
+    // 현재 노드가 센티넬 노드가 아닌 경우에만 증가 연산을 수행한다.
+    RDS_Assert(node_ptr != std::addressof(m_proxy->GetSentinel()) &&
+               "Cannot increment end iterator.");
 
     node_ptr = node_ptr->next;
     return *this;
 }
 
 template <typename List_t>
-inline auto List_ConstIterator<List_t>::operator++(int) noexcept
-    -> List_ConstIterator<List_t>
+auto List_ConstIterator<List_t>::operator++(int) noexcept -> List_ConstIterator<List_t>
 {
-    RDS_Assert(node_ptr->next != m_proxy->m_sentinel_node);
+    // 현재 노드가 센티넬 노드가 아닌 경우에만 증가 연산을 수행한다.
+    RDS_Assert(node_ptr != std::addressof(m_proxy->GetSentinel()) &&
+               "Cannot increment end iterator.");
 
     auto temp = *this;
     node_ptr  = node_ptr->next;
@@ -125,20 +151,22 @@ inline auto List_ConstIterator<List_t>::operator++(int) noexcept
 }
 
 template <typename List_t>
-inline auto List_ConstIterator<List_t>::operator--() noexcept
-    -> List_ConstIterator<List_t>&
+auto List_ConstIterator<List_t>::operator--() noexcept -> List_ConstIterator<List_t>&
 {
-    RDS_Assert(node_ptr->prev != m_proxy->m_sentinel_node);
+    // 이전 노드가 센티넬 노드가 아닌 경우에만 감소 연산을 수행한다.
+    RDS_Assert(node_ptr->prev != std::addressof(m_proxy->GetSentinel()) &&
+               "Cannot decrement begin iterator.");
 
     node_ptr = node_ptr->prev;
     return *this;
 }
 
 template <typename List_t>
-inline auto List_ConstIterator<List_t>::operator--(int) noexcept
-    -> List_ConstIterator<List_t>
+auto List_ConstIterator<List_t>::operator--(int) noexcept -> List_ConstIterator<List_t>
 {
-    RDS_Assert(node_ptr->prev != m_proxy->m_sentinel_node);
+    // 이전 노드가 센티넬 노드가 아닌 경우에만 감소 연산을 수행한다.
+    RDS_Assert(node_ptr->prev != std::addressof(m_proxy->GetSentinel()) &&
+               "Cannot decrement begin iterator.");
 
     auto temp = *this;
     node_ptr  = node_ptr->prev;
