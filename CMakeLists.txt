@@ -25,3 +25,4 @@ target_include_directories(${PROJECT_NAME}
 rds_enable_gtest()
 
 rds_add_test(List Erase)
+rds_add_test(Node_D Ctor)
