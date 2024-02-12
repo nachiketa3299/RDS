@@ -5,6 +5,7 @@ project(RDS
     DESCRIPTION "C++ Data Structures Library written by RZN"
     LANGUAGES CXX
 )
+
 set(CMAKE_CXX_STANDARD 23)
 
 # MSVC Code page(949) Warning sucks please
@@ -13,19 +14,20 @@ add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
 include(RDS_CMakeVars.cmake)
 
-# =[Target: Main RDS Lib]=
-add_library(${PROJECT_NAME} ${RDS_SRCS}
-)
+# Main RDS Library
+add_library(${PROJECT_NAME} ${RDS_SRCS})
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${RDS_INC_PRIVATE}
     PUBLIC ${RDS_INC_PUBLIC}
 )
 
-# ###=== GOOGLE TEST ===####
+# Google Test
 rds_enable_gtest()
 
 rds_add_test(List Erase)
-rds_add_test(List EraseRange)
+rds_add_test(List Erase_Range)
+
 rds_add_test(List Iterators_Equality)
 rds_add_test(List Compare_Equality)
+
 rds_add_test(Node_D Ctor)

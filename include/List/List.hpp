@@ -132,7 +132,7 @@ public: // Modifiers
     void Erase(Iterator it_pos);
 
     /// @brief 반복자로 주어진 범위의 원소들을 제거한다. 제거되는 범위는 `[it_first,
-    /// it_last)` 이다.]
+    /// it_last)` 이다.
     /// @param it_first 제거할 원소들의 시작 위치를 가리키는 반복자
     /// @param it_last 제거할 원소들의 끝 위치를 가리키는 반복자
     /// @return 제거된 범위의 다음 위치를 가리키는 반복자
@@ -144,7 +144,7 @@ public: // Modifiers
     /// - `it_first`와 `it_last`가 리스트와 호환되지 않는 경우 비정상 종료한다.\n
     /// - `it_first`와 `it_last`가 같은 경우, 아무런 동작을 하지 않고 `it_last`를
     /// 반환한다.
-    Iterator EraseRange(ConstIterator it_first, ConstIterator it_last);
+    Iterator Erase(ConstIterator it_first, ConstIterator it_last);
 
     /// @brief 인자로 전달된 값을 리스트의 뒤에 추가한다.
     /// @param[in] val 추가할 원소의 값
@@ -278,7 +278,7 @@ auto List<T_t>::Erase(Iterator it_pos) -> void
 }
 
 template <class T_t>
-auto List<T_t>::EraseRange(ConstIterator it_first, ConstIterator it_last) -> Iterator
+auto List<T_t>::Erase(ConstIterator it_first, ConstIterator it_last) -> Iterator
 {
     RDS_Assert(it_first.IsDereferencible() && "Start of range is not dereferencible.");
     RDS_Assert(it_last.IsValid() && "End of range is not valid.");
@@ -288,26 +288,30 @@ auto List<T_t>::EraseRange(ConstIterator it_first, ConstIterator it_last) -> Ite
                "List is not compatible with given iterator.");
 
     if (it_first.operator==(it_last))
-        return it_last;
+        return Iterator(this, it_last.GetNodePointer());
 
     /*
-    >> === Before EraseRange:
+    >> === Before Erase:
               range_start(it_first)
                    ↓
      ...<p[B]n> <p[X]n> <p[X]n> <p[X]n> <p[A]n>...
            ↑                               ↑
       range_before                    range_after(it_last)
 
-    >> === After EraseRange:
+    >> === After Erase:
 
      ...<p[B]------------n>  <p-----------[A]n>...
            ↑                               ↑
       range_before           [return] range_after(it_last)
     */
 
-    const auto* range_start  = it_first.GetNodePointer();
-    const auto* range_before = range_start->prev;
-    const auto* range_after  = it_last.GetNodePointer();
+    const auto* range_start = it_first.GetNodePointer();
+
+    auto* range_before = const_cast<Node_D_t*>(range_start->prev);
+    auto* range_after  = const_cast<Node_D_t*>(it_last.GetNodePointer());
+
+    range_before->next = range_after;
+    range_after->prev  = range_before;
 
     const auto* p = range_start;
     while (p != range_after)

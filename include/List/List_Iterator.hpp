@@ -36,7 +36,7 @@ public:
     /// @brief 리스트내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자.
     /// @param[in] list_ptr 이 반복자가 가리키는 리스트 자체에 대한 포인터
     /// @param[in] node_pos_ptr 이 반복자가 가리키는 리스트의 노드에 대한 포인터
-    List_Iterator(const List_t* list_ptr, Node_D_t* node_pos_ptr) noexcept;
+    List_Iterator(const List_t* list_ptr, const Node_D_t* node_pos_ptr) noexcept;
 
 public:
     /// @brief 이 반복자가 가리키는 리스트 노드 내 값에 대한 lvalue 참조를 반환한다.
@@ -73,8 +73,8 @@ RDS_END
 RDS_BEGIN
 
 template <class List_t>
-List_Iterator<List_t>::List_Iterator(const List_t* list_ptr,
-                                     Node_D_t*     node_pos_ptr) noexcept
+List_Iterator<List_t>::List_Iterator(const List_t*   list_ptr,
+                                     const Node_D_t* node_pos_ptr) noexcept
     : Super(list_ptr, node_pos_ptr)
 {}
 

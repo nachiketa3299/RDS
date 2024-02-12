@@ -102,8 +102,10 @@ public: // Comparators
     /// @warning 반복자의 유효성 여부는 고려하지 않기 때문에 주의가 필요하다. 예를 들어
     /// 두 반복자가 모두 `nullptr` 인 리스트를 가리키고 있고, 노드 또한 `nullptr` 이면
     /// 두 반복자는 모두 유효하지 않지만, 어쨌든 같은 것으로 취급한다.
+    /// @test \ref List_Iterators_Equality_gtest.cpp 에서 테스트.
     bool operator==(const List_ConstIterator<List_t>& other) const;
 
+public:
 public:
     /// @brief 이 반복자가 유효한지 확인한다.
     /// @return 반복자의 유효성 여부. 유효한 경우 `true`, 그렇지 않으면 `false`
@@ -132,6 +134,11 @@ private:
     /// @details 매개 변수가 포인터로 전달되기 때문에 항상 유효한 리스트를 가리키지 않을
     /// 수도 있음을 주의한다.
     bool IsCompatible_unchecked(const List_t* list_ptr) const;
+
+public:
+    /// @brief 이 상수 반복자가 가리키는 노드의 주소를 반환한다.
+    /// @return 이 상수 반복자가 가리키는 노드의 주소
+    const Node_D_t* GetNodePointer() const;
 
 protected:
     /// @brief 이 상수 반복자가 가리키는 리스트 내 노드에 대한 상수 포인터
@@ -242,6 +249,12 @@ auto List_ConstIterator<List_t>::IsCompatible_unchecked(const List_t* list_ptr) 
     -> bool
 {
     return list_ptr == m_list_ptr;
+}
+
+template <class List_t>
+auto List_ConstIterator<List_t>::GetNodePointer() const -> const Node_D_t*
+{
+    return m_node_ptr;
 }
 
 RDS_END
