@@ -22,6 +22,11 @@ set(RDS_SRCS
     include/List/List.hpp
     include/List/List_ConstIterator.hpp
     include/List/List_Iterator.hpp
+
+    # Vector
+    include/Vector/Vector.hpp
+    include/Vector/Vector_ConstIterator.hpp
+    include/Vector/Vector_Iterator.hpp
 )
 
 set(RDS_INC_PRIVATE
@@ -40,6 +45,7 @@ set(RDS_INC_PUBLIC
     include/Arena/
     include/Node_D/
     include/List/
+    include/Vector/
 )
 
 macro(rds_enable_gtest)
