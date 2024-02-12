@@ -131,6 +131,21 @@ public: // Modifiers
     /// @todo 시작과 끝 반복자를 받는 버전도 작성해야 함
     void Erase(Iterator it_pos);
 
+    /// @brief 반복자로 주어진 범위의 원소들을 제거한다. 제거되는 범위는 `[it_first,
+    /// it_last)` 이다.]
+    /// @param it_first 제거할 원소들의 시작 위치를 가리키는 반복자
+    /// @param it_last 제거할 원소들의 끝 위치를 가리키는 반복자
+    /// @return 제거된 범위의 다음 위치를 가리키는 반복자
+    /// @warning `it_first` 와 `it_last`가 유효하지 않은 범위라면, Undefined Behavior
+    /// 이다.\n 예를 들어, `it_last`가 `it_first` 보다 이전을 가리키는 경우가 그렇다.
+    /// @details
+    /// - `it_first` 는 역참조 가능해야 하고, `it_last`는 유효해야 한다. 그렇지 않으면
+    /// 비정상 종료한다.\n
+    /// - `it_first`와 `it_last`가 리스트와 호환되지 않는 경우 비정상 종료한다.\n
+    /// - `it_first`와 `it_last`가 같은 경우, 아무런 동작을 하지 않고 `it_last`를
+    /// 반환한다.
+    Iterator EraseRange(ConstIterator it_first, ConstIterator it_last);
+
     /// @brief 인자로 전달된 값을 리스트의 뒤에 추가한다.
     /// @param[in] val 추가할 원소의 값
     void PushBack(const Val_t& val);
@@ -160,6 +175,24 @@ public: // Operations
     void Reverse();
     void Unique();
     void Sort();
+
+public:
+    /// @brief 두 리스트가 같은지 비교한다.
+    /// @param other 비교할 리스트
+    /// @return 두 리스트가 같으면 `true`, 그렇지 않으면 `false`
+    /// @note \ref Val_t 가 사용자 정의 자료형인 경우, 연산자 `==`이 정의되어 있어야
+    /// 한다.
+    /// @details 동등 비교 순서는 다음과 같다.\n
+    /// 1. *두 리스트의 크기가 다르면*, 항상 같은 리스트가 아니다.
+    /// 2. *두 리스트의 크기가 같고 크기가 0이라면*,항상 같은 리스트이다.
+    /// 3. *두 리스트의 크기가 같고 크기가 0이 아니라면*, 두 리스트의 각 원소를 순회하며
+    /// 모든 원소가 같은 경우 같은 리스트이고, 그렇지 않으면 다른 리스트이다.
+    /// @test \ref List_Compare_Equality_gtest.cpp 에서 테스트한다.
+    /// @test 두 리스트의 크기가 다를 때, 항상 `false` 를 반환하는지 확인
+    /// @test 두 리스트의 크기가 같고 크기가 0일 때, 항상 `true`를 반환하는지 확인
+    /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `true` 를 반환하는 경우
+    /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `false` 를 반환하는 경우
+    bool operator==(const List<Val_t>& other) const;
 
 private:
     /// @brief 리스트의 센티넬 노드이다.
@@ -242,6 +275,50 @@ auto List<T_t>::Erase(Iterator it_pos) -> void
 
     delete erase_node_ptr;
     --m_size;
+}
+
+template <class T_t>
+auto List<T_t>::EraseRange(ConstIterator it_first, ConstIterator it_last) -> Iterator
+{
+    RDS_Assert(it_first.IsDereferencible() && "Start of range is not dereferencible.");
+    RDS_Assert(it_last.IsValid() && "End of range is not valid.");
+    RDS_Assert(it_first.IsCompatible(*this) &&
+               "List is not compatible with given iterator.");
+    RDS_Assert(it_last.IsCompatible(*this) &&
+               "List is not compatible with given iterator.");
+
+    if (it_first.operator==(it_last))
+        return it_last;
+
+    /*
+    >> === Before EraseRange:
+              range_start(it_first)
+                   ↓
+     ...<p[B]n> <p[X]n> <p[X]n> <p[X]n> <p[A]n>...
+           ↑                               ↑
+      range_before                    range_after(it_last)
+
+    >> === After EraseRange:
+
+     ...<p[B]------------n>  <p-----------[A]n>...
+           ↑                               ↑
+      range_before           [return] range_after(it_last)
+    */
+
+    const auto* range_start  = it_first.GetNodePointer();
+    const auto* range_before = range_start->prev;
+    const auto* range_after  = it_last.GetNodePointer();
+
+    const auto* p = range_start;
+    while (p != range_after)
+    {
+        auto* to_delete = p;
+        p               = p->next;
+        delete to_delete;
+        --m_size;
+    }
+
+    return Iterator(this, range_after);
 }
 
 template <class T_t>
@@ -365,6 +442,30 @@ auto List<T_t>::InsertBefore(Iterator it_pos, const Val_t& val) -> void
     ins_node_ptr->prev  = new_node_ptr;
 
     ++m_size;
+}
+
+template <class T_t>
+auto List<T_t>::operator==(const List<Val_t>& other) const -> bool
+{
+    if (m_size != other.m_size)
+        return false;
+
+    if (m_size == 0 && other.m_size == 0)
+        return true;
+
+    auto* this_ptr  = m_sentinel_node.next;
+    auto* other_ptr = other.m_sentinel_node.next;
+
+    while (this_ptr != std::addressof(m_sentinel_node))
+    {
+        if (this_ptr->val != other_ptr->val)
+            return false;
+
+        this_ptr  = this_ptr->next;
+        other_ptr = other_ptr->next;
+    }
+
+    return true;
 }
 
 RDS_END;
