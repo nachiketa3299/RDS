@@ -8,30 +8,18 @@ project(RDS
 
 set(CMAKE_CXX_STANDARD 23)
 
-# MSVC Code page(949) Warning sucks please
+# MSVC 컴파일러가 인코딩 오류를 내는 문제를 해결하기 위해 UTF-8로 인코딩을 강제로 바꿈
 add_compile_options("$<$<C_COMPILER_ID:MSVC>:/utf-8>")
 add_compile_options("$<$<CXX_COMPILER_ID:MSVC>:/utf-8>")
 
-include(RDS_CMakeVars.cmake)
+include(RDS.cmake)
 
-# Main RDS Library
+# RDS 라이브러리 빌드
 add_library(${PROJECT_NAME} ${RDS_SRCS})
 target_include_directories(${PROJECT_NAME}
     PRIVATE ${RDS_INC_PRIVATE}
     PUBLIC ${RDS_INC_PUBLIC}
 )
 
-# Google Test
-rds_enable_gtest()
-
-rds_add_test(Array ElementAccess)
-rds_add_test(Array Capacity)
-rds_add_test(Array Iterators)
-
-rds_add_test(List Erase)
-rds_add_test(List Erase_Range)
-
-rds_add_test(List Iterators_Equality)
-rds_add_test(List Compare_Equality)
-
-rds_add_test(Node_D Ctor)
+# 테스트 프로그램 빌드
+add_subdirectory(test)
