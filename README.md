@@ -4,35 +4,25 @@
 
 ## Tools
 
-- (Text Editor) **Visual Studio Code**
-- (Build Automation) **CMake (3.27.0)**
-    - [CMakeList.txt](/CMakeLists.txt) <sub>기본 빌드 설정</sub>
-    - [RDS_CMakeVars.cmake](/RDS_CMakeVars.cmake) <sub>빌드 설정 위한 변수 및 매크로 정의</sub>
-- (Compilers)
-    - MSVC (Visual Studio 2019)
+- `Text Editor` **Visual Studio Code**
+- `Build Automation` **CMake (3.27.0)**
+    - **_Main_: RDS 라이브러리**
+        - [/CMakeList.txt](/CMakeLists.txt) <sub>기본 RDS 라이브러리 빌드 설정</sub>
+        - [/RDS.cmake](/RDS.cmake) <sub>빌드 설정 위한 변수 및 매크로 정의</sub>
+    - **_Sub_: RDS_GTest 테스트**
+        - [/test/CMakeList.txt](/test/CMakeLists.txt)<sub>라이브러리 GTest 용 프로젝트</sub>
+        - [/test/RDS_Gtest.cmake](/test/RDS_Gtest.cmake)<sub>테스트 프로젝트 빌드 설정 위한 변수 및 매크로 정의</sub>
+- `Compilers`
+    - MSVC 
+        - Visual Studio 2019 Community Release
     - MSYS g++
     - Clang
-- (Static Analysis) **Clang-tidy**
-- (Test) **Google Test**
-- (Formatting) **clang-format**
-- (Document) **Doxygen**
+- `Static Analysis` **Clang-tidy**
+- `Test` **Google Test**
+- `Formatting` **clang-format**
+- `Documentation` **Doxygen**
 
-# Implemenation
-
-- 최상위 네임스페이스는 `rds`
-- 템플릿 클래스의 경우 확장자 `*.hpp` 로 표현하며, 한 파일에 선언과 구현이 모두 들어있다.
-
-컨테이너 템플릿 클래스의 경우 다음의 순으로 멤버를 정의  
-
-1. Type Alias
-2. Inner Class/Struct
-3. Ctor/Dtor
-5. Element Access
-6. Iterators
-7. Capacity
-8. Modifiers
-9. Operations
-10. Members
+# *RDS* - outlines
 
 ## Utilities
 
@@ -40,27 +30,15 @@
 
 - [RDS_CoreDefs.h](/include/RDS_CoreDefs.h)
 - [RDS_Concepts.h](/include/RDS_Concepts.h)
+- [RDS_FVectors.h](/include/RDS_FVectors.h)
 
 ### Assertion
 
 - [X] [Assertion.h](/include/Assertion/Assertion.h)<sup>Macro function <code>RDS_Assert</code></sup>
 - [X] [Assertion.cpp](/src/Assertion/Assertion.cpp)
 
-## Data Structures
+## Linear Data Structures
 
-### FVector2
-
-> 2 개의 `float` 을 저장하는 벡터 클래스
-
-- [X] [FVector2.h](/include/FVector2/FVector2.h)
-- [X] [FVector2.cpp](/src/FVector2/FVector2.cpp)
-
-### FVector3
-
-> 3 개의 `float` 을 저장하는 벡터 클래스
-
-- [X] [FVector3.h](/include/FVector3/FVector3.h)
-- [X] [FVector3.cpp](/src/FVector3/FVector3.cpp)
 
 ### Static Array
 
@@ -78,9 +56,8 @@
 - [ ] [Vector_ConstIterator.hpp](/include/Vector/Vector_ConstIterator.hpp)
 - [ ] [Vector_Iterator.hpp](/include/Vector/Vector_Iterator.hpp)
 
-### Linked List
 
-#### Doubly Linked List
+### Doubly Linked List
 
 > 이중 연결 리스트 템플릿 클래스
 
@@ -88,7 +65,7 @@
 - [ ] [List_ConstIterator.hpp](/include/List/List_ConstIterator.hpp)
 - [ ] [List_Iterator.hpp](/include/List/List_Iterator.hpp)
 
-#### Singly Linked List
+### Singly Linked List
 
 > 단일 연결 리스트 템플릿 클래스
 
@@ -96,36 +73,58 @@
 - [ ] ForwardList_ConstIterator.hpp
 - [ ] ForwardList_Iterator.hpp
 
-### Container Adapters
-
-#### Heap
+### Heap
 
 - [ ] Heap
 
-#### Queue
+### Queue
 
 - [ ] Queue
 - [ ] Deque
 - [ ] Queue<sup>Circular</sup>
 - [ ] Priority Queue
 
-#### Stack
+### Stack
 
 - [ ] Stack
 
+### Matrix 
 
-### Others
-- [ ] Adjacent Matrix
-- [ ] ForwardList<sup>Singly linked</sup>
+- [ ] Matrix
+
+## Non-Linear Data Structures
+
+### Trees
+
+- [ ] Binary Tree
+
+### Graphs
+
 - [ ] Graph<sup>with Adjacent List</sup>
 - [ ] Graph<sup>with Adjacent Matrix</sup>
-- [ ] Binary Tree
-- [ ] HashMap
-- [ ] HashSet
+
+## Other Data Structures
+
 - [ ] Pair
 - [ ] Tuple
+- [ ] HashMap
+- [ ] HashSet
 
-## Algorithms
+### FVector2
+
+> 2 개의 실수를 저장하는 벡터 클래스
+
+- [X] [FVector2.h](/include/FVector2/FVector2.h)
+- [X] [FVector2.cpp](/src/FVector2/FVector2.cpp)
+
+### FVector3
+
+> 3 개의 실수를 저장하는 벡터 클래스
+
+- [X] [FVector3.h](/include/FVector3/FVector3.h)
+- [X] [FVector3.cpp](/src/FVector3/FVector3.cpp)
+
+## *Algorithms*
 
 ### Sorting Algorithms
 
@@ -156,4 +155,3 @@
 
 - [stlmp/stmlp/Github](https://github.com/stlmp/stlmp)
 - [gtest-cmake-example/dmonopoly](https://github.com/dmonopoly/gtest-cmake-example)
-    - 유용한 GTest 예제 (아직 이해하지 못한 부분이 있음)
