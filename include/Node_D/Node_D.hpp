@@ -10,24 +10,26 @@
 RDS_BEGIN
 
 /// @brief 두 개의 링크를 가지는 노드 구조체
-/// @tparam _T 노드가 가지는 값에 대한 자료형
-template <class _T>
-    requires std::default_initializable<_T>
+/// @tparam T_t 노드가 가지는 값에 대한 자료형
+template <class T_t>
+    requires std::default_initializable<T_t>
 struct Node_D
 {
 public:
     /// @brief 노드가 가지는 값에 대한 자료형
-    using Val_t = _T;
+    using Val_t = T_t;
 
 public:
     /// @brief 기본 생성자
-    /// @details 멤버 @ref val 이 원시 자료형인 경우 value-initialization이
-    /// 이루어진다.\n 멤버 @ref val 이 사용자 정의 자료형이 아닌 경우,
-    /// default-initialization이 이루어지기 때문에, @ref Val_t 는 반드시
+    /// @details
+    /// 멤버 \ref val 이 원시 자료형인 경우 value-initialization이
+    /// 이루어진다.\n
+    /// 멤버 \ref val 이 사용자 정의 자료형이 아닌 경우,
+    /// default-initialization이 이루어지기 때문에, \ref Val_t 는 반드시
     /// `std::default_initializable`을 만족해야 한다.
-    /// @test @ref Node_D_Ctor_gtest.cpp 에서 테스트한다.\n
-    /// (1) 템플릿 인자가 원시 자료형일 때 기본 생성자가 제대로 동작하는지 확인한다.\n
-    /// (2) 템플릿 인자가 사용자 정의 자료형일 때 기본 생성자가 제대로 동작하는지
+    /// @test \ref Node_D_Ctor_gtest.cpp 에서 테스트한다.
+    /// @test 템플릿 인자가 원시 자료형일 때 기본 생성자가 제대로 동작하는지 확인한다.
+    /// @test 템플릿 인자가 사용자 정의 자료형일 때 기본 생성자가 제대로 동작하는지
     /// 확인한다.
     Node_D()  = default;
     /// @brief 기본 소멸자
@@ -49,9 +51,9 @@ RDS_END
 
 RDS_BEGIN
 
-template <class _T>
-    requires std::default_initializable<_T>
-Node_D<_T>::Node_D(const Val_t& value)
+template <class T_t>
+    requires std::default_initializable<T_t>
+Node_D<T_t>::Node_D(const Val_t& value)
     : val(value)
 {}
 
