@@ -17,8 +17,8 @@ include(RDS.cmake)
 # RDS 라이브러리 빌드
 add_library(${PROJECT_NAME} ${RDS_SRCS})
 target_include_directories(${PROJECT_NAME}
-    PRIVATE ${RDS_INC_PRIVATE}
     PUBLIC ${RDS_INC_PUBLIC}
+    PRIVATE ${RDS_INC_PRIVATE}
 )
 
 # 테스트 프로그램 빌드

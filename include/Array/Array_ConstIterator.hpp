@@ -1,12 +1,14 @@
+/// @file Array_ConstIterator.hpp
+
 #ifndef RDS_ARRAY_CONSTITERATOR_HPP
 #define RDS_ARRAY_CONSTITERATOR_HPP
 
 #include <cstddef>
 
+#include "Assertion.h"
 #include "RDS_CoreDefs.h"
 
 #include "Array.hpp"
-#include "Assertion.h"
 
 RDS_BEGIN
 

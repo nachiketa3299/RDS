@@ -1,3 +1,5 @@
+/// @file Array_Iterator.hpp
+
 #ifndef RDS_ARRAY_ITERATOR_HPP
 #define RDS_ARRAY_ITERATOR_HPP
 

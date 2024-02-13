@@ -3,7 +3,8 @@ cmake_minimum_required(VERSION 3.27)
 project(RDS_GTest
     VERSION 0.1.0
     DESCRIPTION "GTest Project for RDS library"
-    LANGUAGES CXX
+
+    # LANGUAGES CXX
 )
 
 include(RDS_Gtest.cmake)
