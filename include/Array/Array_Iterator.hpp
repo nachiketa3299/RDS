@@ -1,95 +1,128 @@
-#ifndef RDS_ARRAY_ITERATOR_H
-#define RDS_ARRAY_ITERATOR_H
+#ifndef RDS_ARRAY_ITERATOR_HPP
+#define RDS_ARRAY_ITERATOR_HPP
 
 #include <cstddef>
 
-#include "Array_ConstIterator.hpp"
 #include "RDS_CoreDefs.h"
+
+#include "Array_ConstIterator.hpp"
 
 RDS_BEGIN
 
-template <typename T, std::size_t Size>
-class Array_Iterator: public Array_ConstIterator<T, Size>
+template <typename Array_t>
+class Array_Iterator: public Array_ConstIterator<Array_t>
 {
 public:
-    using Super  = Array_ConstIterator<T, Size>;
-    using Val_t  = Super::Val_t;
-    using Diff_t = Super::Diff_t;
-    using Size_t = std::size_t;
-    using Val_t  = T;
+    using Super = Array_ConstIterator<Array_t>;
 
 public:
-    /// @brief Default Constructor.
-    Array_Iterator()
-    {}
-
-    /// @brief Constructor gets head pointer of array & offset.
-    explicit Array_Iterator(Val_t* head, Size_t index = 0)
-        : Super(head, index)
-    {}
+    using Val_t  = typename Super::Val_t;
+    using Size_t = typename Super::Size_t;
+    using Diff_t = typename Super::Diff_t;
 
 public:
-    Val_t& operator*() const
-    {
-        return const_cast<Val_t&>(Super::operator*());
-    }
+    Array_Iterator() = default;
+    explicit Array_Iterator(const Val_t* head, Size_t index = 0);
 
-    Val_t* operator->() const
-    {
-        return const_cast<Val_t*>(Super::operator->());
-    }
+public:
+    auto operator*() const -> Val_t&;
+    auto operator->() const -> Val_t*;
 
-    Array_Iterator& operator++()
-    {
-        Super::operator++();
-        return *this;
-    }
+public:
+    auto operator++() -> Array_Iterator&;
+    auto operator++(int) -> Array_Iterator;
+    auto operator--() -> Array_Iterator&;
+    auto operator--(int) -> Array_Iterator;
 
-    Array_Iterator operator++(int)
-    {
-        const auto temp = operator*();
-        Super::operator++();
-        return temp;
-    }
-
-    Array_Iterator& operator--()
-    {
-        Super::operator--();
-        return *this();
-    }
-
-    Array_Iterator operator--(int)
-    {
-        const auto temp = operator*();
-        Super::operator--();
-        return temp;
-    }
-
-    Array_Iterator& operator+=(const Diff_t offset)
-    {
-        Super::operator+=(offset);
-        return *this();
-    }
-
-    Array_Iterator operator+(const Diff_t offset) const
-    {
-        auto temp = operator*();
-        return temp.operator+=(offset);
-    }
-
-    Array_Iterator& operator-=(const Diff_t offset)
-    {
-        Super::operator-=(offset);
-        return *this();
-    }
-
-    Array_Iterator operator-(const Diff_t offset)
-    {
-        auto temp = *this;
-        return temp.operator-=(offset);
-    }
+public:
+    auto operator+=(const Diff_t offset) -> Array_Iterator&;
+    auto operator+(const Diff_t offset) const -> Array_Iterator;
+    auto operator-=(const Diff_t offset) -> Array_Iterator&;
+    auto operator-(const Diff_t offset) -> Array_Iterator;
 };
 
 RDS_END
 
-#endif // RDS_ARRAY_ITERATOR_H
+// IMPELEMENTATIONS //
+
+RDS_BEGIN
+
+template <typename Array_t>
+inline Array_Iterator<Array_t>::Array_Iterator(const Val_t* head, Size_t index)
+    : Super(head, index)
+{}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator*() const -> Val_t&
+{
+    return const_cast<Val_t&>(Super::operator*());
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator->() const -> Val_t*
+{
+    return const_cast<Val_t*>(Super::operator->());
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator++() -> Array_Iterator&
+{
+    Super::operator++();
+    return *this;
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator++(int) -> Array_Iterator
+{
+    const auto temp = *this;
+    Super::operator++();
+    return temp;
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator--() -> Array_Iterator&
+{
+    Super::operator--();
+    return *this;
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator--(int) -> Array_Iterator
+{
+    const auto temp = *this;
+    Super::operator--();
+    return temp;
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator+=(const Diff_t offset) -> Array_Iterator&
+{
+    Super::operator+=(offset);
+    return *this;
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator+(const Diff_t offset) const
+    -> Array_Iterator
+{
+    auto temp = *this;
+    return temp.operator+=(offset);
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator-=(const Diff_t offset) -> Array_Iterator&
+{
+    Super::operator-=(offset);
+    return *this;
+}
+
+template <typename Array_t>
+inline auto Array_Iterator<Array_t>::operator-(const Diff_t offset) -> Array_Iterator
+{
+    auto temp = *this;
+    return temp.operator-=(offset);
+}
+
+RDS_END
+
+#endif // RDS_ARRAY_ITERATOR_HPP

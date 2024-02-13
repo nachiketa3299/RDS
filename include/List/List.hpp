@@ -144,7 +144,7 @@ public: // Modifiers
     /// - `it_first`와 `it_last`가 리스트와 호환되지 않는 경우 비정상 종료한다.\n
     /// - `it_first`와 `it_last`가 같은 경우, 아무런 동작을 하지 않고 `it_last`를
     /// 반환한다.
-    Iterator Erase(ConstIterator it_first, ConstIterator it_last);
+    auto Erase(ConstIterator it_first, ConstIterator it_last) -> Iterator;
 
     /// @brief 인자로 전달된 값을 리스트의 뒤에 추가한다.
     /// @param[in] val 추가할 원소의 값

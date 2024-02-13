@@ -24,6 +24,10 @@ target_include_directories(${PROJECT_NAME}
 # Google Test
 rds_enable_gtest()
 
+rds_add_test(Array ElementAccess)
+rds_add_test(Array Capacity)
+rds_add_test(Array Iterators)
+
 rds_add_test(List Erase)
 rds_add_test(List Erase_Range)
 

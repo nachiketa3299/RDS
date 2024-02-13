@@ -1,26 +1,26 @@
-#ifndef RDS_ARRAY_H
-#define RDS_ARRAY_H
+/// @file Array.hpp
 
-#include <array>
-#include <concepts>
+#ifndef RDS_ARRAY_HPP
+#define RDS_ARRAY_HPP
+
 #include <cstddef>
+#include <initializer_list>
+
+#include "RDS_Concepts.h"
+#include "RDS_CoreDefs.h"
 
 #include "Array_ConstIterator.hpp"
 #include "Array_Iterator.hpp"
-#include "RDS_CoreDefs.h"
 
 RDS_BEGIN
 
-/// @brief 배열 원소의 형식에 대한 필요 사항: Default Constructible 해야 하며, 크기는 0
-/// 이상이어야 함.
-template <typename T_t>
-concept ArrayRequirement = std::default_initializable<T_t>;
-
 /// @brief 정적 크기를 가지는 배열 템플릿 클래스
-/// @tparam T_t 배열 원소의 자료형. 요구 조건은 @ref ArrayRequirement 를 참조.
-/// @tparam _Size 배열의 크기
-/// @details 단순한 원시 배열에 대한 래퍼로 구현하였다.
-template <class T_t, std::size_t _Size>
+/// @tparam T_t 배열 원소의 자료형.
+/// @tparam Size_v 배열의 크기
+/// @details 단순한 원시 배열에 대한 래퍼로 구현되어 있다. 초기값을 전달하지 않는 경우
+/// default-initialization 하기 때문에, `T_t`에 대한 기본 생성자가 정의되어 있으야 한다.
+/// (\ref ArrayRequirement)
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
 class Array
 {
@@ -32,220 +32,246 @@ public: // Type Aliases
 
 public:
     /// @brief 배열의 반복자의 자료형
-    using Iterator      = Array_Iterator<Val_t, _Size>;
+    using Iterator      = Array_Iterator<Array>;
     /// @brief 배열의 상수 반복자의 자료형
-    using ConstIterator = Array_ConstIterator<Val_t, _Size>;
+    using ConstIterator = Array_ConstIterator<Array>;
 
 public: // Ctors
     /// @brief 기본 생성자. @ref Val_t 에 대한 기본 생성자가 정의되어 있어야 하는
     /// 이유이다.
-    Array() = default;
-
-    /// @brief 복사 생성자
-    /// @todo 너무 단순하게 구현한 것 같은데, 더 나은 방법이 없나?
-    Array(const Array& other)
-    {
-        for (int i = 0; i < _Size; ++i)
-            m_ptr[i] = other[i];
-    }
-
+    Array()                   = default;
     /// @brief 기본 소멸자.
-    ~Array() = default;
+    ~Array()                  = default;
+    /// @brief 기본 복사 생성자
+    Array(const Array& other) = default;
+
+    /// @brief 초기화 리스트를 받는 생성자
+    Array(std::initializer_list<Val_t> init_list);
 
 public: // Element Access
-    /// @brief 배열의 앞에서부터 @p index - 1 번째 원소에 대한 lvalue 참조를 반환한다.
-    /// @details 배열 아래 첨자 연산자에 대한 오버로딩.
-    Val_t&       operator[](Size_t index);
-    /// @brief 배열의 앞에서부터 @p index - 1 번째 원소에 대한 const-lvalue 참조 를
-    /// 반환한다.
-    /// @details 배열 아래 첨자 연산자에 대한 오버로딩의 상수 버전. 모든 멤버 접근
-    /// 메소드의 구현의 마지막 부분에서, 항상 이 메소드가 호출된다.
-    const Val_t& operator[](Size_t index) const;
-    /// @brief 배열의 앞에서부터 @p index - 1 번째 원소에 대한 lvalue 참조를 반환하되,
-    /// 전달된
-    /// @p index 가 유효한지 검사한다.
-    Val_t&       At(Size_t index);
-    /// @brief 배열의 앞에서부터 @p index - 1 번째 원소에 대한 const-lvalue 참조를
-    /// 반환하되, 전달된
-    /// @p index 가 유효한지 검사한다.
-    const Val_t& At(Size_t index) const;
+    /// @brief 인자로 전달된 인덱스의 배열 원소에 대한 lvalue 참조를 반환한다.
+    /// @details 배열 아래 첨자 연산자에 대한 오버로딩이다. 인덱스의 범위 검사를 하지
+    /// 않는다.
+    /// @param[in] index 참조를 반환할 배열 원소에 대한 인덱스
+    /// @warning 인덱스의 범위를 검사하지 않으므로, 주의한다.
+    auto operator[](Size_t index) -> Val_t&;
+    /// @brief 인자로 전달된 인덱스의 배열 원소에 대한 const-lvalue 참조를 반환한다.
+    /// @details 배열 아래 첨자 연산자에 대한 오버로딩이다. 인덱스의 범위 검사를 하지
+    /// 않는다.
+    /// @param[in] index 참조를 반환할 배열 원소에 대한 인덱스
+    /// @warning 인덱스의 범위를 검사하지 않으므로, 주의한다.
+    auto operator[](Size_t index) const -> const Val_t&;
+    /// @brief 인자로 전달된 인덱스의 배열 원소에 대한 lvalue 참조를 반환한다.
+    /// @details 배열의 범위를 검사하여 유효한 인덱스인 경우에만 참조를 반환한다.
+    /// 유효하지 않은 경우 비정상 종료한다.
+    /// @test \ref Array_ElementAccess_gtest.cpp 에서 테스트.
+    /// @test `index` 가 [0, `Size_v`) 범위에 속하지 않는 경우, 비정상 종료하는지 확인.
+    auto At(Size_t index) -> Val_t&;
+    /// @brief 인자로 전달된 인덱스의 배열 원소에 대한 const-lvalue 참조를 반환한다.
+    /// @details 배열의 범위를 검사하여 유효한 인덱스인 경우에만 참조를 반환한다.
+    /// 유효하지 않은 경우 비정상 종료한다.
+    /// @test \ref Array_ElementAccess_gtest.cpp 에서 테스트.
+    /// @test `index` 가 [0, `Size_v`) 범위에 속하지 않는 경우, 비정상 종료하는지 확인.
+    auto At(Size_t index) const -> const Val_t&;
 
 public:
     /// @brief 배열의 맨 첫번째 원소에 대한 lvalue 참조를 반환한다.
-    Val_t&       Front();
+    /// @return 배열의 맨 첫번째 원소에 대한 lvalue 참조
+    /// @details 내부적으로 이 배열을 상수 배열로 형변환한 후, \ref Front() const 함수를
+    /// 호출하여 반환값을 `const_cast` 하는 방식으로 작동한다.
+    auto Front() -> Val_t&;
     /// @brief 배열의 맨 첫번째 원소에 대한 const-lvalue 참조를 반환한다.
-    const Val_t& Front() const;
+    /// @return 배열의 맨 첫번째 원소에 대한 const-lvalue 참조
+    auto Front() const -> const Val_t&;
     /// @brief 배열의 맨 마지막 원소에 대한 lvalue 참조를 반환한다.
-    Val_t&       Back();
+    /// @return 배열의 맨 첫번째 원소에 대한 lvalue 참조
+    /// @details 내부적으로 이 배열을 상수 배열로 형변환한 후, \ref Back() const 함수를
+    /// 호출하여 반환값을 `const_cast` 하는 방식으로 작동한다.
+    auto Back() -> Val_t&;
     /// @brief 배열의 맨 마지막 원소에 대한 const-lvalue 참조를 반환한다.
-    const Val_t& Back() const;
+    /// @return 배열의 맨 마지막 원소에 대한 const-lvalue 참조
+    auto Back() const -> const Val_t&;
 
 public: // Iterators
     /// @brief 배열의 맨 첫번째 원소를 가리키는 반복자를 반환한다.
-    Iterator      Begin();
+    /// @return 배열의 맨 첫번째 원소를 가리키는 반복자
+    auto Begin() -> Iterator;
     /// @brief 배열의 맨 첫번째 원소를 가리키는 상수 반복자를 반환한다.
-    ConstIterator Begin() const;
+    /// @return 배열의 맨 첫번째 원소를 가리키는 상수 반복자
+    auto Begin() const -> ConstIterator;
     /// @brief 배열의 맨 마지막 원소를 가리키는 반복자를 반환한다.
-    Iterator      End();
+    /// @return 배열의 맨 마지막 원소를 가리키는 반복자
+    auto End() -> Iterator;
     /// @brief 배열의 맨 마지막 원소를 가리키는 상수 반복자를 반환한다.
-    ConstIterator End() const;
+    /// @return 배열의 맨 마지막 원소를 가리키는 상수 반복자
+    auto End() const -> ConstIterator;
     /// @brief 배열의 맨 첫번째 원소를 가리키는 상수 반복자를 반환한다.
-    ConstIterator CBegin() const;
+    /// @return 배열의 맨 첫번재 원소를 가리키는 상수 반복자
+    auto CBegin() const -> ConstIterator;
     /// @brief 배열의 맨 마지막 원소를 가리키는 상수 반복자를 반환한다.
-    ConstIterator CEnd() const;
+    /// @return 배열의 맨 마지막 원소를 가리키는 상수 반복자
+    auto CEnd() const -> ConstIterator;
 
 public: // Capacity
     /// @brief 배열의 크기(원소의 갯수)를 반환한다.
-    Size_t Size() const;
-    /// @brief 배열의 최대 크기(원소의 갯수)를 반환한다.
-    /// @note @ref Size() const 와 같은 값을 반환한다.
-    Size_t MaxSize() const;
-    /// @brief 배열이 비어있는지의 여부를 부울형 값으로 반환한다.
-    /// @details - @p _Size 가 0 초과인 경우, 항상 참이 반환된다. \n - @p _Size 가 0인
-    /// 경우, 항상 거짓이 반환된다.
-    bool   Empty() const;
+    /// @return 배열의 크기(원소의 갯수)
+    auto Size() const -> Size_t;
+    /// @brief 배열의 최대 크기(원소의 갯수)를 반환한다. 정적 배열이므로 배열의 크기와
+    /// 같은 값을 반환한다.
+    /// @return 배열의 최대 크기
+    auto MaxSize() const -> Size_t;
+    /// @brief 배열이 비어있는지의 여부를 판단한다.
+    /// @return 배열이 비어있으면 (`Size` = 0) `ture`, 그렇지 않으면 비어있지
+    /// 않으면(`Size` > 0) `false` 를 반환한다.
+    /// @details
+    /// - `Size_v` 가 0 초과인 경우, 항상 참이 반환된다.
+    /// - `Size_v` 가 0인 경우, 항상 거짓이 반환된다.
+    auto Empty() const -> bool;
+
+public:
+    auto Fill(const Val_t& value) -> void;
+    auto Swap(Array& other) -> void;
 
 private:
-    /// @brief Array 클래스가 감싸고 있는 크기 @p _Size 의 원시 배열 이다.
-    Val_t m_ptr[_Size];
-};
-
-/// @brief Specialization in @p _Size = 0 for template class @ref Array
-template <typename T>
-class Array<T, 0>
-{
-public:
-    bool IsEmpty() const
-    {
-        return true;
-    }
+    /// @brief Array 클래스가 감싸고 있는 크기 @p Size_v 의 원시 배열 이다.
+    Val_t m_ptr[Size_v];
 };
 
 RDS_END
 
+// IMPLEMENTATIONS //
+
 RDS_BEGIN
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::operator[](Size_t index) -> Val_t&
+Array<T_t, Size_v>::Array(std::initializer_list<Val_t> init_list)
+{
+    for (int i = 0; i < Size_v; ++i)
+        m_ptr[i] = *(init_list.begin() + i);
+}
+
+template <class T_t, std::size_t Size_v>
+    requires ArrayRequirement<T_t>
+auto Array<T_t, Size_v>::operator[](Size_t index) -> Val_t&
 {
     return const_cast<Val_t&>(static_cast<const Array&>(*this).operator[](index));
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::operator[](Size_t index) const -> const Val_t&
+auto Array<T_t, Size_v>::operator[](Size_t index) const -> const Val_t&
 {
     return m_ptr[index];
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::At(Size_t index) -> Val_t&
+auto Array<T_t, Size_v>::At(Size_t index) -> Val_t&
 {
-    RDS_Assert(index < _Size);
+    RDS_Assert(index < Size_v);
     return const_cast<Val_t&>(static_cast<const Array&>(*this).operator[](index));
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::At(Size_t index) const -> const T_t&
+auto Array<T_t, Size_v>::At(Size_t index) const -> const T_t&
 {
-    RDS_Assert(index < _Size);
+    RDS_Assert(index < Size_v);
     return operator[](index);
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Front() -> T_t&
+auto Array<T_t, Size_v>::Front() -> T_t&
 {
-    return const_cast<T_t&>(static_cast<const Array<T_t, _Size>&>(*this).Front());
+    return const_cast<T_t&>(static_cast<const Array<T_t, Size_v>&>(*this).Front());
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Front() const -> const T_t&
+auto Array<T_t, Size_v>::Front() const -> const T_t&
 {
     return m_ptr[0];
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Back() -> T_t&
+auto Array<T_t, Size_v>::Back() -> T_t&
 {
-    return const_cast<T_t&>(static_cast<Array<T_t, _Size>&>(*this).Back());
+    return const_cast<T_t&>(static_cast<const Array<T_t, Size_v>&>(*this).Back());
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Back() const -> const T_t&
+auto Array<T_t, Size_v>::Back() const -> const T_t&
 {
-    return m_ptr[_Size - 1];
+    return m_ptr[Size_v - 1];
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Begin() -> Iterator
+auto Array<T_t, Size_v>::Begin() -> Iterator
 {
     return Iterator(m_ptr, 0);
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Begin() const -> ConstIterator
+auto Array<T_t, Size_v>::Begin() const -> ConstIterator
 {
     return ConstIterator(m_ptr, 0);
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::End() -> Iterator
+auto Array<T_t, Size_v>::End() -> Iterator
 {
-    return Iterator(m_ptr, _Size);
+    return Iterator(m_ptr, Size_v);
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::End() const -> ConstIterator
+auto Array<T_t, Size_v>::End() const -> ConstIterator
 {
-    return ConstIterator(m_ptr, _Size);
+    return ConstIterator(m_ptr, Size_v);
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::CBegin() const -> ConstIterator
+auto Array<T_t, Size_v>::CBegin() const -> ConstIterator
 {
     return ConstIterator(m_ptr, 0);
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::CEnd() const -> ConstIterator
+auto Array<T_t, Size_v>::CEnd() const -> ConstIterator
 {
-    return ConstIterator(m_ptr, _Size);
+    return ConstIterator(m_ptr, Size_v);
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Size() const -> Size_t
+auto Array<T_t, Size_v>::Size() const -> Size_t
 {
-    return _Size;
+    return Size_v;
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::MaxSize() const -> Size_t
+auto Array<T_t, Size_v>::MaxSize() const -> Size_t
 {
-    return _Size;
+    return Size_v;
 }
 
-template <class T_t, std::size_t _Size>
+template <class T_t, std::size_t Size_v>
     requires ArrayRequirement<T_t>
-inline auto Array<T_t, _Size>::Empty() const -> bool
+auto Array<T_t, Size_v>::Empty() const -> bool
 {
     return false;
 }
 
 RDS_END
 
-#endif // RDS_ARRAY_H
+#endif // RDS_ARRAY_HPP

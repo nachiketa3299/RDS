@@ -1,18 +1,15 @@
+/// @file FVector3.cpp
+
 #include "FVector3.h"
 
-#include <cassert>
 #include <cmath>
-
-#include "RDS_CoreDefs.h"
 
 RDS_BEGIN
 
 using namespace std;
-using Val_t     = FVector3::Val_t;
-using VE_pred_t = FVector3::VE_pred_t;
 
-FVector3::FVector3()
-{}
+using Val_t  = FVector3::Val_t;
+using Pred_t = FVector3::Pred_t;
 
 FVector3::FVector3(Val_t xyz)
     : X(xyz)
@@ -26,133 +23,124 @@ FVector3::FVector3(Val_t x, Val_t y, Val_t z)
     , Z(z)
 {}
 
-FVector3::FVector3(const FVector3& other)
-    : X(other.X)
-    , Y(other.Y)
-    , Z(other.Z)
-{}
-
-FVector3::~FVector3()
-{}
-
-const FVector3 FVector3::XAxisVector()
+auto FVector3::XAxis() -> const FVector3
 {
     return FVector3(1.f, 0.f, 0.f);
 }
 
-const FVector3 FVector3::YAxisVector()
+auto FVector3::YAxis() -> const FVector3
 {
     return FVector3(0.f, 1.f, 0.f);
 }
 
-const FVector3 FVector3::ZAxisVector()
+auto FVector3::ZAxis() -> const FVector3
 {
     return FVector3(0.f, 0.f, 0.f);
 }
 
-const FVector3 FVector3::ZeroVector()
+auto FVector3::Zero() -> const FVector3
 {
     return FVector3(0.f);
 }
 
-const FVector3 FVector3::ForwardVector()
+auto FVector3::Forward() -> const FVector3
 {
     return FVector3(1.f, 0.f, 0.f);
 }
 
-const FVector3 FVector3::BackwardVector()
+auto FVector3::Backward() -> const FVector3
 {
-    return ForwardVector().operator-();
+    return Forward().operator-();
 }
 
-const FVector3 FVector3::LeftVector()
+auto FVector3::Left() -> const FVector3
 {
-    return RightVector().operator-();
+    return Right().operator-();
 }
 
-const FVector3 FVector3::RightVector()
+auto FVector3::Right() -> const FVector3
 {
     return FVector3(0.f, 1.f, 0.f);
 }
 
-const FVector3 FVector3::UpVector()
+auto FVector3::Up() -> const FVector3
 {
     return FVector3(0.f, 0.f, 1.f);
 }
 
-const FVector3 FVector3::DownVector()
+auto FVector3::Down() -> const FVector3
 {
-    return UpVector().operator-();
+    return Up().operator-();
 }
 
-FVector3 FVector3::GetAbs() const
+auto FVector3::GetAbs() const -> FVector3
 {
     return FVector3(abs(X), abs(Y), abs(Z));
 }
 
-void FVector3::Set(const FVector3& other)
+auto FVector3::Set(const FVector3& other) -> void
 {
     operator=(other);
 }
 
-void FVector3::Set(Val_t x, Val_t y, Val_t z)
+auto FVector3::Set(Val_t x, Val_t y, Val_t z) -> void
 {
     operator=(FVector3(x, y, z));
 }
 
-void FVector3::Clear()
+auto FVector3::Clear() -> void
 {
-    operator=(ZeroVector());
+    operator=(Zero());
 }
 
-FVector3 FVector3::GetSafeNormal(float tolerance) const
+auto FVector3::GetSafeNormal(float tolerance) const -> FVector3
 {
     const auto len = Length();
     if (len <= tolerance)
-        return ZeroVector();
+        return Zero();
     return operator/(len);
 }
 
-FVector3 FVector3::GetUnsafeNormal() const
+auto FVector3::GetUnsafeNormal() const -> FVector3
 {
     return operator/(Length());
 }
 
-float FVector3::LengthSquared() const
+auto FVector3::LengthSquared() const -> float
 {
     return pow(X, 2) + pow(Y, 2) + pow(Z, 2);
 }
 
-float FVector3::Length() const
+auto FVector3::Length() const -> float
 {
     return sqrt(LengthSquared());
 }
 
-float FVector3::DistanceSquared(const FVector3& s, const FVector3& e)
+auto FVector3::DistanceSquared(const FVector3& s, const FVector3& e) -> float
 {
     return s.operator-(e).Length();
 }
 
-float FVector3::Distance(const FVector3& s, const FVector3& e)
+auto FVector3::Distance(const FVector3& s, const FVector3& e) -> float
 {
     return sqrt(DistanceSquared(s, e));
 }
 
-FVector3 FVector3::GetCrossProduct(const FVector3& other) const
+auto FVector3::GetCrossProduct(const FVector3& other) const -> FVector3
 {
     const auto& [x1, y1, z1] = *this;
     const auto& [x2, y2, z2] = other;
     return FVector3((y1 * z2 - z1 * y2), (z1 * x2 - x1 * z2), (x1 * y2 - y1 * x2));
 }
 
-float FVector3::GetDotProduct(const FVector3& other) const
+auto FVector3::GetDotProduct(const FVector3& other) const -> float
 {
     const auto& [x1, y1, z1] = *this;
     const auto& [x2, y2, z2] = other;
     return x1 * x2 + y1 * y2 + z1 * z2;
 }
 
-FVector3& FVector3::operator=(const FVector3& other)
+auto FVector3::operator=(const FVector3& other) -> FVector3&
 {
     X = other.X;
     Y = other.Y;
@@ -160,127 +148,121 @@ FVector3& FVector3::operator=(const FVector3& other)
     return *this;
 }
 
-FVector3 FVector3::operator+(const FVector3& other) const
+auto FVector3::operator+(const FVector3& other) const -> FVector3
 {
     return FVector3(X + other.X, Y + other.Y, Z + other.Z);
 }
 
-FVector3 FVector3::operator+(float bias) const
+auto FVector3::operator+(float bias) const -> FVector3
 {
     return FVector3(X + bias, Y + bias, Z + bias);
 }
 
-FVector3 FVector3::operator-() const
+auto FVector3::operator-() const -> FVector3
 {
     return FVector3(-X, -Y, -Z);
 }
 
-FVector3 FVector3::operator-(const FVector3& other) const
+auto FVector3::operator-(const FVector3& other) const -> FVector3
 {
     return operator+(other.operator-());
 }
 
-FVector3 FVector3::operator-(float bias) const
+auto FVector3::operator-(float bias) const -> FVector3
 {
     return operator+(-bias);
 }
 
-FVector3 FVector3::operator*(float coeff) const
+auto FVector3::operator*(float coeff) const -> FVector3
 {
     return FVector3(X * coeff, Y * coeff, Z * coeff);
 }
 
-FVector3 FVector3::operator*(const FVector3& other) const
+auto FVector3::operator*(const FVector3& other) const -> FVector3
 {
     return FVector3(X * other.X, Y * other.Y, Z * other.Z);
 }
 
-FVector3 FVector3::operator/(float coeff) const
+auto FVector3::operator/(float coeff) const -> FVector3
 {
     return operator*(1.f / coeff);
 }
 
-FVector3 FVector3::operator/(const FVector3& other) const
+auto FVector3::operator/(const FVector3& other) const -> FVector3
 {
     return operator*(FVector3(1.f / other.X, 1.f / other.Y, 1.f / other.Z));
 }
 
-FVector3& FVector3::operator+=(const FVector3& other)
+auto FVector3::operator+=(const FVector3& other) -> FVector3&
 {
     return operator=(operator+(other));
 }
 
-FVector3& FVector3::operator-=(const FVector3& other)
+auto FVector3::operator-=(const FVector3& other) -> FVector3&
 {
     return operator=(operator-(other));
 }
 
-FVector3& FVector3::operator*=(float coeff)
+auto FVector3::operator*=(float coeff) -> FVector3&
 {
     return operator=(operator*(coeff));
 }
 
-FVector3& FVector3::operator*=(const FVector3& other)
+auto FVector3::operator*=(const FVector3& other) -> FVector3&
 {
     return operator=(operator*(other));
 }
 
-FVector3& FVector3::operator/=(float coeff)
+auto FVector3::operator/=(float coeff) -> FVector3&
 {
     return operator=(operator/(coeff));
 }
 
-FVector3& FVector3::operator/=(const FVector3& other)
+auto FVector3::operator/=(const FVector3& other) -> FVector3&
 {
     return operator=(operator/(other));
 }
 
-bool FVector3::operator==(const FVector3& other) const
+auto FVector3::operator==(const FVector3& other) const -> bool
 {
     return X == other.X && Y == other.Y && Z == other.Z;
 }
 
-bool FVector3::operator!=(const FVector3& other) const
+auto FVector3::operator!=(const FVector3& other) const -> bool
 {
     return !operator==(other);
 }
 
-Val_t& FVector3::operator[](int index)
+auto FVector3::operator[](int index) -> Val_t&
 {
-    switch (static_cast<V3Idx>(index))
+    switch (static_cast<EIdx>(index))
     {
     default:
-    case V3Idx::X:
-        return X;
-    case V3Idx::Y:
-        return Y;
-    case V3Idx::Z:
-        return Z;
+    case EIdx::X: return X;
+    case EIdx::Y: return Y;
+    case EIdx::Z: return Z;
     }
     return X;
 }
 
-const Val_t& FVector3::operator[](int index) const
+auto FVector3::operator[](int index) const -> const Val_t&
 {
-    switch (static_cast<V3Idx>(index))
+    switch (static_cast<EIdx>(index))
     {
     default:
-    case V3Idx::X:
-        return X;
-    case V3Idx::Y:
-        return Y;
-    case V3Idx::Z:
-        return Z;
+    case EIdx::X: return X;
+    case EIdx::Y: return Y;
+    case EIdx::Z: return Z;
     }
     return X;
 }
 
-void FVector3::Map(VE_pred_t pred)
+auto FVector3::Map(Pred_t pred) -> void
 {
     operator=(FVector3(pred(X), pred(Y), pred(Z)));
 }
 
-FVector3 operator*(float coeff, const FVector3& ref)
+auto operator*(float coeff, const FVector3& ref) -> FVector3
 {
     return ref.operator*(coeff);
 }

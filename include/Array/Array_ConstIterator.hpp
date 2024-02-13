@@ -1,176 +1,228 @@
-#ifndef RDS_ARRAY_CONSTITERATOR_H
-#define RDS_ARRAY_CONSTITERATOR_H
+#ifndef RDS_ARRAY_CONSTITERATOR_HPP
+#define RDS_ARRAY_CONSTITERATOR_HPP
 
 #include <cstddef>
 
-#include "Assertion.h"
 #include "RDS_CoreDefs.h"
+
+#include "Array.hpp"
+#include "Assertion.h"
 
 RDS_BEGIN
 
-/// @class Array
-/// @brief Template class for Static-sized array's const iterator.
-/// @tparam T  value type for element in array
-/// @tparam Size size of array
-template <typename T, std::size_t Size>
+template <typename Array_t>
 class Array_ConstIterator
 {
 public:
-    /// @brief value type for element in array
-    using Val_t  = T;
-    /// @brief difference type
+    using Val_t  = typename Array_t::Val_t;
+    using Size_t = typename Array_t::Size_t;
     using Diff_t = std::ptrdiff_t;
-    /// @brief size type
-    using Size_t = std::size_t;
 
 public:
-    /// @brief Default Constructor.
-    Array_ConstIterator()
-        : m_head{nullptr}
-        , m_offset{0}
-    {}
-
-    /// @brief Constructor gets head pointer from an array and index
-    Array_ConstIterator(const Val_t* head, Size_t index = 0)
-        : m_head(head)
-        , m_offset(index)
-    {}
+    Array_ConstIterator() = default;
+    explicit Array_ConstIterator(const Val_t* head, Size_t index = 0);
 
 private:
-    /// @brief
-    /// @todo WTF this means? (case for offset < 0 && offset > 0)
-    void verifyOffset(const Diff_t offset)
-    {
-        if (offset != 0)
-            RDS_Assert(m_head != nullptr);
-        if (offset < 0)
-            RDS_Assert(m_offset >= Size_t{0} - static_cast<Size_t>(offset));
-        if (offset > 0)
-            RDS_Assert(Size - m_offset >= static_cast<Size_t>(offset));
-    }
-
-    void isCompatible(const Array_ConstIterator& other) const
-    {
-        RDS_Assert(m_head == other.m_head);
-        return;
-    }
+    /// @todo WTF This means?
+    auto VerifyOffset(const Diff_t offset) const -> void;
+    auto IsValid() const -> bool;
+    auto IsCompatible(const Array_ConstIterator& other) const -> bool;
 
 public:
-    /// @brief Dereferencing operator
-    const Val_t& operator*() const
-    {
-        return *(operator->());
-    }
-
-    const Val_t* operator->() const
-    {
-        RDS_Assert(m_head != nullptr);
-        RDS_Assert(m_offset < Size);
-        return m_head + m_offset;
-    }
+    auto operator*() const -> const Val_t&;
+    /// @todo no assertion?
+    auto operator->() const -> const Val_t*;
 
 public:
-    /// @brief Prefix increment
-    Array_ConstIterator& operator++()
-    {
-        /// @todo validation test for head?
-        ++m_offset;
-        return *this;
-    }
-
-    /// @brief Postfix increment
-    Array_ConstIterator operator++(int)
-    {
-        const auto temp = *this;
-        operator++();
-        return temp;
-    }
-
-    /// @brief Prefix decrement
-    Array_ConstIterator& operator--()
-    {
-        --m_offset;
-        return *this;
-    }
-
-    /// @brief Postfix decrement
-    Array_ConstIterator operator--(int)
-    {
-        const auto temp = *this;
-        operator--();
-        return temp;
-    }
+    /// @todo what if reaches the end of array?
+    auto operator++() -> Array_ConstIterator&;
+    auto operator++(int) -> Array_ConstIterator;
+    auto operator--() -> Array_ConstIterator&;
+    auto operator--(int) -> Array_ConstIterator;
 
 public:
-    Array_ConstIterator& operator+=(const Diff_t& offset)
-    {
-        verifyOffset(offset);
-        m_offset += static_cast<Size_t>(offset);
-        return *this;
-    }
+    auto operator+=(const Diff_t offset) -> Array_ConstIterator&;
+    auto operator+(const Diff_t offset) const -> Array_ConstIterator;
+    auto operator-=(const Diff_t offset) -> Array_ConstIterator&;
+    auto operator-(const Diff_t offset) -> Array_ConstIterator;
+    auto operator-(const Array_ConstIterator& other) const -> Diff_t;
 
-    Array_ConstIterator operator+(const Diff_t& offset) const
-    {
-        auto temp = *this;
-        return temp.operator+=(offset);
-    }
-
-    Array_ConstIterator& operator-=(const Diff_t& offset)
-    {
-        verifyOffset(offset);
-        m_offset -= static_cast<Size_t>(offset);
-        return *this;
-    }
-
-    Array_ConstIterator operator-(const Diff_t& offset) const
-    {
-        auto temp = operator*();
-        return temp.operator-=(offset);
-    }
-
-    Diff_t operator-(const Array_ConstIterator& other) const
-    {
-        isCompatible(other);
-        return static_cast<Diff_t>(m_offset - other.m_offset);
-    }
-
-    bool operator==(const Array_ConstIterator& other) const
-    {
-        isCompatible(other);
-        return m_offset == other.m_offset;
-    }
-
-    bool operator!=(const Array_ConstIterator& other) const
-    {
-        return !(operator==(other));
-    }
-
-    bool operator<(const Array_ConstIterator& other) const
-    {
-        isCompatible(other);
-        return m_offset < other.m_offset;
-    }
-
-    bool operator>(const Array_ConstIterator& other) const
-    {
-        return other.operator<(*this);
-    }
-
-    bool operator<=(const Array_ConstIterator& other) const
-    {
-        return !operator>(other);
-    }
-
-    bool operator>=(const Array_ConstIterator& other) const
-    {
-        return !operator<(other);
-    }
+public:
+    auto operator==(const Array_ConstIterator& other) const -> bool;
+    auto operator!=(const Array_ConstIterator& other) const -> bool;
+    auto operator<(const Array_ConstIterator& other) const -> bool;
+    auto operator>(const Array_ConstIterator& other) const -> bool;
+    auto operator<=(const Array_ConstIterator& other) const -> bool;
+    auto operator>=(const Array_ConstIterator& other) const -> bool;
 
 private:
-    const Val_t* m_head;   //< head of array
-    Size_t       m_offset; //< offset from head of array
+    const Val_t* m_head{nullptr};
+    Size_t       m_offset{0};
 };
 
 RDS_END
 
-#endif // RDS_ARRAY_CONSTITERATOR_H
+// IMPLEMENTATIONS //
+
+RDS_BEGIN
+
+template <typename Array_t>
+Array_ConstIterator<Array_t>::Array_ConstIterator(const Val_t* head, Size_t index)
+    : m_head(head)
+    , m_offset(index)
+{}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::VerifyOffset(const Diff_t offset) const -> void
+{
+    if (offset != 0)
+        RDS_Assert(m_head != nullptr);
+    if (offset < 0)
+        RDS_Assert(m_offset >= Size_t{0} - static_cast<Size_t>(offset));
+    if (offset > 0)
+        RDS_Assert(Array_t::Size_v - m_offset >= static_cast<Size_t>(offset));
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::IsValid() const -> bool
+{
+    return m_head != nullptr;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::IsCompatible(const Array_ConstIterator& other) const
+    -> bool
+{
+    return m_head == other.m_head;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator*() const -> const Val_t&
+{
+    return *(operator->());
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator->() const -> const Val_t*
+{
+    return m_head + m_offset;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator++() -> Array_ConstIterator&
+{
+    ++m_offset;
+    return *this;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator++(int) -> Array_ConstIterator
+{
+    const auto temp = *this;
+    operator++();
+    return temp;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator--() -> Array_ConstIterator&
+{
+    --m_offset;
+    return *this;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator--(int) -> Array_ConstIterator
+{
+    const auto temp = *this;
+    operator--();
+    return temp;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator+=(const Diff_t offset)
+    -> Array_ConstIterator&
+{
+    VerifyOffset(offset);
+    m_offset += static_cast<Size_t>(offset);
+    return *this;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator+(const Diff_t offset) const
+    -> Array_ConstIterator
+{
+    auto temp = *this;
+    return temp.operator+=(offset);
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator-=(const Diff_t offset)
+    -> Array_ConstIterator&
+{
+    VerifyOffset(offset);
+    m_offset -= static_cast<Size_t>(offset);
+    return *this;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator-(const Diff_t offset) -> Array_ConstIterator
+{
+    auto temp = *this;
+    return temp.operator-=(offset);
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator-(const Array_ConstIterator& other) const
+    -> Diff_t
+{
+    RDS_Assert(IsCompatible(other));
+    return static_cast<Diff_t>(m_offset - other.m_offset);
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator==(const Array_ConstIterator& other) const
+    -> bool
+{
+    RDS_Assert(IsCompatible(other) && "Iterators are not compatible.");
+    return m_offset == other.m_offset;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator!=(const Array_ConstIterator& other) const
+    -> bool
+{
+    return !(operator==(other));
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator<(const Array_ConstIterator& other) const
+    -> bool
+{
+    RDS_Assert(IsCompatible(other) && "Iterators are not compatible.");
+    return m_offset < other.m_offset;
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator>(const Array_ConstIterator& other) const
+    -> bool
+{
+    return other.operator<(*this);
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator<=(const Array_ConstIterator& other) const
+    -> bool
+{
+    return !operator>(other);
+}
+
+template <typename Array_t>
+auto Array_ConstIterator<Array_t>::operator>=(const Array_ConstIterator& other) const
+    -> bool
+{
+    return !operator<(other);
+}
+
+RDS_END
+
+#endif // RDS_ARRAY_CONSTITERATOR_HPP

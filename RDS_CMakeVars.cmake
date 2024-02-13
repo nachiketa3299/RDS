@@ -9,6 +9,7 @@ set(RDS_SRCS
 
     # Array
     include/Array/Array.hpp
+    include/Array/Array_zero.hpp
     include/Array/Array_ConstIterator.hpp
     include/Array/Array_Iterator.hpp
 
@@ -39,6 +40,7 @@ set(RDS_INC_PRIVATE
 set(RDS_INC_PUBLIC
     include/
     include/Assertion/
+    include/Array/
     include/FVector2/
     include/FVector3/
     include/Allocator/
@@ -60,7 +62,7 @@ macro(rds_enable_gtest)
     enable_testing()
 endmacro()
 
-set(GTEST_DIR test/gtest)
+set(GTEST_DIR test)
 
 macro(rds_add_test CLASS_NAME TEST_NAME)
     set(TARGET_NAME ${CLASS_NAME}_${TEST_NAME}_gtest)

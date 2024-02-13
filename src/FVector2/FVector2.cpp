@@ -8,11 +8,9 @@
 RDS_BEGIN
 
 using namespace std;
-using Val_t     = FVector2::Val_t;
-using VE_pred_t = FVector2::VE_pred_t;
 
-FVector2::FVector2()
-{}
+using Val_t  = FVector2::Val_t;
+using Pred_t = FVector2::Pred_t;
 
 FVector2::FVector2(Val_t xy)
     : X(xy)
@@ -24,208 +22,196 @@ FVector2::FVector2(Val_t x, Val_t y)
     , Y(y)
 {}
 
-FVector2::FVector2(const FVector2& other)
-    : X(other.X)
-    , Y(other.Y)
-{}
-
-FVector2::~FVector2()
-{}
-
-const FVector2 FVector2::XAxisVector()
+auto FVector2::XAxis() -> const FVector2
 {
     return FVector2(1.f, 0.f);
 }
 
-const FVector2 FVector2::YAxisVector()
+auto FVector2::YAxis() -> const FVector2
 {
     return FVector2(0.f, 1.f);
 }
 
-const FVector2 FVector2::ZeroVector()
+auto FVector2::Zero() -> const FVector2
 {
     return FVector2(0.f, 0.f);
 }
 
-FVector2 FVector2::GetAbs() const
+auto FVector2::GetAbs() const -> FVector2
 {
     return FVector2(abs(X), abs(Y));
 }
 
-void FVector2::Set(const FVector2& other)
+auto FVector2::Set(const FVector2& other) -> void
 {
     operator=(other);
 }
 
-void FVector2::Set(Val_t x, Val_t y)
+auto FVector2::Set(Val_t x, Val_t y) -> void
 {
     operator=(FVector2(x, y));
 }
 
-inline void FVector2::Clear()
+auto FVector2::Clear() -> void
 {
     operator=(FVector2(0, 0));
 }
 
-float FVector2::LengthSquared() const
+auto FVector2::LengthSquared() const -> float
 {
     return pow(X, 2) + pow(Y, 2);
 }
 
-float FVector2::Length() const
+auto FVector2::Length() const -> float
 {
     return sqrt(LengthSquared());
 }
 
-float FVector2::DistanceSquared(const FVector2& s, const FVector2& e)
+auto FVector2::DistanceSquared(const FVector2& s, const FVector2& e) -> float
 {
     return pow(s.X - e.X, 2) + pow(s.Y - e.Y, 2);
 }
 
-float FVector2::Distance(const FVector2& start, const FVector2& end)
+auto FVector2::Distance(const FVector2& start, const FVector2& end) -> float
 {
     return sqrt(DistanceSquared(start, end));
 }
 
-FVector2 FVector2::GetSafeNormal(float tolerance) const
+auto FVector2::GetSafeNormal(float tolerance) const -> FVector2
 {
     const auto len = Length();
     if (len <= tolerance)
-        return ZeroVector();
+        return Zero();
     return operator/(len);
 }
 
-FVector2 FVector2::GetUnsafeNormal() const
+auto FVector2::GetUnsafeNormal() const -> FVector2
 {
     return operator/(Length());
 }
 
-float FVector2::GetDotProduct(const FVector2& other) const
+auto FVector2::GetDotProduct(const FVector2& other) const -> float
 {
     const auto& [x1, y1] = *this;
     const auto& [x2, y2] = other;
     return (x1 * x2) + (y1 * y2);
 }
 
-FVector2& FVector2::operator=(const FVector2& other)
+auto FVector2::operator=(const FVector2& other) -> FVector2&
 {
     X = other.X;
     Y = other.Y;
     return *this;
 }
 
-FVector2 FVector2::operator+(const FVector2& other) const
+auto FVector2::operator+(const FVector2& other) const -> FVector2
 {
     return FVector2(X + other.X, Y + other.Y);
 }
 
-FVector2 FVector2::operator+(float bias) const
+auto FVector2::operator+(float bias) const -> FVector2
 {
     return FVector2(X + bias, Y + bias);
 }
 
-FVector2 FVector2::operator-() const
+auto FVector2::operator-() const -> FVector2
 {
     return FVector2(-X, -Y);
 }
 
-FVector2 FVector2::operator-(const FVector2& other) const
+auto FVector2::operator-(const FVector2& other) const -> FVector2
 {
     return operator+(other.operator-());
 }
 
-FVector2 FVector2::operator-(float bias) const
+auto FVector2::operator-(float bias) const -> FVector2
 {
     return operator+(-bias);
 }
 
-FVector2 FVector2::operator*(float coeff) const
+auto FVector2::operator*(float coeff) const -> FVector2
 {
     return FVector2(X * coeff, Y * coeff);
 }
 
-FVector2 FVector2::operator*(const FVector2& other) const
+auto FVector2::operator*(const FVector2& other) const -> FVector2
 {
     return FVector2(X * other.X, Y * other.Y);
 }
 
-FVector2 FVector2::operator/(float coeff) const
+auto FVector2::operator/(float coeff) const -> FVector2
 {
     return operator*(1.f / coeff);
 }
 
-FVector2 FVector2::operator/(const FVector2& other) const
+auto FVector2::operator/(const FVector2& other) const -> FVector2
 {
     return operator*(FVector2(1.f / other.X, 1.f / other.Y));
 }
 
-FVector2& FVector2::operator+=(const FVector2& other)
+auto FVector2::operator+=(const FVector2& other) -> FVector2&
 {
     return operator=(operator+(other));
 }
 
-FVector2& FVector2::operator-=(const FVector2& other)
+auto FVector2::operator-=(const FVector2& other) -> FVector2&
 {
     return operator=(operator-(other));
 }
 
-FVector2& FVector2::operator*=(float coeff)
+auto FVector2::operator*=(float coeff) -> FVector2&
 {
     return operator=(operator*(coeff));
 }
 
-FVector2& FVector2::operator*=(const FVector2& other)
+auto FVector2::operator*=(const FVector2& other) -> FVector2&
 {
     return operator=(operator*(other));
 }
 
-FVector2& FVector2::operator/=(float coeff)
+auto FVector2::operator/=(float coeff) -> FVector2&
 {
     return operator=(operator/(coeff));
 }
 
-FVector2& FVector2::operator/=(const FVector2& other)
+auto FVector2::operator/=(const FVector2& other) -> FVector2&
 {
     return operator=(operator/(other));
 }
 
-bool FVector2::operator==(const FVector2& other)
+auto FVector2::operator==(const FVector2& other) -> bool
 {
     return X == other.X && Y == other.Y;
 }
 
-bool FVector2::operator!=(const FVector2& other)
+auto FVector2::operator!=(const FVector2& other) -> bool
 {
     return !operator==(other);
 }
 
-Val_t& FVector2::operator[](int index)
+auto FVector2::operator[](int index) -> Val_t&
 {
-    switch (static_cast<V2Idx>(index))
+    switch (static_cast<EIdx>(index))
     {
     default:
-    case V2Idx::X:
-        return X;
-    case V2Idx::Y:
-        return Y;
+    case EIdx::X: return X;
+    case EIdx::Y: return Y;
     }
     return Y;
 }
 
-const Val_t& FVector2::operator[](int index) const
+auto FVector2::operator[](int index) const -> const Val_t&
 {
-    switch (static_cast<V2Idx>(index))
+    switch (static_cast<EIdx>(index))
     {
     default:
-    case V2Idx::X:
-        return X;
-    case V2Idx::Y:
-        return Y;
+    case EIdx::X: return X;
+    case EIdx::Y: return Y;
     }
     return X;
 }
 
-void FVector2::Map(VE_pred_t pred)
+auto FVector2::Map(Pred_t pred) -> void
 {
     operator=(FVector2(pred(X), pred(Y)));
 }
@@ -235,7 +221,7 @@ FVector2 operator*(float coeff, const FVector2& ref)
     return ref.operator*(coeff);
 }
 
-string FVector2::GetAsString() const
+auto FVector2::GetAsString() const -> string
 {
     return "(" + to_string(X) + ", " + to_string(Y) + ")";
 }
