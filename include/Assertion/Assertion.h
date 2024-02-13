@@ -1,3 +1,5 @@
+/// @file RDS_CoreDefs.h
+
 #ifndef RDS_ASSERTION_H
 #define RDS_ASSERTION_H
 
@@ -7,19 +9,19 @@ RDS_BEGIN
 
 // clang-format off
 
-/// @brief Macro function for assertion in RDS library
-/// @param[in] Expression bool-evaluated expresion to assert
-/// @see @ref __rds_assert(bool, const char*, const char*, long int*)
+/// @brief RDS 라이브러리에서 사용하는 메인 Assertion 매크로
+/// @param[in] Expression bool 로 평가되는 표현식
+/// @see \ref __rds_assert(bool, const char*, const char*, long int*)
 #define RDS_Assert(Expression) __rds_assert(Expression, #Expression, __FILE__, __LINE__)
 
 // clang-format on
 
-/// @brief Inner assertion function.
-/// @warning Not intended to call directly. Use @ref RDS_Assert instead.
-/// @param[in] exp bool-evaluated expression to assert
-/// @param[in] exp_str string of expression itself
-/// @param[in] file_str name of file ( @p __FILE__ )
-/// @param[in] line line number where this assertion called ( @p __LINE__ )
+/// @brief Assertion 매크로 내부 함수 (직접 호출하지 말 것!)
+/// @warning 직접 호출하지 말고 #RDS_Assert 매크로를 통해 호출할 것
+/// @param[in] exp bool로 평가되는 표현식
+/// @param[in] exp_str 표현식의 문자열
+/// @param[in] file_str 이 Assertion이 호출된 파일의 이름 (`__FILE__`)
+/// @param[in] line 이 Assertion이 호출된 줄 번호 (`__LINE__`)
 void __rds_assert(bool exp, const char* exp_str, const char* file_str, long int line);
 
 RDS_END
