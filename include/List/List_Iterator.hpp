@@ -1,4 +1,4 @@
-/// @file List_ConstIterator.hpp
+/// @file List_Iterator.hpp
 
 #ifndef RDS_LIST_ITERATOR_HPP
 #define RDS_LIST_ITERATOR_HPP
@@ -16,9 +16,11 @@ RDS_BEGIN
 template <class List_t>
 class List_Iterator: public List_ConstIterator<List_t>
 {
-public:
+public: // Base Template Class
     /// @brief 이 반복자의 기초 클래스
-    using Super    = List_ConstIterator<List_t>;
+    using Super = List_ConstIterator<List_t>;
+
+public: // Type Alias
     /// @brief 이 반복자가 가리키는 리스트 원소의 자료형
     using Val_t    = typename List_ConstIterator<List_t>::Val_t;
     /// @brief 이 반복자가 가리키는 리스트 크기의 자료형
@@ -26,44 +28,49 @@ public:
     /// @brief 이 반복자가 가리키는 리스트 노드의 자료형 (@ref Node_D)
     using Node_D_t = typename List_ConstIterator<List_t>::Node_D_t;
 
-public:
+public: // Default CDtors
     /// @brief 기본 생성자
     List_Iterator()                                   = default;
     /// @brief 기본 복사 생성자
     List_Iterator(const List_Iterator<List_t>& other) = default;
     /// @brief 기본 소멸자
     ~List_Iterator()                                  = default;
+
+public:
     /// @brief 리스트내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자.
     /// @param[in] list_ptr 이 반복자가 가리키는 리스트 자체에 대한 포인터
     /// @param[in] node_pos_ptr 이 반복자가 가리키는 리스트의 노드에 대한 포인터
-    List_Iterator(const List_t* list_ptr, const Node_D_t* node_pos_ptr) noexcept;
+    explicit List_Iterator(const List_t*   list_ptr,
+                           const Node_D_t* node_pos_ptr) noexcept;
 
-public:
+public: // IO Iterator
     /// @brief 이 반복자가 가리키는 리스트 노드 내 값에 대한 lvalue 참조를 반환한다.
     /// @details @ref List_ConstIterator::operator*() 를 호출하고 @p const_cast 로
     /// 상수성을 제거한다.
-    Val_t& operator*() const noexcept;
+    auto operator*() const noexcept -> Val_t&;
     /// @brief 이 반복자가 가리키는 리스트 노드 내 값에 대한 포인터를 반환한다.
     /// @details @ref List_ConstIterator::operator->() 를 호출하고 @p const_cast 로
     /// 상수성을 제거한다.
-    Val_t* operator->() const noexcept;
+    auto operator->() const noexcept -> Val_t*;
 
-public:
-    /// @copydoc List_ConstIterator::operator++()
-    List_Iterator& operator++() noexcept;
-    /// @copydoc List_ConstIterator::operator++(int)
-    List_Iterator  operator++(int) noexcept;
-    /// @copydoc List_ConstIterator::operator--()
-    List_Iterator& operator--() noexcept;
-    /// @copydoc List_ConstIterator::operator--(int)
-    List_Iterator  operator--(int) noexcept;
+public: // Forward Iterator
+    /// @brief 이 반복자가 가리키는 리스트 노드를 다음으로 이동시킨다노
+    auto operator++() noexcept -> List_Iterator&;
+    /// @brief 이 반복자가 가리키는 리스트 노드를 다음으로 이동시킨다노
+    auto operator++(int) noexcept -> List_Iterator;
+
+public: // Bidirectional Iterator
+    /// @brief 이 반복자가 가리키는 리스트 노드를 이전으로 이동시킨다노
+    auto operator--() noexcept -> List_Iterator&;
+    /// @brief 이 반복자가 가리키는 리스트 노드를 이전으로 이동시킨다노
+    auto operator--(int) noexcept -> List_Iterator;
 
 public:
     /// @brief 이 반복자가 가리키는 노드의 포인터를 반환한다.
     /// @return 이 반복자가 가리키는 리스트 내 노드의 포인터
-    /// @details \ref List_ConstIterator 의 \ref m_node_ptr 을 상수성을 제거하여
+    /// @details \ref List_ConstIterator 의 \ref m_data_ptr 을 상수성을 제거하여
     /// 반환한다.
-    Node_D_t* GetNodePointer() const;
+    auto GetDataPointer() const -> Node_D_t*;
 };
 
 RDS_END
@@ -121,9 +128,9 @@ auto List_Iterator<List_t>::operator--(int) noexcept -> List_Iterator
 }
 
 template <class List_t>
-auto List_Iterator<List_t>::GetNodePointer() const -> Node_D_t*
+auto List_Iterator<List_t>::GetDataPointer() const -> Node_D_t*
 {
-    return const_cast<Node_D_t*>(Super::m_node_ptr);
+    return const_cast<Node_D_t*>(Super::GetDataPointer());
 }
 
 RDS_END

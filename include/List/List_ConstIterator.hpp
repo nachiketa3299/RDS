@@ -11,11 +11,10 @@
 
 RDS_BEGIN
 
-/// @class List_ConstIterator
 /// @brief \ref List 컨테이너에 대한 상수 반복자 템플릿 클래스
-/// @tparam List_t 이 상수 반복자가 가리킬 리스트의 자료형
+/// @tparam List_t 이 상수 반복자가 가리킬 리스트 자료형
 /// @details 양방향 반복자(Bidirectional Iterator) 이며, 기본적으로 이 상수 반복자가
-/// 가리키는 리스트와 리스트 내부 노드를 포인터(\ref m_node_ptr, \ref m_list_ptr)로
+/// 가리키는 리스트와 리스트 내부 노드를 포인터(\ref m_node_ptr, \ref m_cont_ptr)로
 /// 저장하고 있다.
 template <class List_t>
 class List_ConstIterator
@@ -28,31 +27,34 @@ public:
     /// @brief 이 상수 반복자가 가리키는 리스트 노드의 자료형 (@ref Node_D)
     using Node_D_t = typename List_t::Node_D_t;
 
-public:
+public: // Default CDtors
     /// @brief 기본 생성자. 모든 멤버를 @p nullptr 로 설정한다.
     List_ConstIterator()                                        = default;
     /// @brief 기본 복사 생성자
     List_ConstIterator(const List_ConstIterator<List_t>& other) = default;
     /// @brief 기본 소멸자
     ~List_ConstIterator()                                       = default;
-    /// @brief 리스트내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자.
-    /// @param[in] list_ptr 이 상수 반복자가 가리키는 리스트 자체에 대한 포인터
-    /// @param[in] node_pos_ptr 이 상수 반복자가 가리키는 리스트의 노드에 대한 포인터
-    List_ConstIterator(const List_t* list_ptr, const Node_D_t* node_pos_ptr) noexcept;
 
-public:
+public: // Custom Ctors
+    /// @brief 리스트내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자.
+    /// @param[in] cont_ptr 이 상수 반복자가 가리키는 리스트 자체에 대한 포인터
+    /// @param[in] node_pos_ptr 이 상수 반복자가 가리키는 리스트의 노드에 대한 포인터
+    explicit List_ConstIterator(const List_t*   cont_ptr,
+                                const Node_D_t* node_pos_ptr) noexcept;
+
+public: // IO Iterator
     /// @brief 이 상수 반복자가 가리키는 리스트 노드내 값 @p val 에 대한
     /// const-lvalue 참조를 반환한다.
     /// @details 역참조 연산자에 대한 오버로드.
     /// @todo 반복자의 위치가 End() 인 경우, 역참조시 비정상 종료하도록 구현
-    const Val_t& operator*() const noexcept;
+    auto operator*() const noexcept -> const Val_t&;
     /// @brief 이 상수 반복자가 가리키는 리스트 노드내 값 @p val 에 대한 상수
     /// 포인터를 반환한다.
     /// @details 화살표(클래스 멤버 접근 연산자)에 대한 오버로드. 화살표 연산자 특성상,
     /// 전역 화살표 연산자가 해당 반환값에 대해 다시 한 번 적용된다.
-    const Val_t* operator->() const noexcept;
+    auto operator->() const noexcept -> const Val_t*;
 
-public:
+public: // Forward Iterator
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 다음 노드로
     /// 바꾼다.
     /// @return 이 반복자에 대한 lvalue 참조
@@ -61,7 +63,7 @@ public:
     /// @ref List::End() 의 다음으로 가는 것과 같으며, Assertion Failed이다.
     /// @test 반복자가 현재 센티넬 노드를 가리키고 있을 때, 이 연산을 수행하면 비정상
     /// 종료하는지 확인.
-    List_ConstIterator& operator++() noexcept;
+    auto operator++() noexcept -> List_ConstIterator&;
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 다음 노드로
     /// 바꾼다.
     /// @return 이 반복자에 대한 연산 전의 사본
@@ -70,7 +72,9 @@ public:
     /// @ref List::End() 의 다음으로 가는 것과 같으며, Assertion Failed이다.
     /// @test 반복자가 현재 센티넬 노드를 가리키고 있을 때, 이 연산을 수행하면 비정상
     /// 종료하는지 확인.
-    List_ConstIterator  operator++(int) noexcept;
+    auto operator++(int) noexcept -> List_ConstIterator;
+
+public: // Bidirectional Iterator
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 이전 노드로
     /// 바꾼다.
     /// @return 이 반복자에 대한 lvalue 참조
@@ -80,7 +84,7 @@ public:
     /// 같으며, Assertion Failed이다.
     /// @test 반복자가 현재 센티넬 노드 바로 다음 노드를 가리키고 있을 때, 이 연산을
     /// 수행하면 비정상 종료하는지 확인.
-    List_ConstIterator& operator--() noexcept;
+    auto operator--() noexcept -> List_ConstIterator&;
     /// @brief 이 상수 반복자가 가리키는 리스트 노드를 리스트의 이전 노드로
     /// 바꾼다.
     /// @return 이 반복자에 대한 연산 전의 사본
@@ -89,11 +93,12 @@ public:
     /// 노드라면, @ref List::Begin()의 이전으로 가는 것과 같으며, Assertion Failed이다.
     /// @test 반복자가 현재 센티넬 노드 바로 다음 노드를 가리키고 있을 때, 이 연산을
     /// 수행하면 비정상 종료하는지 확인.
-    List_ConstIterator  operator--(int) noexcept;
+    auto operator--(int) noexcept -> List_ConstIterator;
 
 public: // Comparators
     /// @brief 인자로 전달된 반복자와 이 반복자가 같은지 비교한다.
     /// @param[in] other 비교할 반복자
+    /// @return 두 반복자가 같은 경우 `true`, 그렇지 않으면 `false`
     /// @details 다음의 두 조건을 만족하면 두 반복자가 같다고 정의한다.
     /// - 두 반복자가 같은 리스트를 가리키고 있다. (\ref
     /// List_ConstIterator::IsCompatible_unchecked(const List_t*) const 의 결과이다.)
@@ -103,48 +108,49 @@ public: // Comparators
     /// 두 반복자가 모두 `nullptr` 인 리스트를 가리키고 있고, 노드 또한 `nullptr` 이면
     /// 두 반복자는 모두 유효하지 않지만, 어쨌든 같은 것으로 취급한다.
     /// @test \ref List_Iterators_Equality_gtest.cpp 에서 테스트.
-    bool operator==(const List_ConstIterator<List_t>& other) const;
+    auto operator==(const List_ConstIterator<List_t>& other) const -> bool;
+    /// @brief 인자로 전달된 반복자와 이 반복자가 다른지 비교한다
+    /// @param other 비교할 반복자
+    /// @return 두 반복자가 다른 경우 `true`, 그렇지 않으면 `false`
+    auto operator!=(const List_ConstIterator<List_t>& other) const -> bool;
 
-public:
-public:
+public: // Helper Functions
     /// @brief 이 반복자가 유효한지 확인한다.
     /// @return 반복자의 유효성 여부. 유효한 경우 `true`, 그렇지 않으면 `false`
-    bool IsValid() const;
-
+    auto IsValid() const -> bool;
     /// @brief 이 반복자가 가리키는 리스트의 원소를 역참조할 수 있는지 확인한다.
     /// @return 역참조 여부. 역참조가 가능한 경우 `true`, 그렇지 않으면 `false`
     /// @details 역참조가 가능하지 않은 상황은 다음과 같다.\n
     /// - 이 반복자가 유효한 리스트의 유효한 위치를 가리키고 있지 않은 경우 (\ref
     /// IsValid() const 의 결과이다.)
     /// - 이 반복자가 센티넬 노드를 가리키고 있는 경우
-    bool IsDereferencible() const;
-
+    auto IsDereferencible() const -> bool;
     /// @brief 인자로 전달된 리스트에 대한 참조가 이 상수 반복자가 가리키는 리스트와
     /// 호환되는지 확인한다.
     /// @param list 이 반복자와 호환성을 확인할 리스트
     /// @return 호환성 여부. 호환이 되는 경우 `true`, 그렇지 않으면 `false`
     /// @details 매개 변수가 참조로 전달되기 때문에 항상 유효한 리스트를 전달해야 한다.
-    bool IsCompatible(const List_t& list) const;
+    auto IsCompatible(const List_t& list) const -> bool;
 
 private:
     /// @brief 인자로 전달된 리스트에 대한 포인터가 이 상수 반복자가 가리키는 리스트와
     /// 호환되는지 확인한다.
-    /// @param list_ptr 이 반복자와 호환성을 확인할 리스트
+    /// @param cont_ptr 이 반복자와 호환성을 확인할 리스트
     /// @return 호환성 여부. 호환이 되는 경우 `true`, 그렇지 않으면 `false`
     /// @details 매개 변수가 포인터로 전달되기 때문에 항상 유효한 리스트를 가리키지 않을
     /// 수도 있음을 주의한다.
-    bool IsCompatible_unchecked(const List_t* list_ptr) const;
+    auto IsCompatible_unchecked(const List_t* cont_ptr) const -> bool;
 
-public:
+public: // Data Access
     /// @brief 이 상수 반복자가 가리키는 노드의 주소를 반환한다.
     /// @return 이 상수 반복자가 가리키는 노드의 주소
-    const Node_D_t* GetNodePointer() const;
+    auto GetDataPointer() const -> const Node_D_t*;
 
-protected:
-    /// @brief 이 상수 반복자가 가리키는 리스트 내 노드에 대한 상수 포인터
-    const Node_D_t* m_node_ptr{nullptr};
+protected: // Members
     /// @brief 반복자가 가리키는 리스트에 대한 상수 포인터
-    const List_t*   m_list_ptr{nullptr};
+    const List_t*   m_cont_ptr{nullptr};
+    /// @brief 이 상수 반복자가 가리키는 리스트 내 노드에 대한 상수 포인터
+    const Node_D_t* m_data_ptr{nullptr};
 };
 
 RDS_END
@@ -154,16 +160,17 @@ RDS_END
 RDS_BEGIN
 
 template <class List_t>
-List_ConstIterator<List_t>::List_ConstIterator(const List_t*   list_ptr,
+List_ConstIterator<List_t>::List_ConstIterator(const List_t*   cont_ptr,
                                                const Node_D_t* node_pos_ptr) noexcept
-    : m_node_ptr(node_pos_ptr)
-    , m_list_ptr(list_ptr)
+    : m_data_ptr(node_pos_ptr)
+    , m_cont_ptr(cont_ptr)
 {}
 
 template <class List_t>
 auto List_ConstIterator<List_t>::operator*() const noexcept -> const Val_t&
 {
-    return m_node_ptr->val;
+    RDS_Assert(IsDereferencible() && "Cannot dereference invalid iterator.");
+    return m_data_ptr->val;
 }
 
 template <typename List_t>
@@ -176,10 +183,10 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator++() noexcept -> List_ConstIterator<List_t>&
 {
     // 현재 노드가 센티넬 노드가 아닌 경우에만 증가 연산을 수행한다.
-    RDS_Assert(m_node_ptr != std::addressof(m_list_ptr->GetSentinel()) &&
+    RDS_Assert(m_data_ptr != m_cont_ptr->GetSentinelPointer() &&
                "Cannot increment end iterator.");
 
-    m_node_ptr = m_node_ptr->next;
+    m_data_ptr = m_data_ptr->next;
     return *this;
 }
 
@@ -187,11 +194,11 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator++(int) noexcept -> List_ConstIterator<List_t>
 {
     // 현재 노드가 센티넬 노드가 아닌 경우에만 증가 연산을 수행한다.
-    RDS_Assert(m_node_ptr != std::addressof(m_list_ptr->GetSentinel()) &&
+    RDS_Assert(m_data_ptr != m_cont_ptr->GetSentinelPointer() &&
                "Cannot increment end iterator.");
 
     auto temp  = *this;
-    m_node_ptr = m_node_ptr->next;
+    m_data_ptr = m_data_ptr->next;
     return temp;
 }
 
@@ -199,10 +206,10 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator--() noexcept -> List_ConstIterator<List_t>&
 {
     // 이전 노드가 센티넬 노드가 아닌 경우에만 감소 연산을 수행한다.
-    RDS_Assert(m_node_ptr->prev != std::addressof(m_list_ptr->GetSentinel()) &&
+    RDS_Assert(m_data_ptr->prev != m_cont_ptr->GetSentinelPointer() &&
                "Cannot decrement begin iterator.");
 
-    m_node_ptr = m_node_ptr->prev;
+    m_data_ptr = m_data_ptr->prev;
     return *this;
 }
 
@@ -210,11 +217,11 @@ template <typename List_t>
 auto List_ConstIterator<List_t>::operator--(int) noexcept -> List_ConstIterator<List_t>
 {
     // 이전 노드가 센티넬 노드가 아닌 경우에만 감소 연산을 수행한다.
-    RDS_Assert(m_node_ptr->prev != std::addressof(m_list_ptr->GetSentinel()) &&
+    RDS_Assert(m_data_ptr->prev != m_cont_ptr->GetSentinelPointer() &&
                "Cannot decrement begin iterator.");
 
     auto temp  = *this;
-    m_node_ptr = m_node_ptr->prev;
+    m_data_ptr = m_data_ptr->prev;
     return temp;
 }
 
@@ -222,39 +229,46 @@ template <class List_t>
 auto List_ConstIterator<List_t>::operator==(
     const List_ConstIterator<List_t>& other) const -> bool
 {
-    return IsCompatible_unchecked(other.m_list_ptr) && m_node_ptr == other.m_node_ptr;
+    return IsCompatible_unchecked(other.m_cont_ptr) && m_data_ptr == other.m_data_ptr;
+}
+
+template <class List_t>
+auto List_ConstIterator<List_t>::operator!=(
+    const List_ConstIterator<List_t>& other) const -> bool
+{
+    return !(operator==(other));
 }
 
 template <class List_t>
 auto List_ConstIterator<List_t>::IsCompatible(const List_t& list) const -> bool
 {
     // list is not null
-    return std::addressof(list) == m_list_ptr;
+    return std::addressof(list) == m_cont_ptr;
 }
 
 template <class List_t>
 auto List_ConstIterator<List_t>::IsDereferencible() const -> bool
 {
-    return IsValid() && std::addressof(m_list_ptr->GetSentinel()) != m_node_ptr;
+    return IsValid() && m_cont_ptr->GetSentinelPointer() != m_data_ptr;
 }
 
 template <class List_t>
 auto List_ConstIterator<List_t>::IsValid() const -> bool
 {
-    return m_list_ptr != nullptr && m_node_ptr != nullptr;
+    return m_cont_ptr != nullptr && m_data_ptr != nullptr;
 }
 
 template <class List_t>
-auto List_ConstIterator<List_t>::IsCompatible_unchecked(const List_t* list_ptr) const
+auto List_ConstIterator<List_t>::IsCompatible_unchecked(const List_t* cont_ptr) const
     -> bool
 {
-    return list_ptr == m_list_ptr;
+    return cont_ptr == m_cont_ptr;
 }
 
 template <class List_t>
-auto List_ConstIterator<List_t>::GetNodePointer() const -> const Node_D_t*
+auto List_ConstIterator<List_t>::GetDataPointer() const -> const Node_D_t*
 {
-    return m_node_ptr;
+    return m_data_ptr;
 }
 
 RDS_END
