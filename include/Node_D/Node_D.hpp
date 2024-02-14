@@ -19,7 +19,7 @@ public:
     /// @brief 노드가 가지는 값에 대한 자료형
     using Val_t = T_t;
 
-public:
+public: // Default CDtors
     /// @brief 기본 생성자
     /// @details
     /// 멤버 \ref val 이 원시 자료형인 경우 value-initialization이
@@ -34,17 +34,21 @@ public:
     Node_D()  = default;
     /// @brief 기본 소멸자
     ~Node_D() = default;
+
+public: // Custom Ctors
     /// @brief 초기화 값으로 노드의 값을 초기화하는 생성자
     /// @param[in] value 초기화할 값
     Node_D(const Val_t& value);
+    /// @brief 이전 노드와 다음 노드를 가리키는 포인터를 받는 생성자
+    Node_D(Node_D* prev, Node_D* next);
 
 public:
     /// @brief 노드가 가지는 값
     Val_t   val{};
-    /// @brief 이 노드의 다음 노드를 가리키는 포인터. 기본적으로 `nullptr`로 초기화된다.
-    Node_D* next{nullptr};
     /// @brief 이 노드의 이전 노드를 가리키는 포인터. 기본적으로 `nullptr`로 초기화된다.
     Node_D* prev{nullptr};
+    /// @brief 이 노드의 다음 노드를 가리키는 포인터. 기본적으로 `nullptr`로 초기화된다.
+    Node_D* next{nullptr};
 };
 
 RDS_END
@@ -55,6 +59,13 @@ template <class T_t>
     requires std::default_initializable<T_t>
 Node_D<T_t>::Node_D(const Val_t& value)
     : val(value)
+{}
+
+template <class T_t>
+    requires std::default_initializable<T_t>
+Node_D<T_t>::Node_D(Node_D* prev, Node_D* next)
+    : prev(prev)
+    , next(next)
 {}
 
 RDS_END
