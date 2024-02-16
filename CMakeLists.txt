@@ -22,4 +22,4 @@ target_include_directories(${PROJECT_NAME}
 )
 
 # 테스트 프로그램 빌드
-add_subdirectory(test)
+add_subdirectory(RDT)

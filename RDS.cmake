@@ -9,12 +9,13 @@ set(RDS_SRCS
 
     # === Array
     include/Array/Array.hpp
-    include/Array/Array_zero.hpp
     include/Array/Array_ConstIterator.hpp
     include/Array/Array_Iterator.hpp
 
     # Memory Management
-    # include/Allocator/MAllocator.hpp
+    include/Allocator/Allocator_Trait.hpp
+    include/Allocator/Mallocator.hpp
+
     # include/Allocator/Allocator.hpp
     # include/Arena/Arena.hpp
 
