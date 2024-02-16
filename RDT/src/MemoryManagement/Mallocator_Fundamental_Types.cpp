@@ -1,4 +1,5 @@
 /// @file Mallocator_Fundamental_Types.cpp
+/// 기본 자료형에 대해 Mallocator 클래스의 테스트 코드
 
 #include <gtest/gtest.h>
 
