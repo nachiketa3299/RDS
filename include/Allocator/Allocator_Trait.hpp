@@ -22,11 +22,11 @@ public: // Memory Allocation / Deallocation
     /// @brief 인자로 전달된 크기만큼의 메모리를 할당한다.
     /// @param count 할당할 메모리의 크기
     /// @return 할당된 메모리의 시작 주소
-    static auto Allocate(Size_t count) -> Val_t*;
+    static auto Allocate(Size_t count) -> Val_t* { return Alloc_t().Allocate(count); }
 
     /// @brief 할당된 메모리를 해제한다.
     /// @param ptr 할당된 메모리의 시작 주소
-    static auto Deallocate(Val_t* const ptr) -> void;
+    static auto Deallocate(const Val_t* ptr) -> void { Alloc_t().Deallocate(ptr); }
 
 public: // Object Construction / Deconstruction
     /// @brief 포인터의 위치에 객체를 생성한다.
@@ -34,48 +34,20 @@ public: // Object Construction / Deconstruction
     /// @param ptr 객체를 생성할 위치를 가리키는 포인터
     /// @param ...CtorArgs 객체를 생성할 때 생성자에 전달할 인자(들)
     template <class... CtorArgs_t>
-    static auto Construct(Val_t* const ptr, const Size_t count,
-                          CtorArgs_t&&... CtorArgs) -> void;
+    static auto Construct(Val_t* ptr, Size_t count, CtorArgs_t&&... CtorArgs) -> void
+    {
+        Alloc_t().Construct(ptr, count, std::forward<CtorArgs_t>(CtorArgs)...);
+    }
 
     /// @brief 포인터의 위치에 있는 객체를 소멸시킨다.
     /// @param ptr 소멸시킬 객체의 시작 주소
-    static auto Deconstruct(Val_t* const ptr, const Size_t count) -> void;
+    static auto Deconstruct(const Val_t* ptr, Size_t count) -> void
+    {
+        Alloc_t().Deconstruct(ptr, count);
+    }
 
 public:
 };
-
-RDS_END
-
-// IMPLEMENTATIONS //
-
-RDS_BEGIN
-
-template <class Alloc_t>
-inline auto Allocator_Trait<Alloc_t>::Allocate(Size_t count) -> Val_t*
-{
-    return Alloc_t().Allocate(count);
-}
-
-template <class Alloc_t>
-inline auto Allocator_Trait<Alloc_t>::Deallocate(Val_t* const ptr) -> void
-{
-    Alloc_t().Deallocate(ptr);
-}
-
-template <class Alloc_t>
-template <class... CtorArgs_t>
-inline auto Allocator_Trait<Alloc_t>::Construct(Val_t* const ptr, const Size_t count,
-                                                CtorArgs_t&&... CtorArgs) -> void
-{
-    Alloc_t().Construct(ptr, count, std::forward<CtorArgs_t>(CtorArgs)...);
-}
-
-template <class Alloc_t>
-inline auto Allocator_Trait<Alloc_t>::Deconstruct(Val_t* const ptr, const Size_t count)
-    -> void
-{
-    Alloc_t().Deconstruct(ptr, count);
-}
 
 RDS_END
 

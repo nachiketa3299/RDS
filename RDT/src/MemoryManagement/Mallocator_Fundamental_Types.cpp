@@ -11,6 +11,19 @@ RDT_BEGIN
 template <class T_t>
 class tfMallocator_Test: public testing::Test
 {
+    void SetUp() override
+    {
+        struct A
+        {
+            int a{};
+        };
+
+        A a = A{3};
+
+        auto* const ptr = &a;
+        ptr->a          = 44;
+    }
+
 protected:
     rds::Mallocator<T_t> m_mallocator{};
 };

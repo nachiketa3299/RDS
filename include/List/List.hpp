@@ -10,6 +10,9 @@
 #include "Assertion.h"
 #include "RDS_CoreDefs.h"
 
+#include "Allocator_Trait.hpp"
+#include "Mallocator.hpp"
+
 #include "List_ConstIterator.hpp"
 #include "List_Iterator.hpp"
 #include "Node_D.hpp"
@@ -19,7 +22,7 @@ RDS_BEGIN
 /// @brief 동적 이중 연결 리스트에 대한 템플릿 클래스
 /// @tparam T_t 리스트 내 원소에 대한 자료형
 /// @details 리스트의 최전방에 비어 있는 노드를 두어 구현하였다.
-template <class T_t>
+template <class T_t, class Alloc_t = Mallocator<Node_D<T_t>>>
 class List
 {
 public: // Type Aliases
@@ -54,6 +57,17 @@ public: // Custom Dtor
     /// @details 센티넬 노드 다음부터 시작하여 리스트에 동적으로 할당된 노드들을
     /// 해제한다.
     ~List();
+
+public:
+    /// @brief 새로운 노드위한 메모리를 할당하고, 그 위치에 노드를 생성한 후 주소를
+    /// 반환한다.
+    /// @param val 노드에 들어갈 값
+    /// @return 동적으로 생성된 노드의 주소
+    auto CreateNode(const Val_t& val) const -> Node_D_t*;
+    /// @brief 동적으로 할당된 노드의 주소를 받아 그 노드를 소멸시키고 할당된 메모리를
+    /// 해제한다.
+    /// @param node 소멸시킬 노드의 주소
+    auto DeleteNode(const Node_D_t* node) const -> void;
 
 public: // Element Access - Front & Back
     /// @brief 리스트의 첫 번째 원소에 대한 const-lvalue 참조를 반환한다.
@@ -109,14 +123,14 @@ public: // Modifiers
     /// @param[in] it_pos 삽입할 위치를 가리키는 반복자. 이 위치 이전에 새 원소가
     /// 삽입된다.
     /// @param[in] val 삽입할 원소의 값
-    auto InsertBefore(Iterator it_pos, const Val_t& val) -> void;
+    auto InsertBefore(ConstIterator it_pos, const Val_t& val) -> void;
     /// @brief 인자로 전달된 반복자가 가리키는 위치 이전에 새 원소를 전달받은 갯수만큼
     /// 삽입한다.
     /// @param[in] it_pos 삽입할 위치를 가리키는 반복자. 이 위치 이전에 새 원소가
     /// 삽입된다.
     /// @param[in] val 삽입할 원소의 값
     /// @param[in] count 삽입할 원소의 갯수
-    auto InsertBefore(Iterator it_pos, Size_t count, const Val_t& val) -> void;
+    auto InsertBefore(ConstIterator it_pos, Size_t count, const Val_t& val) -> void;
     /// @brief 인자로 전달된 반복자가 가리키는 위치에 있는 원소를 제거한다.
     /// @param[in] it_pos 삭제할 위치를 가리키는 반복자. 정확히 이 위치에 있는 원소가
     /// 삭제된다.
@@ -129,7 +143,7 @@ public: // Modifiers
     /// @todo 반복자를 리턴하도록 해야함
     /// @todo ConstIterator도 받을 수 있음
     /// @todo 시작과 끝 반복자를 받는 버전도 작성해야 함
-    auto Erase(Iterator it_pos) -> Iterator;
+    auto Erase(ConstIterator it_pos) -> Iterator;
     /// @brief 반복자로 주어진 범위의 원소들을 제거한다. 제거되는 범위는 `[it_first,
     /// it_last)` 이다.
     /// @param it_first 제거할 원소들의 시작 위치를 가리키는 반복자
@@ -184,7 +198,8 @@ public: // Comparators
     /// @test 두 리스트의 크기가 같고 크기가 0일 때, 항상 `true`를 반환하는지 확인
     /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `true` 를 반환하는 경우
     /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `false` 를 반환하는 경우
-    auto operator==(const List<Val_t>& other) const -> bool;
+    template <class Other_Alloc_t>
+    auto operator==(const List<Val_t, Other_Alloc_t>& other) const -> bool;
 
 private: // Members
     /// @brief 리스트의 센티넬 노드이다.
@@ -199,29 +214,29 @@ RDS_END
 
 RDS_BEGIN
 
-template <class T_t>
-List<T_t>::List()
+template <class T_t, class Alloc_t>
+List<T_t, Alloc_t>::List()
     : m_sentinel_node(std::addressof(m_sentinel_node), std::addressof(m_sentinel_node))
 {}
 
-template <class T_t>
-List<T_t>::List(std::size_t size, const T_t& init_val)
+template <class T_t, class Alloc_t>
+List<T_t, Alloc_t>::List(std::size_t size, const T_t& init_val)
     : m_sentinel_node(std::addressof(m_sentinel_node), std::addressof(m_sentinel_node))
 {
     for (std::size_t i = 0; i < size; ++i)
         PushBack(init_val);
 }
 
-template <class T_t>
-List<T_t>::List(const std::initializer_list<T_t>& init_list)
+template <class T_t, class Alloc_t>
+List<T_t, Alloc_t>::List(const std::initializer_list<T_t>& init_list)
     : m_sentinel_node(std::addressof(m_sentinel_node), std::addressof(m_sentinel_node))
 {
     for (const auto& e: init_list)
         PushBack(e);
 }
 
-template <class T_t>
-List<T_t>::~List()
+template <class T_t, class Alloc_t>
+List<T_t, Alloc_t>::~List()
 {
     auto* ptr = m_sentinel_node.next;
     // 센티넬 노드 다음부터 시작하여 센티넬 노드까지 순회하며 메모리 해제
@@ -230,26 +245,43 @@ List<T_t>::~List()
         auto* to_delete = ptr;
         ptr             = ptr->next;
 
-        delete to_delete;
+        DeleteNode(to_delete);
     }
 }
 
-template <class T_t>
-void List<T_t>::PushBack(const T_t& val)
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::CreateNode(const Val_t& val) const -> Node_D_t*
+{
+    Node_D_t* ptr = Allocator_Trait<Alloc_t>::Allocate(1);
+    Allocator_Trait<Alloc_t>::Construct(ptr, 1, val);
+
+    return ptr;
+}
+
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::DeleteNode(const Node_D_t* node) const -> void
+{
+    Allocator_Trait<Alloc_t>::Deconstruct(node, 1);
+    Allocator_Trait<Alloc_t>::Deallocate(node);
+}
+
+template <class T_t, class Alloc_t>
+void List<T_t, Alloc_t>::PushBack(const T_t& val)
 {
     InsertBefore(End(), val);
 }
 
-template <class T_t>
-auto List<T_t>::Erase(Iterator it_pos) -> Iterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Erase(ConstIterator it_pos) -> Iterator
 {
     auto it_last = it_pos;
     it_last.operator++();
     return Erase(it_pos, it_last);
 }
 
-template <class T_t>
-auto List<T_t>::Erase(ConstIterator it_first, ConstIterator it_last) -> Iterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Erase(ConstIterator it_first, ConstIterator it_last)
+    -> Iterator
 {
     RDS_Assert(it_first.IsDereferencible() && "Start of range is not dereferencible.");
     RDS_Assert(it_last.IsValid() && "End of range is not valid.");
@@ -276,126 +308,132 @@ auto List<T_t>::Erase(ConstIterator it_first, ConstIterator it_last) -> Iterator
       range_before           [return] range_after(it_last)
     */
 
-    const auto* range_start = it_first.GetDataPointer();
+    // ConsIterator 로부터 노드 포인터를 받아와서 Const 를 떼버린다!
+    auto* range_start  = const_cast<Node_D_t*>(it_first.GetDataPointer());
+    auto* range_before = range_start->prev;
 
-    auto* range_before = const_cast<Node_D_t*>(range_start->prev);
-    auto* range_after  = const_cast<Node_D_t*>(it_last.GetDataPointer());
+    auto* range_after = const_cast<Node_D_t*>(it_last.GetDataPointer());
 
+    // 삭제 범위 전후 노드에 대한 재연결
     range_before->next = range_after;
     range_after->prev  = range_before;
 
+    // 삭제 범위를 순회하며 노드 삭제
     const auto* p = range_start;
     while (p != range_after)
     {
-        auto* to_delete = p;
-        p               = p->next;
-        delete to_delete;
+        const auto* to_delete = p;
+        p                     = p->next;
+
+        DeleteNode(to_delete);
+
         --m_size;
     }
 
     return Iterator(this, range_after);
 }
 
-template <class T_t>
-void List<T_t>::PopBack()
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::PopBack() -> void
 {
     Erase(End().operator--());
 }
 
-template <class T_t>
-void List<T_t>::PushFront(const Val_t& val)
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::PushFront(const Val_t& val) -> void
 {
     InsertBefore(Begin(), val);
 }
 
-template <class T_t>
-void List<T_t>::PopFront()
+template <class T_t, class Alloc_t>
+void List<T_t, Alloc_t>::PopFront()
 {
     Erase(Begin());
 }
 
-template <class T_t>
-auto List<T_t>::Front() -> T_t&
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Front() -> T_t&
 {
     return const_cast<T_t&>(static_cast<const List&>(*this).Front());
 }
 
-template <class T_t>
-auto List<T_t>::Front() const -> const T_t&
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Front() const -> const T_t&
 {
     RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access front in empty list.");
     return m_sentinel_node.next->val;
 }
 
-template <class T_t>
-auto List<T_t>::Back() -> T_t&
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Back() -> T_t&
 {
     return const_cast<T_t&>(static_cast<const List&>(*this).Back());
 }
 
-template <class T_t>
-auto List<T_t>::Back() const -> const T_t&
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Back() const -> const T_t&
 {
     RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access back in empty list.");
     return m_sentinel_node.prev->val;
 }
 
-template <class T_t>
-auto List<T_t>::GetSentinelPointer() const -> const Node_D_t*
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::GetSentinelPointer() const -> const Node_D_t*
 {
     return std::addressof(m_sentinel_node);
 }
 
-template <class T_t>
-auto List<T_t>::Begin() -> Iterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Begin() -> Iterator
 {
     return Iterator(this, m_sentinel_node.next);
 }
 
-template <class T_t>
-auto List<T_t>::Begin() const -> ConstIterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Begin() const -> ConstIterator
 {
     return ConstIterator(this, m_sentinel_node.next);
 }
 
-template <class T_t>
-auto List<T_t>::End() -> Iterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::End() -> Iterator
 {
     return Iterator(this, std::addressof(m_sentinel_node));
 }
 
-template <class T_t>
-auto List<T_t>::End() const -> ConstIterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::End() const -> ConstIterator
 {
     return ConstIterator(this, std::addressof(m_sentinel_node));
 }
 
-template <class T_t>
-auto List<T_t>::CBegin() const -> ConstIterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::CBegin() const -> ConstIterator
 {
     return Begin();
 }
 
-template <class T_t>
-auto List<T_t>::CEnd() const -> ConstIterator
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::CEnd() const -> ConstIterator
 {
     return End();
 }
 
-template <class T_t>
-auto List<T_t>::Size() const -> Size_t
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Size() const -> Size_t
 {
     return m_size;
 }
 
-template <class T_t>
-auto List<T_t>::Empty() const -> bool
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::Empty() const -> bool
 {
     return m_size == 0;
 }
 
-template <class T_t>
-auto List<T_t>::InsertBefore(Iterator it_pos, const Val_t& val) -> void
+template <class T_t, class Alloc_t>
+inline auto List<T_t, Alloc_t>::InsertBefore(ConstIterator it_pos, const Val_t& val)
+    -> void
 {
     RDS_Assert(it_pos.IsCompatible(*this) && "List is not compatible.");
 
@@ -411,9 +449,9 @@ auto List<T_t>::InsertBefore(Iterator it_pos, const Val_t& val) -> void
     ...<-p-[prev_node]-n-><-p-[new_node]-n-><-p-[ins_node]-n-><-p-[next_node]-n->...
     */
 
-    auto* new_node_ptr = new Node_D_t(val);
+    Node_D_t* new_node_ptr = CreateNode(val);
 
-    auto* ins_node_ptr  = it_pos.GetDataPointer();
+    auto* ins_node_ptr  = const_cast<Node_D_t*>(it_pos.GetDataPointer());
     auto* prev_node_ptr = ins_node_ptr->prev;
 
     new_node_ptr->prev = prev_node_ptr;
@@ -425,8 +463,10 @@ auto List<T_t>::InsertBefore(Iterator it_pos, const Val_t& val) -> void
     ++m_size;
 }
 
-template <class T_t>
-auto List<T_t>::operator==(const List<Val_t>& other) const -> bool
+template <class T_t, class Alloc_t>
+template <class Other_Alloc_t>
+inline auto
+List<T_t, Alloc_t>::operator==(const List<Val_t, Other_Alloc_t>& other) const -> bool
 {
     if (m_size != other.m_size)
         return false;

@@ -64,13 +64,6 @@ public: // Bidirectional Iterator
     auto operator--() noexcept -> List_Iterator&;
     /// @brief 이 반복자가 가리키는 리스트 노드를 이전으로 이동시킨다노
     auto operator--(int) noexcept -> List_Iterator;
-
-public:
-    /// @brief 이 반복자가 가리키는 노드의 포인터를 반환한다.
-    /// @return 이 반복자가 가리키는 리스트 내 노드의 포인터
-    /// @details \ref List_ConstIterator 의 \ref m_data_ptr 을 상수성을 제거하여
-    /// 반환한다.
-    auto GetDataPointer() const -> Node_D_t*;
 };
 
 RDS_END
@@ -125,12 +118,6 @@ auto List_Iterator<List_t>::operator--(int) noexcept -> List_Iterator
     auto temp = *this;
     operator--();
     return temp;
-}
-
-template <class List_t>
-auto List_Iterator<List_t>::GetDataPointer() const -> Node_D_t*
-{
-    return const_cast<Node_D_t*>(Super::GetDataPointer());
 }
 
 RDS_END

@@ -27,60 +27,36 @@ public: // Default CDtors
     ~Mallocator()                 = default;
 
 public: // Memory Allocation / Deallocation
-    auto Allocate(Size_t count) -> Val_t*;
-    auto Deallocate(Val_t* const ptr) -> void;
+    auto Allocate(Size_t count) -> Val_t*
+    {
+        return static_cast<Val_t*>(malloc(sizeof(Val_t) * count));
+    }
+
+    /// @todo 이게 애초에 매개변수가 `const Val_t*` 이 아니어야 하는 것 아닌가?
+    auto Deallocate(const Val_t* ptr) -> void
+    {
+        free(const_cast<void*>(static_cast<const void*>(ptr)));
+    }
 
 public: // Object Construction / Destruction
     template <class... CtorArgs_t>
-    auto Construct(Val_t* const ptr, const Size_t count, CtorArgs_t&&... CtorArgs)
-        -> void;
+    auto Construct(Val_t* ptr, Size_t count, CtorArgs_t&&... CtorArgs) -> void
+    {
+        for (Size_t i = 0; i < count; ++i)
+        {
+            // Placement new
+            ::new (ptr + i) Val_t(std::forward<CtorArgs_t>(CtorArgs)...);
+        }
+    }
 
-    auto Deconstruct(Val_t* const ptr, const Size_t count) -> void;
+    auto Deconstruct(const Val_t* ptr, Size_t count) -> void
+    {
+        for (Size_t i = 0; i < count; ++i)
+        {
+            (ptr + i)->~Val_t();
+        }
+    }
 };
-
-RDS_END
-
-// IMPLEMENTATIONS //
-
-RDS_BEGIN
-
-template <class T_t>
-inline auto Mallocator<T_t>::Allocate(Size_t count) -> Val_t*
-{
-    // 그냥 메모리를 할당하기만 한다
-    return static_cast<Val_t*>(malloc(sizeof(Val_t) * count));
-}
-
-template <class T_t>
-inline auto Mallocator<T_t>::Deallocate(Val_t* const ptr) -> void
-{
-    // 그냥 메모리를 해제하기만 한다
-    free(ptr);
-}
-
-template <class T_t>
-template <class... CtorArgs_t>
-inline auto Mallocator<T_t>::Construct(Val_t* const ptr, const Size_t count,
-                                       CtorArgs_t&&... CtorArgs) -> void
-{
-    // 객체를 생성해야 한다
-    //::new (ptr) Val_t(std::forward<CtorArgs_t>(CtorArgs)...);
-    for (Size_t i = 0; i < count; ++i)
-    {
-        // Placement new
-        ::new (ptr + i) Val_t(std::forward<CtorArgs_t>(CtorArgs)...);
-    }
-}
-
-template <class T_t>
-inline auto Mallocator<T_t>::Deconstruct(Val_t* const ptr, const Size_t count) -> void
-{
-    // 객체를 소멸시켜야 한다
-    for (Size_t i = 0; i < count; ++i)
-    {
-        (ptr + i)->~Val_t();
-    }
-}
 
 RDS_END
 
