@@ -7,12 +7,20 @@
 
 RDS_BEGIN
 
+#ifdef _DEBUG // _DEBUG가 정의되어 있을 때만 디버그 모드로 동작
+
 /// @brief RDS 라이브러리에서 사용하는 메인 Assertion 매크로
 /// @param[in] Expression bool 로 평가되는 표현식
 /// @see \ref rds_assert(bool, const char*, const char*, long int*)
 #define RDS_Assert(Expression) rds_assert(Expression, #Expression, __FILE__, __LINE__)
-
 #define RDS_Error(Message) rds_error(Message, __FILE__, __LINE__)
+
+#else // _DEBUG가 정의되어 있지 않을 때는 아무것도 하지 않음 (과연?)
+
+#define RDS_Assert(Expression) ((void)0)
+#define RDS_Error(Message) ((void)0)
+
+#endif
 
 /// @brief Assertion 매크로 내부 함수 (직접 호출하지 말 것!)
 /// @warning 직접 호출하지 말고 #RDS_Assert 매크로를 통해 호출할 것
