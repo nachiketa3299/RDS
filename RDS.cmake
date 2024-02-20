@@ -40,13 +40,21 @@ set(RDS_INC_PRIVATE
 
 set(RDS_INC_PUBLIC
     include/
+
     include/Assertion/
+
     include/Array/
+
     include/FVector2/
     include/FVector3/
+
     include/Allocator/
+
     include/Arena/
+
     include/Node_D/
+
     include/List/
+
     include/Vector/
 )
