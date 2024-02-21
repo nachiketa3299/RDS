@@ -3,6 +3,9 @@ set(RDS_SRCS
     # === Assertion
     src/Assertion/Assertion.cpp
 
+    # === TypeTraits
+    include/TypeTraits/TypeTraits.hpp
+
     # === FVectors
     src/FVector2/FVector2.cpp
     src/FVector3/FVector3.cpp
@@ -42,6 +45,8 @@ set(RDS_INC_PUBLIC
     include/
 
     include/Assertion/
+
+    include/TypeTraits/
 
     include/Array/
 

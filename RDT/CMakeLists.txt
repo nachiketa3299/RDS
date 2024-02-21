@@ -23,3 +23,5 @@ rdt_add_test(MemoryManagement Allocator_Trait_Mallocator_Fundamental_Types)
 rdt_add_test(List Basic)
 
 rdt_add_test(Vector Ctor)
+
+rdt_add_test(Cores Helpers)
