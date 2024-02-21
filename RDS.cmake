@@ -28,6 +28,12 @@ set(RDS_SRCS
     include/List/List_ConstIterator.hpp
     include/List/List_Iterator.hpp
 
+    # === ForwardList
+    include/Node_S/Node_S.hpp
+    include/ForwardList/ForwardList.hpp
+    include/ForwardList/ForwardList_ConstIterator.hpp
+    include/ForwardList/ForwardList_Iterator.hpp
+
     # === Vector
     include/Vector/Vector.hpp
     include/Vector/Vector_ConstIterator.hpp
@@ -58,8 +64,11 @@ set(RDS_INC_PUBLIC
     include/Arena/
 
     include/Node_D/
+    include/Node_S/
 
     include/List/
 
     include/Vector/
+
+    include/ForwardList/
 )

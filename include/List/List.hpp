@@ -41,12 +41,13 @@ public: // Iterator Type Aliases
 
 public: // Custom Ctors
     /// @brief 기본 생성자
-    /// @details 리스트의 초기 크기를 0으로, 센티넬 노드의 다음 노드와 이전 노드를 자기
-    /// 자신으로 초기화한다.
+    /// @details 리스트의 초기 크기를 0으로, 센티넬 노드의 다음 노드와 이전
+    /// 노드를 자기 자신으로 초기화한다.
     List();
     /// @brief 리스트의 초기 크기와 초기값을 지정하는 생성자
     /// @param[in] size 생성할 리스트의 크기
-    /// @param[in] init_val 생성할 리스트의 초기값. 모든 원소가 이 값으로 초기화된다.
+    /// @param[in] init_val 생성할 리스트의 초기값. 모든 원소가 이 값으로
+    /// 초기화된다.
     List(Size_t size, const Val_t& init_val);
     /// @brief \p std::initializer_list 를 통해 초기화하는 생성자
     /// @param init_list 초기화 리스트
@@ -59,13 +60,13 @@ public: // Custom Dtor
     ~List();
 
 public:
-    /// @brief 새로운 노드위한 메모리를 할당하고, 그 위치에 노드를 생성한 후 주소를
-    /// 반환한다.
+    /// @brief 새로운 노드위한 메모리를 할당하고, 그 위치에 노드를 생성한 후
+    /// 주소를 반환한다.
     /// @param val 노드에 들어갈 값
     /// @return 동적으로 생성된 노드의 주소
     auto CreateNode(const Val_t& val) const -> Node_D_t*;
-    /// @brief 동적으로 할당된 노드의 주소를 받아 그 노드를 소멸시키고 할당된 메모리를
-    /// 해제한다.
+    /// @brief 동적으로 할당된 노드의 주소를 받아 그 노드를 소멸시키고 할당된
+    /// 메모리를 해제한다.
     /// @param node 소멸시킬 노드의 주소
     auto DeleteNode(const Node_D_t* node) const -> void;
 
@@ -120,43 +121,46 @@ public: // Modifiers
     auto Swap() -> void;
     auto Clear() -> void;
     /// @brief 인자로 전달된 반복자가 가리키는 위치 이전에 새 원소를 삽입한다.
-    /// @param[in] it_pos 삽입할 위치를 가리키는 반복자. 이 위치 이전에 새 원소가
-    /// 삽입된다.
+    /// @param[in] it_pos 삽입할 위치를 가리키는 반복자. 이 위치 이전에 새
+    /// 원소가 삽입된다.
     /// @param[in] val 삽입할 원소의 값
     auto InsertBefore(ConstIterator it_pos, const Val_t& val) -> void;
-    /// @brief 인자로 전달된 반복자가 가리키는 위치 이전에 새 원소를 전달받은 갯수만큼
-    /// 삽입한다.
-    /// @param[in] it_pos 삽입할 위치를 가리키는 반복자. 이 위치 이전에 새 원소가
-    /// 삽입된다.
+    /// @brief 인자로 전달된 반복자가 가리키는 위치 이전에 새 원소를 전달받은
+    /// 갯수만큼 삽입한다.
+    /// @param[in] it_pos 삽입할 위치를 가리키는 반복자. 이 위치 이전에 새
+    /// 원소가 삽입된다.
     /// @param[in] val 삽입할 원소의 값
     /// @param[in] count 삽입할 원소의 갯수
-    auto InsertBefore(ConstIterator it_pos, Size_t count, const Val_t& val) -> void;
+    auto InsertBefore(ConstIterator it_pos, Size_t count, const Val_t& val)
+        -> void;
     /// @brief 인자로 전달된 반복자가 가리키는 위치에 있는 원소를 제거한다.
-    /// @param[in] it_pos 삭제할 위치를 가리키는 반복자. 정확히 이 위치에 있는 원소가
-    /// 삭제된다.
+    /// @param[in] it_pos 삭제할 위치를 가리키는 반복자. 정확히 이 위치에 있는
+    /// 원소가 삭제된다.
     /// @test @ref List_Erase_gtest.cpp 에서 테스트한다.\n
-    /// (1) 비어 있는 리스트에서 시작, 끝 반복자를 통해 Erase 메서드를 호출하는 경우
-    /// 비정상 종료함을 확인\n
-    /// (2) 비어 있지 않은 리스트에서 센티널 노드 위치의 반복자를 통해 Erase 메서드를
-    /// 호출하는 경우 비정상 종료함을 확인\n (3) 호환되지 않는 리스트의 반복자로 Erase
-    /// 메서드를 호출하는 경우 비정상 종료
+    /// (1) 비어 있는 리스트에서 시작, 끝 반복자를 통해 Erase 메서드를 호출하는
+    /// 경우 비정상 종료함을 확인\n (2) 비어 있지 않은 리스트에서 센티널 노드
+    /// 위치의 반복자를 통해 Erase 메서드를 호출하는 경우 비정상 종료함을 확인\n
+    /// (3) 호환되지 않는 리스트의 반복자로 Erase 메서드를 호출하는 경우 비정상
+    /// 종료
     /// @todo 반복자를 리턴하도록 해야함
     /// @todo ConstIterator도 받을 수 있음
     /// @todo 시작과 끝 반복자를 받는 버전도 작성해야 함
     auto Erase(ConstIterator it_pos) -> Iterator;
-    /// @brief 반복자로 주어진 범위의 원소들을 제거한다. 제거되는 범위는 `[it_first,
-    /// it_last)` 이다.
+    /// @brief 반복자로 주어진 범위의 원소들을 제거한다. 제거되는 범위는
+    /// `[it_first, it_last)` 이다.
     /// @param it_first 제거할 원소들의 시작 위치를 가리키는 반복자
     /// @param it_last 제거할 원소들의 끝 위치를 가리키는 반복자
     /// @return 제거된 범위의 다음 위치를 가리키는 반복자
-    /// @warning `it_first` 와 `it_last`가 유효하지 않은 범위라면, Undefined Behavior
-    /// 이다.\n 예를 들어, `it_last`가 `it_first` 보다 이전을 가리키는 경우가 그렇다.
+    /// @warning `it_first` 와 `it_last`가 유효하지 않은 범위라면, Undefined
+    /// Behavior 이다.\n 예를 들어, `it_last`가 `it_first` 보다 이전을 가리키는
+    /// 경우가 그렇다.
     /// @details
-    /// - `it_first` 는 역참조 가능해야 하고, `it_last`는 유효해야 한다. 그렇지 않으면
-    /// 비정상 종료한다.\n
-    /// - `it_first`와 `it_last`가 리스트와 호환되지 않는 경우 비정상 종료한다.\n
-    /// - `it_first`와 `it_last`가 같은 경우, 아무런 동작을 하지 않고 `it_last`를
-    /// 반환한다.
+    /// - `it_first` 는 역참조 가능해야 하고, `it_last`는 유효해야 한다. 그렇지
+    /// 않으면 비정상 종료한다.\n
+    /// - `it_first`와 `it_last`가 리스트와 호환되지 않는 경우 비정상
+    /// 종료한다.\n
+    /// - `it_first`와 `it_last`가 같은 경우, 아무런 동작을 하지 않고
+    /// `it_last`를 반환한다.
     auto Erase(ConstIterator it_first, ConstIterator it_last) -> Iterator;
     /// @brief 인자로 전달된 값을 리스트의 뒤에 추가한다.
     /// @param[in] val 추가할 원소의 값
@@ -186,18 +190,22 @@ public: // Comparators
     /// @brief 두 리스트가 같은지 비교한다.
     /// @param other 비교할 리스트
     /// @return 두 리스트가 같으면 `true`, 그렇지 않으면 `false`
-    /// @note \ref Val_t 가 사용자 정의 자료형인 경우, 연산자 `==`이 정의되어 있어야
-    /// 한다.
+    /// @note \ref Val_t 가 사용자 정의 자료형인 경우, 연산자 `==`이 정의되어
+    /// 있어야 한다.
     /// @details 동등 비교 순서는 다음과 같다.\n
     /// 1. *두 리스트의 크기가 다르면*, 항상 같은 리스트가 아니다.
     /// 2. *두 리스트의 크기가 같고 크기가 0이라면*,항상 같은 리스트이다.
-    /// 3. *두 리스트의 크기가 같고 크기가 0이 아니라면*, 두 리스트의 각 원소를 순회하며
-    /// 모든 원소가 같은 경우 같은 리스트이고, 그렇지 않으면 다른 리스트이다.
+    /// 3. *두 리스트의 크기가 같고 크기가 0이 아니라면*, 두 리스트의 각 원소를
+    /// 순회하며 모든 원소가 같은 경우 같은 리스트이고, 그렇지 않으면 다른
+    /// 리스트이다.
     /// @test \ref List_Compare_Equality_gtest.cpp 에서 테스트한다.
     /// @test 두 리스트의 크기가 다를 때, 항상 `false` 를 반환하는지 확인
-    /// @test 두 리스트의 크기가 같고 크기가 0일 때, 항상 `true`를 반환하는지 확인
-    /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `true` 를 반환하는 경우
-    /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `false` 를 반환하는 경우
+    /// @test 두 리스트의 크기가 같고 크기가 0일 때, 항상 `true`를 반환하는지
+    /// 확인
+    /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `true` 를 반환하는
+    /// 경우
+    /// @test 두 리스트의 크기가 같고 크기가 0이 아닐 때, `false` 를 반환하는
+    /// 경우
     template <class Other_Alloc_t>
     auto operator==(const List<Val_t, Other_Alloc_t>& other) const -> bool;
 
@@ -216,12 +224,14 @@ RDS_BEGIN
 
 template <class T_t, class Alloc_t>
 List<T_t, Alloc_t>::List()
-    : m_sentinel_node(std::addressof(m_sentinel_node), std::addressof(m_sentinel_node))
+    : m_sentinel_node(std::addressof(m_sentinel_node),
+                      std::addressof(m_sentinel_node))
 {}
 
 template <class T_t, class Alloc_t>
 List<T_t, Alloc_t>::List(std::size_t size, const T_t& init_val)
-    : m_sentinel_node(std::addressof(m_sentinel_node), std::addressof(m_sentinel_node))
+    : m_sentinel_node(std::addressof(m_sentinel_node),
+                      std::addressof(m_sentinel_node))
 {
     for (std::size_t i = 0; i < size; ++i)
         PushBack(init_val);
@@ -229,7 +239,8 @@ List<T_t, Alloc_t>::List(std::size_t size, const T_t& init_val)
 
 template <class T_t, class Alloc_t>
 List<T_t, Alloc_t>::List(const std::initializer_list<T_t>& init_list)
-    : m_sentinel_node(std::addressof(m_sentinel_node), std::addressof(m_sentinel_node))
+    : m_sentinel_node(std::addressof(m_sentinel_node),
+                      std::addressof(m_sentinel_node))
 {
     for (const auto& e: init_list)
         PushBack(e);
@@ -280,10 +291,11 @@ inline auto List<T_t, Alloc_t>::Erase(ConstIterator it_pos) -> Iterator
 }
 
 template <class T_t, class Alloc_t>
-inline auto List<T_t, Alloc_t>::Erase(ConstIterator it_first, ConstIterator it_last)
-    -> Iterator
+inline auto List<T_t, Alloc_t>::Erase(ConstIterator it_first,
+                                      ConstIterator it_last) -> Iterator
 {
-    RDS_Assert(it_first.IsDereferencible() && "Start of range is not dereferencible.");
+    RDS_Assert(it_first.IsDereferencible() &&
+               "Start of range is not dereferencible.");
     RDS_Assert(it_last.IsValid() && "End of range is not valid.");
     RDS_Assert(it_first.IsCompatible(*this) &&
                "List is not compatible with given iterator.");
@@ -360,7 +372,8 @@ inline auto List<T_t, Alloc_t>::Front() -> T_t&
 template <class T_t, class Alloc_t>
 inline auto List<T_t, Alloc_t>::Front() const -> const T_t&
 {
-    RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access front in empty list.");
+    RDS_Assert(static_cast<int>(m_size) > 0 &&
+               "Cannot access front in empty list.");
     return m_sentinel_node.next->val;
 }
 
@@ -373,7 +386,8 @@ inline auto List<T_t, Alloc_t>::Back() -> T_t&
 template <class T_t, class Alloc_t>
 inline auto List<T_t, Alloc_t>::Back() const -> const T_t&
 {
-    RDS_Assert(static_cast<int>(m_size) > 0 && "Cannot access back in empty list.");
+    RDS_Assert(static_cast<int>(m_size) > 0 &&
+               "Cannot access back in empty list.");
     return m_sentinel_node.prev->val;
 }
 
@@ -432,8 +446,8 @@ inline auto List<T_t, Alloc_t>::Empty() const -> bool
 }
 
 template <class T_t, class Alloc_t>
-inline auto List<T_t, Alloc_t>::InsertBefore(ConstIterator it_pos, const Val_t& val)
-    -> void
+inline auto List<T_t, Alloc_t>::InsertBefore(ConstIterator it_pos,
+                                             const Val_t&  val) -> void
 {
     RDS_Assert(it_pos.IsCompatible(*this) && "List is not compatible.");
 
@@ -466,7 +480,8 @@ inline auto List<T_t, Alloc_t>::InsertBefore(ConstIterator it_pos, const Val_t& 
 template <class T_t, class Alloc_t>
 template <class Other_Alloc_t>
 inline auto
-List<T_t, Alloc_t>::operator==(const List<Val_t, Other_Alloc_t>& other) const -> bool
+List<T_t, Alloc_t>::operator==(const List<Val_t, Other_Alloc_t>& other) const
+    -> bool
 {
     if (m_size != other.m_size)
         return false;
