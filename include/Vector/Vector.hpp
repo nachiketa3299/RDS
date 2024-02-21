@@ -24,44 +24,45 @@ public:
     using Allocator_t = Alloc_t;
 
 public: // Type Aliases
-    using Val_t  = T_t;
-    using Size_t = std::size_t;
+    using Value_t      = T_t;
+    using Size_t       = std::size_t;
+    using Difference_t = std::ptrdiff_t;
 
 public: // Iterator Type Aliases
-    using ConstIterator = Vector_ConstIterator<Vector<Val_t>>;
-    using Iterator      = Vector_Iterator<Vector<Val_t>>;
+    using ConstIterator = Vector_ConstIterator<Vector<Value_t>>;
+    using Iterator      = Vector_Iterator<Vector<Value_t>>;
 
 public: // Default Ctros
     Vector()              = default;
     Vector(const Vector&) = default;
 
 public:
-    Vector(Size_t size, const Val_t& init_val);
-    Vector(const std::initializer_list<Val_t>& init_list);
+    Vector(Size_t size, const Value_t& init_val);
+    Vector(const std::initializer_list<Value_t>& init_list);
 
 public:
     ~Vector();
 
 public: // Element Access
-    auto operator[](Size_t index) const -> const Val_t&;
-    auto operator[](Size_t index) -> Val_t&;
-    auto At(Size_t index) const -> const Val_t&;
-    auto At(Size_t index) -> Val_t&;
+    auto operator[](Size_t index) const -> const Value_t&;
+    auto operator[](Size_t index) -> Value_t&;
+    auto At(Size_t index) const -> const Value_t&;
+    auto At(Size_t index) -> Value_t&;
 
 public:
-    auto Front() const -> const Val_t&;
-    auto Front() -> Val_t&;
-    auto Back() const -> const Val_t&;
-    auto Back() -> Val_t&;
+    auto Front() const -> const Value_t&;
+    auto Front() -> Value_t&;
+    auto Back() const -> const Value_t&;
+    auto Back() -> Value_t&;
 
 public:
-    auto GetSentinelPointer() const -> const Val_t*;
+    auto GetSentinelPointer() const -> const Value_t*;
 
 public: // Iterators
-    auto Begin() -> Iterator;
     auto Begin() const -> ConstIterator;
-    auto End() -> Iterator;
+    auto Begin() -> Iterator;
     auto End() const -> ConstIterator;
+    auto End() -> Iterator;
 
 public:
     auto CBegin() const -> ConstIterator;
@@ -77,23 +78,24 @@ public:
     auto Shrink() -> void;
 
 public: // cppreference 다시 참고하여 매개변수 형식 확정지을 것
-    auto Assign(const Val_t& val, Size_t n) -> void; // Iterator 버전은 템플릿으로 구현
-    template<class InputIt_t>
+    auto Assign(const Value_t& val, Size_t n)
+        -> void; // Iterator 버전은 템플릿으로 구현
+    template <class InputIt_t>
     auto Assign(InputIt_t first, InputIt_t last) -> void;
-    auto Assign(const std::initializer_list<Val_t>& init_list) -> void;
-    auto PushBack(const Val_t& val) -> void;
+    auto Assign(const std::initializer_list<Value_t>& init_list) -> void;
+    auto PushBack(const Value_t& val) -> void;
     auto PopBack() -> void;
-    auto Insert(Iterator it_pos, const Val_t&) -> Iterator;
-    auto Insert(Iterator it_pos, const Val_t&, Size_t n) -> void;
+    auto Insert(Iterator it_pos, const Value_t&) -> Iterator;
+    auto Insert(Iterator it_pos, const Value_t&, Size_t n) -> void;
     template <class InputIt_t>
     auto Insert(Iterator it_pos, InputIt_t first, InputIt_t last) -> void;
     auto Erase(Iterator it_pos) -> Iterator;
     auto Erate(Iterator it_first, Iterator it_last) -> Iterator;
     auto Swap(Vector& other) -> void;
     auto Clear() -> void;
-    template<class... Args_t>
-    auto Emplace(ConstIterator it_pos, Args_t&&... args) ->  Iterator;
-    template<class... Args_t>
+    template <class... Args_t>
+    auto Emplace(ConstIterator it_pos, Args_t&&... args) -> Iterator;
+    template <class... Args_t>
     auto EmplaceBack(Args_t&&... args) -> void;
 
 public:
@@ -104,9 +106,9 @@ public:
     auto IsValidOffset(Size_t offset) const -> bool;
 
 private:
-    Val_t* m_ptr{nullptr};
-    Size_t m_size{};
-    Size_t m_capacity{};
+    Value_t* m_ptr{nullptr};
+    Size_t   m_size{};
+    Size_t   m_capacity{};
 };
 
 RDS_END
@@ -116,7 +118,7 @@ RDS_END
 RDS_BEGIN
 
 template <class T_t, class Alloc_t>
-inline Vector<T_t, Alloc_t>::Vector(Size_t size, const Val_t& init_val)
+inline Vector<T_t, Alloc_t>::Vector(Size_t size, const Value_t& init_val)
     : m_size(size)
     , m_capacity(size)
 {
@@ -125,7 +127,8 @@ inline Vector<T_t, Alloc_t>::Vector(Size_t size, const Val_t& init_val)
 }
 
 template <class T_t, class Alloc_t>
-inline Vector<T_t, Alloc_t>::Vector(const std::initializer_list<Val_t>& init_list)
+inline Vector<T_t, Alloc_t>::Vector(
+    const std::initializer_list<Value_t>& init_list)
     : m_size(init_list.size())
     , m_capacity(init_list.size())
 {
@@ -145,50 +148,52 @@ inline Vector<T_t, Alloc_t>::~Vector()
 }
 
 template <class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::operator[](Size_t index) const -> const Val_t&
+inline auto Vector<T_t, Alloc_t>::operator[](Size_t index) const
+    -> const Value_t&
 {
     return m_ptr[index];
 }
 
 template <class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::operator[](Size_t index) -> Val_t&
+inline auto Vector<T_t, Alloc_t>::operator[](Size_t index) -> Value_t&
 {
-    return const_cast<Val_t&>(static_cast<const Vector&>(*this).operator[](index));
+    return const_cast<Value_t&>(
+        static_cast<const Vector&>(*this).operator[](index));
 }
 
 template <class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::At(Size_t index) const -> const Val_t&
+inline auto Vector<T_t, Alloc_t>::At(Size_t index) const -> const Value_t&
 {
-    RDS_Assert(IsValidOffset(index), "Index out of range");
+    RDS_Assert(IsValidOffset(index) && "Index out of range");
     return operator[](index);
 }
 
 template <class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::At(Size_t index) -> Val_t&
+inline auto Vector<T_t, Alloc_t>::At(Size_t index) -> Value_t&
 {
-    return const_cast<Val_t&>(static_cast<const Vector&>(*this).At(index));
+    return const_cast<Value_t&>(static_cast<const Vector&>(*this).At(index));
 }
 
-template<class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::Front() -> Val_t &
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::Front() -> Value_t&
 {
-    return const_cast<Val_t&>(static_cast<const Vector&>(*this).Front());
+    return const_cast<Value_t&>(static_cast<const Vector&>(*this).Front());
 }
 
-template<class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::Back() const -> const Val_t &
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::Back() const -> const Value_t&
 {
     return operator[](m_size - 1);
 }
 
-template<class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::Back() -> Val_t &
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::Back() -> Value_t&
 {
-    return const_cast<Val_t&>(static_cast<const Vector&>(*this).Back());
+    return const_cast<Value_t&>(static_cast<const Vector&>(*this).Back());
 }
 
-template<class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::Front() const -> const Val_t &
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::Front() const -> const Value_t&
 {
     return operator[](0);
 }
@@ -205,18 +210,18 @@ inline auto Vector<T_t, Alloc_t>::Capacity() const -> Size_t
     return m_capacity;
 }
 
-template<class T_t, class Alloc_t>
+template <class T_t, class Alloc_t>
 inline auto Vector<T_t, Alloc_t>::Empty() const -> bool
 {
     return m_size == 0;
 }
 
-template<class T_t, class Alloc_t>
+template <class T_t, class Alloc_t>
 inline auto Vector<T_t, Alloc_t>::Reserve(Size_t reserve_size) -> void
 {
     if (reserve_size <= m_capacity)
         return;
-    
+
     // 재할당 후 복사
     auto* new_ptr = Allocator_Trait<Allocator_t>::Allocate(reserve_size);
     for (Size_t i = 0; i < m_size; ++i)
@@ -240,9 +245,45 @@ inline auto Vector<T_t, Alloc_t>::IsValidOffset(Size_t offset) const -> bool
 }
 
 template <class T_t, class Alloc_t>
-inline auto Vector<T_t, Alloc_t>::GetSentinelPointer() const -> const Val_t*
+inline auto Vector<T_t, Alloc_t>::GetSentinelPointer() const -> const Value_t*
 {
     return m_ptr;
+}
+
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::Begin() const -> ConstIterator
+{
+    return ConstIterator(this, 0);
+}
+
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::Begin() -> Iterator
+{
+    return Iterator(this, 0);
+}
+
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::End() const -> ConstIterator
+{
+    return ConstIterator(this, m_size);
+}
+
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::End() -> Iterator
+{
+    return Iterator(this, m_size);
+}
+
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::CBegin() const -> ConstIterator
+{
+    return ConstIterator(this, 0);
+}
+
+template <class T_t, class Alloc_t>
+inline auto Vector<T_t, Alloc_t>::CEnd() const -> ConstIterator
+{
+    return ConstIterator(this, m_size);
 }
 
 RDS_END

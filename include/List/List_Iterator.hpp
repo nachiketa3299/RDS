@@ -11,8 +11,9 @@ RDS_BEGIN
 
 /// @brief @ref List 컨테이너에 대한 반복자 템플릿 클래스
 /// @tparam List_t 이 반복자가 가리킬 리스트의 자료형
-/// @details 이 반복자는 @ref List_ConstIterator 클래스를 상속하고 상수성을 제거하는
-/// 방식으로 구현되어 있다. 자세한 설명은 @ref List_ConstIterator 클래스를 참고한다.
+/// @details 이 반복자는 @ref List_ConstIterator 클래스를 상속하고 상수성을
+/// 제거하는 방식으로 구현되어 있다. 자세한 설명은 @ref List_ConstIterator
+/// 클래스를 참고한다.
 template <class List_t>
 class List_Iterator: public List_ConstIterator<List_t>
 {
@@ -22,19 +23,19 @@ public: // Base Template Class
 
 public: // Type Alias
     /// @brief 이 반복자가 가리키는 리스트 원소의 자료형
-    using Val_t    = typename List_ConstIterator<List_t>::Val_t;
+    using Val_t    = typename List_t::Val_t;
     /// @brief 이 반복자가 가리키는 리스트 크기의 자료형
-    using Size_t   = typename List_ConstIterator<List_t>::Size_t;
+    using Size_t   = typename List_t::Size_t;
     /// @brief 이 반복자가 가리키는 리스트 노드의 자료형 (@ref Node_D)
-    using Node_D_t = typename List_ConstIterator<List_t>::Node_D_t;
+    using Node_D_t = typename List_t::Node_D_t;
 
 public: // Default CDtors
     /// @brief 기본 생성자
-    List_Iterator()                                   = default;
+    List_Iterator()                             = default;
     /// @brief 기본 복사 생성자
-    List_Iterator(const List_Iterator<List_t>& other) = default;
+    List_Iterator(const List_Iterator<List_t>&) = default;
     /// @brief 기본 소멸자
-    ~List_Iterator()                                  = default;
+    ~List_Iterator()                            = default;
 
 public:
     /// @brief 리스트내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자.
@@ -44,13 +45,14 @@ public:
                            const Node_D_t* node_pos_ptr) noexcept;
 
 public: // IO Iterator
-    /// @brief 이 반복자가 가리키는 리스트 노드 내 값에 대한 lvalue 참조를 반환한다.
-    /// @details @ref List_ConstIterator::operator*() 를 호출하고 @p const_cast 로
-    /// 상수성을 제거한다.
+    /// @brief 이 반복자가 가리키는 리스트 노드 내 값에 대한 lvalue 참조를
+    /// 반환한다.
+    /// @details @ref List_ConstIterator::operator*() 를 호출하고 @p const_cast
+    /// 로 상수성을 제거한다.
     auto operator*() const noexcept -> Val_t&;
     /// @brief 이 반복자가 가리키는 리스트 노드 내 값에 대한 포인터를 반환한다.
-    /// @details @ref List_ConstIterator::operator->() 를 호출하고 @p const_cast 로
-    /// 상수성을 제거한다.
+    /// @details @ref List_ConstIterator::operator->() 를 호출하고 @p const_cast
+    /// 로 상수성을 제거한다.
     auto operator->() const noexcept -> Val_t*;
 
 public: // Forward Iterator
@@ -100,7 +102,7 @@ auto List_Iterator<List_t>::operator++() noexcept -> List_Iterator&
 template <typename List_t>
 auto List_Iterator<List_t>::operator++(int) noexcept -> List_Iterator
 {
-    auto temp = *this;
+    const auto temp = *this;
     operator++();
     return temp;
 }
@@ -115,7 +117,7 @@ auto List_Iterator<List_t>::operator--() noexcept -> List_Iterator&
 template <typename List_t>
 auto List_Iterator<List_t>::operator--(int) noexcept -> List_Iterator
 {
-    auto temp = *this;
+    const auto temp = *this;
     operator--();
     return temp;
 }

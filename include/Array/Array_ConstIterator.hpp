@@ -3,17 +3,17 @@
 #ifndef RDS_ARRAY_CONSTITERATOR_HPP
 #define RDS_ARRAY_CONSTITERATOR_HPP
 
-#include <cstddef>
+#include <memory>
 
-#include "Assertion.h"
 #include "RDS_CoreDefs.h"
 
-#include "Array.hpp"
+#include "Assertion.h"
 
 RDS_BEGIN
 
 /// @brief \ref Array 컨테이너에 대한 상수 반복자 템플릿 클래스
 /// @tparam Array_t 이 상수 반복자가 가리킬 배열 자료형
+/// @details 연속 반복자(Contiguous Iterator) 이다.
 template <typename Array_t>
 class Array_ConstIterator
 {
@@ -34,28 +34,33 @@ public: // Default CDtors
     ~Array_ConstIterator()                                = default;
 
 public: // Custom Ctors
-    /// @brief 배열 자체에 대한 포인터와 배열 내 원소에 대한 인덱스를 받는 생성자
+    /// @brief 배열 자체에 대한 포인터와 배열 내 원소에 대한 인덱스를 받는
+    /// 생성자
     /// @param cont_ptr 배열 자체에 대한 포인터
     /// @param index 배열 내 원소에 대한 인덱스
-    explicit Array_ConstIterator(const Array_t* cont_ptr, Size_t index);
+    Array_ConstIterator(const Array_t* cont_ptr, Size_t index);
 
 public: // IO Iterator
-    /// @brief 이 상수 반복자가 가리키는 배열 원소에 대한 const-lvalue 참조를 반환한다.
+    /// @brief 이 상수 반복자가 가리키는 배열 원소에 대한 const-lvalue 참조를
+    /// 반환한다.
     /// @todo 역참조 불가능한 경우에 대한 처리가 필요하다
     auto operator*() const -> const Val_t&;
-    /// @brief 이 상수 반복자가 가리키는 배열 원소에 대한 상수 포인터를 반환한다.
+    /// @brief 이 상수 반복자가 가리키는 배열 원소에 대한 상수 포인터를
+    /// 반환한다.
     auto operator->() const -> const Val_t*;
 
 public: // Forward Iterator
     /// @brief 이 상수 반복자가 가리키는 배열 원소를 다음 원소로 바꾼다.
     /// @return 이 반복자에 대한 lvalue 참조
-    /// @details 전위 증가 연산자에 대한 오버로드. 반복자가 배열의 끝을 넘어서는 경우
+    /// @details 전위 증가 연산자에 대한 오버로드. 반복자가 배열의 끝을 넘어서는
+    /// 경우
     /// (`m_data_offset` > `Array_t::Size_v`) 비정상 종료한다.
     /// @test 반복자가 배열의 끝을 넘어서면 비정상 종료하는지 확인
     auto operator++() -> Array_ConstIterator&;
     /// @brief 이 상수 반복자가 가리키는 배열 원소를 다음 원소로 바꾼다.
     /// @return 이 반복자에 대한 const-lvalue 참조
-    /// @details 후위 증가 연산자에 대한 오버로드. 반복자가 배열의 끝을 넘어서는 경우
+    /// @details 후위 증가 연산자에 대한 오버로드. 반복자가 배열의 끝을 넘어서는
+    /// 경우
     /// (`m_data_offset` > `Array_t::Size_v`) 비정상 종료한다.
     /// @test 반복자가 배열의 끝을 넘어서면 비정상 종료하는지 확인
     auto operator++(int) -> Array_ConstIterator;
@@ -63,14 +68,14 @@ public: // Forward Iterator
 public: // Bidirectional Iterator
     /// @brief 이 상수 반복자가 가리키는 배열 원소를 이전 원소로 바꾼다.
     /// @return 이 반복자에 대한 lvalue 참조
-    /// @details 전위 감소 연산자에 대한 오버로드. 반복자가 배열의 시작보다 이전을
-    /// 가리키려는 경우 (`m_data_offset` < 0) 비정상 종료한다.
+    /// @details 전위 감소 연산자에 대한 오버로드. 반복자가 배열의 시작보다
+    /// 이전을 가리키려는 경우 (`m_data_offset` < 0) 비정상 종료한다.
     /// @test 반복자가 시작 이전을 가리키려고 할 때 비정상 종료하는지 확인
     auto operator--() -> Array_ConstIterator&;
     /// @brief 이 상수 반복자가 가리키는 배열 원소를 이전 원소로 바꾼다.
     /// @return 이 반복자에 대한 const-lvalue 참조
-    /// @details 후위 감소 연산자에 대한 오버로드. 반복자가 배열의 시작보다 이전을
-    /// 가리키려는 경우 (`m_data_offset` < 0) 비정상 종료한다.
+    /// @details 후위 감소 연산자에 대한 오버로드. 반복자가 배열의 시작보다
+    /// 이전을 가리키려는 경우 (`m_data_offset` < 0) 비정상 종료한다.
     /// @test 반복자가 시작 이전을 가리키려고 할 때 비정상 종료하는지 확인
     auto operator--(int) -> Array_ConstIterator;
 
@@ -98,7 +103,7 @@ private: // Helper Functions
     /// @brief 이 반복자가 역참조 가능한지 검사한다.
     auto IsDereferencible() const -> bool;
     /// @brief 인자로 전달된 반복자와 이 반복자가 호환 가능한지 검사한다.
-    auto IsCompatible(const Array_ConstIterator& other) const -> bool;
+    auto IsCompatible(const Array_t& array) const -> bool;
 
 public: // Data Access
     /// @brief 이 상수 반복자가 가리키는 배열 원소의 포인터를 반환한다.
@@ -118,21 +123,22 @@ RDS_END
 RDS_BEGIN
 
 template <typename Array_t>
-Array_ConstIterator<Array_t>::Array_ConstIterator(const Array_t* cont_ptr, Size_t index)
+inline Array_ConstIterator<Array_t>::Array_ConstIterator(
+    const Array_t* cont_ptr, Size_t index)
     : m_cont_ptr(cont_ptr)
     , m_data_offset(index)
 {}
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::IsValid() const -> bool
+inline auto Array_ConstIterator<Array_t>::IsValid() const -> bool
 {
     return m_cont_ptr != nullptr;
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::IsValidPos() const -> bool
+inline auto Array_ConstIterator<Array_t>::IsValidPos() const -> bool
 {
-    return 0 <= m_data_offset && m_data_offset <= m_cont_ptr->Size();
+    return m_data_offset <= m_cont_ptr->Size();
 }
 
 template <typename Array_t>
@@ -142,27 +148,28 @@ inline auto Array_ConstIterator<Array_t>::IsDereferencible() const -> bool
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::IsCompatible(const Array_ConstIterator& other) const
-    -> bool
+inline auto
+Array_ConstIterator<Array_t>::IsCompatible(const Array_t& array) const -> bool
 {
-    return m_cont_ptr->GetSentinelPointer() == other.GetSentinelPointer();
+    return m_cont_ptr == &array;
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator*() const -> const Val_t&
+inline auto Array_ConstIterator<Array_t>::operator*() const -> const Val_t&
 {
-    RDS_Assert(IsDereferencible() && "Cannot dereference iterator out of range.");
+    RDS_Assert(IsDereferencible() &&
+               "Cannot dereference iterator out of range.");
     return *(operator->());
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator->() const -> const Val_t*
+inline auto Array_ConstIterator<Array_t>::operator->() const -> const Val_t*
 {
     return m_cont_ptr->GetSentinelPointer() + m_data_offset;
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator++() -> Array_ConstIterator&
+inline auto Array_ConstIterator<Array_t>::operator++() -> Array_ConstIterator&
 {
     ++m_data_offset;
     RDS_Assert(IsValidPos() && "Iterator out of range.");
@@ -170,7 +177,7 @@ auto Array_ConstIterator<Array_t>::operator++() -> Array_ConstIterator&
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator++(int) -> Array_ConstIterator
+inline auto Array_ConstIterator<Array_t>::operator++(int) -> Array_ConstIterator
 {
     const auto temp = *this;
     operator++();
@@ -178,7 +185,7 @@ auto Array_ConstIterator<Array_t>::operator++(int) -> Array_ConstIterator
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator--() -> Array_ConstIterator&
+inline auto Array_ConstIterator<Array_t>::operator--() -> Array_ConstIterator&
 {
     --m_data_offset;
     RDS_Assert(IsValidPos() && "Iterator out of range.");
@@ -186,7 +193,7 @@ auto Array_ConstIterator<Array_t>::operator--() -> Array_ConstIterator&
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator--(int) -> Array_ConstIterator
+inline auto Array_ConstIterator<Array_t>::operator--(int) -> Array_ConstIterator
 {
     const auto temp = *this;
     operator--();
@@ -194,7 +201,7 @@ auto Array_ConstIterator<Array_t>::operator--(int) -> Array_ConstIterator
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator+=(const Diff_t offset)
+inline auto Array_ConstIterator<Array_t>::operator+=(const Diff_t offset)
     -> Array_ConstIterator&
 {
     m_data_offset += static_cast<Size_t>(offset);
@@ -203,7 +210,7 @@ auto Array_ConstIterator<Array_t>::operator+=(const Diff_t offset)
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator+(const Diff_t offset) const
+inline auto Array_ConstIterator<Array_t>::operator+(const Diff_t offset) const
     -> Array_ConstIterator
 {
     auto temp = *this;
@@ -211,7 +218,7 @@ auto Array_ConstIterator<Array_t>::operator+(const Diff_t offset) const
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator-=(const Diff_t offset)
+inline auto Array_ConstIterator<Array_t>::operator-=(const Diff_t offset)
     -> Array_ConstIterator&
 {
     m_data_offset -= static_cast<Size_t>(offset);
@@ -220,66 +227,74 @@ auto Array_ConstIterator<Array_t>::operator-=(const Diff_t offset)
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator-(const Diff_t offset) -> Array_ConstIterator
+inline auto Array_ConstIterator<Array_t>::operator-(const Diff_t offset)
+    -> Array_ConstIterator
 {
     auto temp = *this;
     return temp.operator-=(offset);
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator-(const Array_ConstIterator& other) const
+inline auto
+Array_ConstIterator<Array_t>::operator-(const Array_ConstIterator& other) const
     -> Diff_t
 {
-    RDS_Assert(IsCompatible(other));
+    RDS_Assert(IsCompatible(*other.m_cont_ptr) && "Incompatible iterators.");
     return static_cast<Diff_t>(m_data_offset - other.m_data_offset);
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator==(const Array_ConstIterator& other) const
+inline auto
+Array_ConstIterator<Array_t>::operator==(const Array_ConstIterator& other) const
     -> bool
 {
-    RDS_Assert(IsCompatible(other) && "Iterators are not compatible.");
+    RDS_Assert(IsCompatible(*other.m_cont_ptr) && "Incompatible iterators.");
     return m_data_offset == other.m_data_offset;
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator!=(const Array_ConstIterator& other) const
+inline auto
+Array_ConstIterator<Array_t>::operator!=(const Array_ConstIterator& other) const
     -> bool
 {
     return !(operator==(other));
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator<(const Array_ConstIterator& other) const
+inline auto
+Array_ConstIterator<Array_t>::operator<(const Array_ConstIterator& other) const
     -> bool
 {
-    RDS_Assert(IsCompatible(other) && "Iterators are not compatible.");
+    RDS_Assert(IsCompatible(*other.m_cont_ptr) && "Incompatible iterators.");
     return m_data_offset < other.m_data_offset;
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator>(const Array_ConstIterator& other) const
+inline auto
+Array_ConstIterator<Array_t>::operator>(const Array_ConstIterator& other) const
     -> bool
 {
     return other.operator<(*this);
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator<=(const Array_ConstIterator& other) const
+inline auto
+Array_ConstIterator<Array_t>::operator<=(const Array_ConstIterator& other) const
     -> bool
 {
     return !operator>(other);
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::operator>=(const Array_ConstIterator& other) const
+inline auto
+Array_ConstIterator<Array_t>::operator>=(const Array_ConstIterator& other) const
     -> bool
 {
     return !operator<(other);
 }
 
 template <typename Array_t>
-auto Array_ConstIterator<Array_t>::GetDataPointer() const -> const Val_t*
+inline auto Array_ConstIterator<Array_t>::GetDataPointer() const -> const Val_t*
 {
     return m_cont_ptr->GetSentinelPointer() + m_data_offset;
 }

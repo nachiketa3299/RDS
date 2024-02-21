@@ -15,20 +15,6 @@ RDS_BEGIN
 template <class T_t>
 concept ArrayRequirement = std::default_initializable<T_t>;
 
-template <class L_t, class R_t = L_t>
-concept type_has_equal_operator = requires(const L_t& left, const R_t& right) {
-    {
-        left == right
-    } -> std::same_as<bool>;
-};
-
-template <typename It_t>
-concept Readable = requires(It_t it) {
-    {
-        *it
-    } -> const Val_t<It_t>&;
-};
-
 RDS_END
 
 #endif // RDS_CONCEPTS_H
