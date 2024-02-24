@@ -42,7 +42,7 @@ public:
     /// @param[in] list_ptr 이 반복자가 가리키는 리스트 자체에 대한 포인터
     /// @param[in] node_pos_ptr 이 반복자가 가리키는 리스트의 노드에 대한 포인터
     explicit List_Iterator(const List_t*   list_ptr,
-                           const Node_D_t* node_pos_ptr);
+                           const Node_D_t* dnode_pos_ptr);
 
 public: // IO Iterator
     /// @brief 이 반복자가 가리키는 리스트 노드 내 값에 대한 lvalue 참조를
@@ -76,8 +76,8 @@ RDS_BEGIN
 
 template <class List_t>
 List_Iterator<List_t>::List_Iterator(const List_t*   list_ptr,
-                                     const Node_D_t* node_pos_ptr)
-    : Super_t(list_ptr, node_pos_ptr)
+                                     const Node_D_t* dnode_pos_ptr)
+    : Super_t(list_ptr, dnode_pos_ptr)
 {}
 
 template <typename List_t>
