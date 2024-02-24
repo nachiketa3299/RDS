@@ -20,7 +20,7 @@ public: // Default CDtors
     /// @brief 기본 생성자
     Node_S()  = default;
     /// @brief 기본 소멸자
-    ~Node_D() = default;
+    ~Node_S() = default;
 
 public: // Custom Ctors
     /// @brief 노드의 값을 초기화하는 생성자
