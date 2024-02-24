@@ -204,13 +204,8 @@ template <typename List_t>
 inline auto List_ConstIterator<List_t>::operator++(int)
     -> List_ConstIterator<List_t>
 {
-    // 현재 노드가 센티넬 노드가 아닌 경우에만 증가 연산을 수행한다.
-    RDS_Assert(m_data_ptr != m_cont_ptr->GetSentinelPointer() &&
-               "Cannot increment end iterator.");
-
     const auto temp = *this;
     operator++();
-    // m_data_ptr      = m_data_ptr->next;
     return temp;
 }
 
@@ -230,13 +225,8 @@ template <typename List_t>
 inline auto List_ConstIterator<List_t>::operator--(int)
     -> List_ConstIterator<List_t>
 {
-    // 이전 노드가 센티넬 노드가 아닌 경우에만 감소 연산을 수행한다.
-    RDS_Assert(m_data_ptr->prev != m_cont_ptr->GetSentinelPointer() &&
-               "Cannot decrement begin iterator.");
-
     const auto temp = *this;
     operator--();
-    // m_data_ptr      = m_data_ptr->prev;
     return temp;
 }
 
