@@ -209,7 +209,8 @@ inline auto List_ConstIterator<List_t>::operator++(int)
                "Cannot increment end iterator.");
 
     const auto temp = *this;
-    m_data_ptr      = m_data_ptr->next;
+    operator++();
+    // m_data_ptr      = m_data_ptr->next;
     return temp;
 }
 
@@ -234,7 +235,8 @@ inline auto List_ConstIterator<List_t>::operator--(int)
                "Cannot decrement begin iterator.");
 
     const auto temp = *this;
-    m_data_ptr      = m_data_ptr->prev;
+    operator--();
+    // m_data_ptr      = m_data_ptr->prev;
     return temp;
 }
 
