@@ -1,128 +1,108 @@
 # **RDS** <sub>*Data Structures & Algorithms in C++*</sub>
 
-계획 및 일지는 [여기](.\docs\mds\Plans.md)를 참조
+[![wakatime](https://wakatime.com/badge/github/nachiketa3299/RDS.svg)](https://wakatime.com/badge/github/nachiketa3299/RDS)
 
 ## Tools
 
-- `Text Editor` **Visual Studio Code**
-- `Build Automation` **CMake (3.27.0)**
-    - **_Main_: RDS 라이브러리**
-        - [/CMakeList.txt](/CMakeLists.txt) <sub>기본 RDS 라이브러리 빌드 설정</sub>
-        - [/RDS.cmake](/RDS.cmake) <sub>빌드 설정 위한 변수 및 매크로 정의</sub>
-    - **_Sub_: RDS_GTest 테스트**
-        - [/test/CMakeList.txt](/test/CMakeLists.txt)<sub>라이브러리 GTest 용 프로젝트</sub>
-        - [/test/RDS_Gtest.cmake](/test/RDS_Gtest.cmake)<sub>테스트 프로젝트 빌드 설정 위한 변수 및 매크로 정의</sub>
-- `Compilers`
+- Text Editor 
+    - **Visual Studio Code**
+- Build Automation 
+    - **CMake (3.27.0)**
+        - **_Main_: RDS 라이브러리**
+            - [/CMakeList.txt](/CMakeLists.txt) <sub>기본 RDS 라이브러리 빌드 설정</sub>
+            - [/RDS.cmake](/RDS.cmake) <sub>빌드 설정 위한 변수 및 매크로 정의</sub>
+        - **_Sub_: RDS_GTest 테스트**
+            - [/test/CMakeList.txt](/test/CMakeLists.txt)<sub>라이브러리 GTest 용 프로젝트</sub>
+            - [/test/RDS_Gtest.cmake](/test/RDS_Gtest.cmake)<sub>테스트 프로젝트 빌드 설정 위한 변수 및 매크로 정의</sub>
+- Compilers
     - MSVC 
         - Visual Studio 2019 Community Release
     - MSYS g++
     - Clang
-- `Static Analysis` **Clang-tidy**
-- `Test` **Google Test**
-- `Formatting` **clang-format**
-- `Documentation` **Doxygen**
+- Static Analysis
+    - **Clang-tidy**
+- Test
+    - **Google Test**
+- Formatting
+    - **clang-format**
+- Documentation
+    - **Doxygen**
+- Special Thanks to *Zenburn* & *VsCodeVim*
 
-# *RDS* - outlines
+# *RDS* <sup><i>outlines</i></sup>
+
+## Container Specs
+
+1. Member Types Aliases
+2. Method
+    - Constructors
+    - Destructor
+    - Assignment Operator
+    - Iterators
+    - Capacity
+    - Element Access
+    - Modifiers
+    - Operations
+    - Observers
+3. Members
+4. Non-Member Function Overloads
 
 ## Utilities
 
-### Cores
-
-- [RDS_CoreDefs.h](/include/RDS_CoreDefs.h)
-- [RDS_Concepts.h](/include/RDS_Concepts.h)
-- [RDS_FVectors.h](/include/RDS_FVectors.h)
-
-### Assertion
-
-- [X] [Assertion.h](/include/Assertion/Assertion.h)<sup>Macro function <code>RDS_Assert</code></sup>
-- [X] [Assertion.cpp](/src/Assertion/Assertion.cpp)
+- **Cores**
+    - [RDS_CoreDefs.h](/include/RDS_CoreDefs.h)
+    - [RDS_Concepts.h](/include/RDS_Concepts.h)
+- **Assertion**
+    - [Assertion.h](/include/Assertion/Assertion.h)
+    - [Assertion.cpp](/src/Assertion/Assertion.cpp)
 
 ## Linear Data Structures
 
-
-### Static Array
-
-> 정적 배열 템플릿 클래스
-
-- [X] [Array.hpp](/include/Array/Array.hpp)
-- [X] [Array_ConstIterator.hpp](/include/Array/Array_ConstIterator.hpp)
-- [X] [Array_Iterator.hpp](/include/Array/Array_Iterator.hpp)
-
-### Dynamic Array
-
-> 동적 배열 템플릿 클래스
-
-- [ ] [Vector.hpp](/include/Vector/Vector.hpp)
-- [ ] [Vector_ConstIterator.hpp](/include/Vector/Vector_ConstIterator.hpp)
-- [ ] [Vector_Iterator.hpp](/include/Vector/Vector_Iterator.hpp)
-
-
-### Doubly Linked List
-
-> 이중 연결 리스트 템플릿 클래스
-
-- [ ] [List.hpp](/include/List/List.hpp)
-- [ ] [List_ConstIterator.hpp](/include/List/List_ConstIterator.hpp)
-- [ ] [List_Iterator.hpp](/include/List/List_Iterator.hpp)
-
-### Singly Linked List
-
-> 단일 연결 리스트 템플릿 클래스
-
-- [ ] ForwardList.hpp
-- [ ] ForwardList_ConstIterator.hpp
-- [ ] ForwardList_Iterator.hpp
-
-### Heap
-
-- [ ] Heap
-
-### Queue
-
-- [ ] Queue
-- [ ] Deque
-- [ ] Queue<sup>Circular</sup>
-- [ ] Priority Queue
-
-### Stack
-
-- [ ] Stack
-
-### Matrix 
-
-- [ ] Matrix
+- **정적 배열(Static Array)**
+    - [Array.hpp](/include/Array/Array.hpp)
+    - [Array_ConstIterator.hpp](/include/Array/Array_ConstIterator.hpp)
+    - [Array_Iterator.hpp](/include/Array/Array_Iterator.hpp)
+- **동적 배열(Dynamic Array)**
+    - [Vector.hpp](/include/Vector/Vector.hpp)
+    - [Vector_ConstIterator.hpp](/include/Vector/Vector_ConstIterator.hpp)
+    - [Vector_Iterator.hpp](/include/Vector/Vector_Iterator.hpp)
+- **이중 연결 리스트(Doubly Linked List)**
+    - [List.hpp](/include/List/List.hpp)
+    - [List_ConstIterator.hpp](/include/List/List_ConstIterator.hpp)
+    - [List_Iterator](/include/List/List_Iterator.hpp)
+- **단일 연결 리스트(Singly Linked List)**
+    - [ForwardList.hpp](/include/ForwardList/ForwardList.hpp)
+    - [ForwardList_ConstIterator.hpp](/include/ForwardList/ForwardList_ConstIterator.hpp)
+    - [ForwardList_Iteartor.hpp](/include/ForwardList/ForwardList_Iterator.hpp)
+- **벡터(FVector)**
+    - [RDS_FVectors.h](/include/RDS_FVectors.h)
+    - **2차원 벡터(FVector2)**
+        - [FVector2.h](/include/FVector2/FVector2.h)
+        - [FVector2.cpp](/src/FVector2/FVector2.cpp)
+    - **3차원 벡터(FVector3)**
+        - [FVector3.h](/include/FVector3/FVector3.h)
+        - [FVector3.cpp](/src/FVector3/FVector3.cpp)
+- Heap
+- Queue
+    - Queue
+    - Circular Queue
+    - Priority Queue
+- Stack
+- Matrix
+    - Matrix
+    - Sparse Matrix
+- Pair
+- Tuple
+- Hashmap
+- Hashset
 
 ## Non-Linear Data Structures
 
-### Trees
-
-- [ ] Binary Tree
-
-### Graphs
-
-- [ ] Graph<sup>with Adjacent List</sup>
-- [ ] Graph<sup>with Adjacent Matrix</sup>
-
-## Other Data Structures
-
-- [ ] Pair
-- [ ] Tuple
-- [ ] HashMap
-- [ ] HashSet
-
-### FVector2
-
-> 2 개의 실수를 저장하는 벡터 클래스
-
-- [X] [FVector2.h](/include/FVector2/FVector2.h)
-- [X] [FVector2.cpp](/src/FVector2/FVector2.cpp)
-
-### FVector3
-
-> 3 개의 실수를 저장하는 벡터 클래스
-
-- [X] [FVector3.h](/include/FVector3/FVector3.h)
-- [X] [FVector3.cpp](/src/FVector3/FVector3.cpp)
+- Trees
+    - Binary Tree
+- Graphs
+    - Graph: <sup>with Adjacent List</sup>
+    - Graph: <sup>with Adjacent Matrix</sup>
 
 ## *Algorithms*
 
