@@ -38,6 +38,9 @@ set(RDS_SRCS
     include/Vector/Vector.hpp
     include/Vector/Vector_ConstIterator.hpp
     include/Vector/Vector_Iterator.hpp
+
+    # === Tuple
+    include/Tuple/Tuple.hpp
 )
 
 set(RDS_INC_PRIVATE
