@@ -45,18 +45,20 @@ RDS_BEGIN
 /// @brief 동적 이중 연결 리스트에 대한 템플릿 클래스
 /// @tparam T_t 리스트 내 원소에 대한 자료형
 /// @details 리스트의 최전방에 비어 있는 노드를 두어 구현하였다.
-template <class T_t, class Alloc_t = Mallocator<Node_D<T_t>>>
+template <class __T_t, class __Alloc_t = Mallocator<Node_D<__T_t>>>
 class List
 {
 public: // Type Aliases
-    using Allocator_t = Alloc_t;
+    using Allocator_t = __Alloc_t;
 
 public:
-    /// @brief 리스트 내 원소에 대한 자료형
-    using Value_t  = T_t;
-    /// @brief 리스트의 크기를 나타내는 자료형
+    using Value_t      = __T_t;
+    using Pointer_t    = __T_t*;
+    using Reference_t  = __T_t&;
+    using Difference_t = PointerDifference_t;
+
+public:
     using Size_t   = std::size_t;
-    /// @brief 리스트 내 노드에 대한 자료형
     using Node_D_t = Node_D<Value_t>;
 
 public: // Iterator Type Aliases

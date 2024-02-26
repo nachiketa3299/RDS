@@ -42,7 +42,7 @@
     * {NEmpty} 리스트에 대한 {begin/cbegin}: 반환값 확인
     * {Empty/NEmpty} 리스트에 대한 {end/cend}: Assertion Failed 확인
 --------------------------------------------------------------------------------
-- [Helper]         IsCompatible(const List_t&) const -> bool
+- [Helper]         IsCompatible(const __List_t&) const -> bool
 - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
     * 기본 초기화된 {일반/상수} 반복자({Empty/NEmpty} 리스트): `false`
     * {Empty/NEmpty} 리스트에 대한 {begin/end/cbegin/cend}(동일한 리스트): `true`
