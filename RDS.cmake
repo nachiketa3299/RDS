@@ -41,6 +41,9 @@ set(RDS_SRCS
 
     # === Tuple
     include/Tuple/Tuple.hpp
+
+    # === Iterators
+    include/Iterator/Iterator.hpp
 )
 
 set(RDS_INC_PRIVATE
@@ -74,4 +77,7 @@ set(RDS_INC_PUBLIC
     include/Vector/
 
     include/ForwardList/
+
+    include/Tuple/
+    include/Iterator/
 )
