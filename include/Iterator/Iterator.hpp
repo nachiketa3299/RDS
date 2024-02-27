@@ -67,16 +67,16 @@ struct RandomAccessIterator_Tag: BidirectionalIterator_Tag
 struct ContiguosIterator_Tag: RandomAccessIterator_Tag
 {};
 
-// template <class __IteratorCategory_t, class __Value_t, class __Pointer_t,
-//           class __Reference_t, class __Difference_t>
-// struct Iterator
-// {
-//     using IteratorCategory_t;
-//     using Value_t;
-//     using Pointer_t;
-//     using Reference_t;
-//     using Difference_t;
-// };
+template <class __IteratorTag_t, class __Value_t, class __Pointer_t,
+          class __Reference_t, class __Difference_t>
+struct Iterator
+{
+    using IteratorCategory_t = __IteratorTag_t;
+    using Value_t = __Value_t;
+    using Pointer_t = __Pointer_t;
+    using Reference_t = __Reference_t;
+    using Difference_t = __Difference_t;
+};
 
 template <class __Iterator_t>
 struct IteratorTraits

@@ -18,6 +18,7 @@ set(RDS_SRCS
     # Memory Management
     include/Allocator/Allocator_Trait.hpp
     include/Allocator/Mallocator.hpp
+    include/Allocator/Nallocator.hpp
 
     # include/Allocator/Allocator.hpp
     # include/Arena/Arena.hpp
@@ -39,10 +40,7 @@ set(RDS_SRCS
     include/Vector/Vector_ConstIterator.hpp
     include/Vector/Vector_Iterator.hpp
 
-    # === Tuple
-    include/Tuple/Tuple.hpp
-
-    # === Iterators
+    # === Iterator
     include/Iterator/Iterator.hpp
 )
 
@@ -75,9 +73,5 @@ set(RDS_INC_PUBLIC
     include/List/
 
     include/Vector/
-
-    include/ForwardList/
-
-    include/Tuple/
     include/Iterator/
 )

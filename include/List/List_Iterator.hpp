@@ -10,38 +10,40 @@
 RDS_BEGIN
 
 /// @brief @ref List 컨테이너에 대한 반복자 템플릿 클래스
-/// @tparam List_t 이 반복자가 가리킬 리스트의 자료형
+/// @tparam __List_t 이 반복자가 가리킬 리스트의 자료형
 /// @details 이 반복자는 @ref List_ConstIterator 클래스를 상속하고 상수성을
 /// 제거하는 방식으로 구현되어 있다. 자세한 설명은 @ref List_ConstIterator
 /// 클래스를 참고한다.
-template <class List_t>
-class List_Iterator: public List_ConstIterator<List_t>
+template <class __List_t>
+class List_Iterator: public List_ConstIterator<__List_t>
 {
 public: // Base Template Class
     /// @brief 이 반복자의 기초 클래스
-    using Super_t = List_ConstIterator<List_t>;
+    using Super_t = List_ConstIterator<__List_t>;
 
-public: // Type Alias
-    /// @brief 이 반복자가 가리키는 리스트 원소의 자료형
-    using Value_t  = typename List_ConstIterator<List_t>::Value_t;
-    /// @brief 이 반복자가 가리키는 리스트 크기의 자료형
-    using Size_t   = typename List_t::Size_t;
-    /// @brief 이 반복자가 가리키는 리스트 노드의 자료형 (@ref Node_D)
-    using Node_D_t = typename List_t::Node_D_t;
+public:
+    using Size_t   = typename __List_t::Size_t;
+    using Node_D_t = typename __List_t::Node_D_t;
+
+public: // Iterators
+    using Value_t      = typename __List_t::Value_t;
+    using Pointer_t    = typename __List_t::Pointer_t;
+    using Reference_t  = typename __List_t::Reference_t;
+    using Difference_t = typename __List_t::Difference_t;
 
 public: // Default CDtors
     /// @brief 기본 생성자
-    List_Iterator()                             = default;
+    List_Iterator()                               = default;
     /// @brief 기본 복사 생성자
-    List_Iterator(const List_Iterator<List_t>&) = default;
+    List_Iterator(const List_Iterator<__List_t>&) = default;
     /// @brief 기본 소멸자
-    ~List_Iterator()                            = default;
+    ~List_Iterator()                              = default;
 
 public:
     /// @brief 리스트내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자.
     /// @param[in] list_ptr 이 반복자가 가리키는 리스트 자체에 대한 포인터
     /// @param[in] node_pos_ptr 이 반복자가 가리키는 리스트의 노드에 대한 포인터
-    explicit List_Iterator(const List_t*   list_ptr,
+    explicit List_Iterator(const __List_t* list_ptr,
                            const Node_D_t* dnode_pos_ptr);
 
 public: // IO Iterator
@@ -74,48 +76,48 @@ RDS_END
 
 RDS_BEGIN
 
-template <class List_t>
-List_Iterator<List_t>::List_Iterator(const List_t*   list_ptr,
-                                     const Node_D_t* dnode_pos_ptr)
+template <class __List_t>
+List_Iterator<__List_t>::List_Iterator(const __List_t* list_ptr,
+                                       const Node_D_t* dnode_pos_ptr)
     : Super_t(list_ptr, dnode_pos_ptr)
 {}
 
-template <typename List_t>
-auto List_Iterator<List_t>::operator*() const -> Value_t&
+template <typename __List_t>
+auto List_Iterator<__List_t>::operator*() const -> Value_t&
 {
     return const_cast<Value_t&>(Super_t::operator*());
 }
 
-template <typename List_t>
-auto List_Iterator<List_t>::operator->() const -> Value_t*
+template <typename __List_t>
+auto List_Iterator<__List_t>::operator->() const -> Value_t*
 {
     return const_cast<Value_t*>(Super_t::operator->());
 }
 
-template <typename List_t>
-auto List_Iterator<List_t>::operator++() -> List_Iterator&
+template <typename __List_t>
+auto List_Iterator<__List_t>::operator++() -> List_Iterator&
 {
     Super_t::operator++();
     return *this;
 }
 
-template <typename List_t>
-auto List_Iterator<List_t>::operator++(int) -> List_Iterator
+template <typename __List_t>
+auto List_Iterator<__List_t>::operator++(int) -> List_Iterator
 {
     const auto temp = *this;
     operator++();
     return temp;
 }
 
-template <typename List_t>
-auto List_Iterator<List_t>::operator--() -> List_Iterator&
+template <typename __List_t>
+auto List_Iterator<__List_t>::operator--() -> List_Iterator&
 {
     Super_t::operator--();
     return *this;
 }
 
-template <typename List_t>
-auto List_Iterator<List_t>::operator--(int) -> List_Iterator
+template <typename __List_t>
+auto List_Iterator<__List_t>::operator--(int) -> List_Iterator
 {
     const auto temp = *this;
     operator--();
