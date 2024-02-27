@@ -16,6 +16,8 @@
 /// @brief 메인 네임스페이스(`rds`) 구간 종료 매크로
 #define RDS_END };
 
+#define RDS_TAG_ tag::
+
 
 RDS_BEGIN
 
