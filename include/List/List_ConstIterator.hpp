@@ -17,21 +17,38 @@ RDS_BEGIN
 /// @details 양방향 반복자(Bidirectional Iterator) 이며, 기본적으로 이 상수
 /// 반복자가 가리키는 리스트와 리스트 내부 노드를 포인터(\ref m_node_ptr, \ref
 /// m_cont_ptr)로 저장하고 있다.
+// clang-format off
 template <class __List_t>
 class List_ConstIterator
-    : public Iterator<BidirectionalIterator_Tag, typename __List::Value_T,
-                      typename __List_t::Node_D_t,
-                      typename __List_t::Reference_t,
-                      typename __List_t::Difference_t>
+    : public Iterator< RDS_TAG_ BidirectionalIterator
+                     , typename __List_t::Value_t
+                     , typename __List_t::Pointer_t
+                     , typename __List_t::Reference_t
+                     , typename __List_t::Difference_t 
+                     >
 {
+
+
 public:
     using Node_D_t = typename __List_t::Node_D_t;
 
 public: // Iterators
-    using Value_t      = typename __List_t::Value_t;
-    using Pointer_t    = typename __List_t::Pointer_t;
-    using Size_t       = typename __List_t::Size_t;
-    using Difference_t = typename __List_t::Difference_t;
+    // using Value_t      = typename __List_t::Value_t;
+    // using Pointer_t    = typename __List_t::Pointer_t;
+    // using Size_t       = typename __List_t::Size_t;
+    // using Difference_t = typename __List_t::Difference_t;
+
+    using Iterator_t = Iterator< RDS_TAG_ BidirectionalIterator
+                               , typename __List_t::Value_t
+                               , typename __List_t::Pointer_t
+                               , typename __List_t::Reference_t
+                               , typename __List_t::Difference_t>;
+    // clang-format on
+    using IteratorTag_t = typename Iterator_t::IteratorTag_t;
+    using Value_t       = typename Iterator_t::Value_t;
+    using Pointer_t     = typename Iterator_t::Pointer_t;
+    using Reference_t   = typename Iterator_t::Reference_t;
+    using Difference_t  = typename Iterator_t::Difference_t;
 
 public: // Default CDtors
     /// @brief 기본 생성자.
@@ -52,7 +69,8 @@ public:
 
 public: // Custom Ctors
     /// @brief 리스트내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자.
-    /// @param[in] cont_ptr 이 상수 반복자가 가리키는 리스트 자체에 대한 포인터
+    /// @param[inout] cont_ptr 이 상수 반복자가 가리키는 리스트 자체에 대한
+    /// 포인터
     /// @param[in] node_pos_ptr 이 상수 반복자가 가리키는 리스트의 노드에 대한
     /// 포인터
     explicit List_ConstIterator(const __List_t* cont_ptr,
