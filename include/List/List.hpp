@@ -296,10 +296,14 @@ public:
 public:
     /** @brief 첫번째 원소에 대한 참조를 반환한다.
      *  @return 첫번째 원소에 대한 참조
+     *  @exception
+     *  Debug 구성에서 리스트가 비어있는 경우 비정상 종료한다. Release
+     *  구성에서는 Undefined Behavior 이다.
      */
     auto Front() const -> const Value_t&
     {
-        RDS_Assert(static_cast<int>(m_size) > 0 &&
+        RDS_Assert(GetSentinelPointer()->next != GetSentinelPointer() &&
+                   GetSentinelPointer()->prev != GetSentinelPointer() &&
                    "Cannot access front in empty list.");
         return m_sentinel_node.next->val;
     }
@@ -314,6 +318,9 @@ public:
 
     /** @brief 마지막 원소에 대한 참조를 반환한다.
      *  @return 마지막 원소에 대한 참조
+     *  @exception
+     *  Debug 구성에서 리스트가 비어있는 경우 비정상 종료한다. Release
+     *  구성에서는 Undefined Behavior 이다.
      */
     auto Back() const -> const Value_t&
     {
