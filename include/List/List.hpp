@@ -67,7 +67,7 @@ public:
     using Value_t      = __T_t;
     using Pointer_t    = __T_t*;
     using Reference_t  = __T_t&;
-    using Difference_t = PointerDifference_t;
+    using Difference_t = std::ptrdiff_t;
 
 public:
     using Size_t   = std::size_t;
@@ -401,19 +401,26 @@ public:
         __InitializeSentinelNode();
     }
 
-private:
-    /**
-     * @brief 반복자가 가리키는 위치 이전에 새 원소들을 삽입한다.
-     * @param[in] it_pos 삽입할 위치의 이후 노드를 가리키는 반복자. 이 반복자가
-     * 가리키는 노드 이전에 새 노드가 삽입된다.
-     * @param[in] count 삽입할 원소의 갯수
-     * @param[in] val 삽입할 원소들이 가질 값
-     * @return 삽입된 마지막 노드의 다음 위치를 가리키는 반복자이다.
+public:
+    /** @brief 반복자가 가리키는 위치 이전에 새 원소들을 삽입한다.
+     *  @param[in] it_pos 삽입할 위치의 이후 노드를 가리키는 반복자. 이 반복자가
+     *  가리키는 노드 *이전(Before)*에 새 노드가 생성되어 삽입된다.
+     *  @param[in] count 삽입할 원소의 갯수
+     *  @param[in] val 삽입할 원소들이 가질 값
+     *  @return 삽입된 노드들 중 첫 번째 노드를 가리키는 반복자
+     *  @note 호출 후 기존의 반복자들이 무효화되지 않으며, `it_pos`가 역참조
+     가능할 필요는 없다.
+     *  @exception
+     *  - Debug 구성에서 유효하지 않거나 호환되지 않는 반복자로 호출되는 경우
+     *    비정상 종료한다.
+     *  - Release 구성에서 유효하지 않거나 호환되지 않는 반복자로 호출되는 경우
+     *    Undefined Behavior 이다.
+     ///@todo Release 구성에서 예외를 던지도록 구현하는 것이 나을 수도 있다.
      */
     auto InsertBefore(ConstIterator_t it_pos, Size_t count, const Value_t& val)
         -> Iterator_t
     {
-        /// @todo 유효성 검사 등등등을 수행해야 하지 않을까?
+        RDS_Assert(it_pos.IsValid() && "Invalid iterator.");
         RDS_Assert(it_pos.IsCompatible(*this) && "List is not compatible.");
 
         // 삽입할 원소의 갯수가 1 미만이면 아무런 동작도 하지 않고 it_pos를
@@ -422,21 +429,23 @@ private:
             return Iterator_t(this, it_pos.GetDataPointer());
 
         /*
-        ----------------------------------------------------------------------------
+        ------------------------------------------------------------------------
          * Before InsertBefore(it_pos, count, val)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        - - it_pos.m_data_ptr ↓
+                               it_pos.m_data_ptr
+                                 ↓
          <-p[ ]n-> <-p[ ]n-> <-p[ ]n-> <-p[ ]n->
                        ↑         ↑
                    prev_node_ptr next_node_ptr
-        ----------------------------------------------------------------------------
+        ------------------------------------------------------------------------
          * After InsertBefore(it_pos, count, val)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        - - it_pos.m_data_ptr ↓
+                        [return] nn_head   nn_tail     it_pos.m_data_ptr
+                                   ↓         ↓           ↓
          <-p[ ]n-> <-p[ ]n->> <<-p[N]n-> <-p[N]n->> <<-p[ ]n->
                        ↑                                 ↑
                    prev_node_ptr                     next_node_ptr
-        ----------------------------------------------------------------------------
+        ------------------------------------------------------------------------
           4 Links to be updated:
         */
 
@@ -474,20 +483,33 @@ private:
         return Iterator_t(this, new_node_ptr_head);
     }
 
-    /// @brief 인자로 전달된 반복자가 가리키는 위치 이전에 새 원소를 전달받은
-    /// 갯수만큼 삽입한다.
-    /// @param[in] it_pos 삽입할 위치를 가리키는 반복자. 이 위치 이전에 새
-    /// 원소가 삽입된다.
-    /// @param[in] val 삽입할 원소의 값
-    /// @param[in] count 삽입할 원소의 갯수
+    /** @brief 반복자가 가리키는 위치 이전에 새 원소를 하나 삽입한다.
+     *  @param[in] it_pos 삽입할 위치의 이후 노드를 가리키는 반복자. 이 반복자가
+     *  가리키는 노드 *이전(Before)*에 새 노드가 생성되어 삽입된다.
+     *  @param[in] val 삽입할 원소의 값
+     *  @details `InsertBefore(ConstIterator_t, Size_t, const Value_t&)` 를
+     *  내부에서 호출한다.
+     */
     auto InsertBefore(ConstIterator_t it_pos, const Value_t& val) -> Iterator_t
     {
         return InsertBefore(it_pos, 1, val);
     }
 
-    auto InsertBefore(ConstIterator_t                 it_pos,
-                      std::initializer_list<Value_t>& ilist) -> Iterator_t
-    {}
+    /** @brief 반복자가 가리키는 위치 이전에 초기화 리스트에 있는 원소들을
+     *  삽입한다.
+     *  @param[in] it_pos 삽입할 위치의 이후 노드를 가리키는 반복자. 이 반복자가
+     *  가리키는 노드 *이전(Before)*에 새 노드가 생성되어 삽입된다.
+     *  @param[in] ilist 삽입할 원소들의 초기화 리스트
+     *  @return 삽입된 마지막 노드의 다음 위치를 가리키는 반복자
+     *  @note 호출 후 기존의 반복자들이 무효화되지 않는다.
+     */
+    auto InsertBefore(ConstIterator_t                       it_pos,
+                      const std::initializer_list<Value_t>& ilist) -> Iterator_t
+    {
+        for (const auto& e: ilist)
+            InsertBefore(it_pos, e);
+        return Iterator_t(this, it_pos.GetDataPointer());
+    }
 
     /// @brief 인자로 전달된 반복자가 가리키는 위치에 있는 원소를 제거한다.
     /// @param[in] it_pos 삭제할 위치를 가리키는 반복자. 정확히 이 위치에 있는

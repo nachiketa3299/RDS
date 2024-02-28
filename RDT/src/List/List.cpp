@@ -421,8 +421,456 @@ TEST(Clear, __default)
     }
 }
 
-/// @todo 여기서부터 해야함
-TEST(InsertBefore, __default)
-{}
+#ifndef NDEBUG
+// Assertion이 제대로 걸리는지 확인
+// (1) 유효하지 않은 반복자에 대해 종료하는지
+// (2) 호환되지 않는 반복자에 대해 종료하는지
+TEST(InsertBefore, __Constiterator_t__Size_t__const_Value_t_Assertion)
+{
+    { // Nallocator
+        List<int, Nallocator> li;
+        List<int, Nallocator> li_a;
+
+        List<int, Nallocator>::Iterator_t it_pos;
+
+        RDT_EXPECT_EXIT_FAILURE(li.InsertBefore(it_pos, 1, 99), "");
+
+        it_pos = li_a.End();
+
+        RDT_EXPECT_EXIT_FAILURE(li.InsertBefore(it_pos, 1, 99), "");
+    }
+    { // Mallocator
+        List<int, Mallocator> li;
+        List<int, Mallocator> li_a;
+
+        List<int, Mallocator>::Iterator_t it_pos;
+
+        RDT_EXPECT_EXIT_FAILURE(li.InsertBefore(it_pos, 1, 99), "");
+
+        it_pos = li_a.End();
+
+        RDT_EXPECT_EXIT_FAILURE(li.InsertBefore(it_pos, 1, 99), "");
+    }
+}
+#else
+#endif
+
+TEST(InsertBefore, __Constiterator_t__Size_t__const_Value_t)
+{
+    const std::size_t count = 2;
+    const int         val   = 99;
+
+    {     // Nallocator
+        { // Count is Empty
+            List<int, Nallocator> li{0, 1, 2};
+
+            auto it = li.Begin();
+
+            auto it_ret = li.InsertBefore(it, 0, val);
+
+            EXPECT_TRUE(it == it_ret);
+        }
+
+        { // Empty
+            List<int, Nallocator> li;
+            List<int, Nallocator> li_ans = {val, val};
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            EXPECT_EQ(li.Size(), count);
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, val);
+            }
+        }
+
+        { // Not Empty - case a
+            List<int, Nallocator> li({0, 1, 2});
+            List<int, Nallocator> li_ans = {val, val, 0, 1, 2};
+
+            const auto prev_size = li.Size();
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            const auto new_size = li.Size();
+
+            EXPECT_EQ(prev_size + count, new_size);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Not Empty - case b
+            List<int, Nallocator> li({0, 1, 2});
+            List<int, Nallocator> li_ans = {0, val, val, 1, 2};
+
+            const auto prev_size = li.Size();
+
+            auto it_pos = ++li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            const auto new_size = li.Size();
+
+            EXPECT_EQ(prev_size + count, new_size);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Not Empty - case c
+            List<int, Nallocator> li({0, 1, 2});
+            List<int, Nallocator> li_ans = {0, 1, 2, val, val};
+
+            const auto prev_size = li.Size();
+
+            auto it_pos = li.End();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            const auto new_size = li.Size();
+
+            EXPECT_EQ(prev_size + count, new_size);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+    }
+
+    {     // Mallocator
+        { // Count is Empty
+            List<int, Mallocator> li{0, 1, 2};
+
+            auto it = li.Begin();
+
+            auto it_ret = li.InsertBefore(it, 0, val);
+
+            EXPECT_TRUE(it == it_ret);
+        }
+
+        { // Empty
+            List<int, Mallocator> li;
+            List<int, Mallocator> li_ans = {val, val};
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            EXPECT_EQ(li.Size(), count);
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, val);
+            }
+        }
+
+        { // Not Empty - case a
+            List<int, Mallocator> li({0, 1, 2});
+            List<int, Mallocator> li_ans = {val, val, 0, 1, 2};
+
+            const auto prev_size = li.Size();
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            const auto new_size = li.Size();
+
+            EXPECT_EQ(prev_size + count, new_size);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Not Empty - case b
+            List<int, Mallocator> li({0, 1, 2});
+            List<int, Mallocator> li_ans = {0, val, val, 1, 2};
+
+            const auto prev_size = li.Size();
+
+            auto it_pos = ++li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            const auto new_size = li.Size();
+
+            EXPECT_EQ(prev_size + count, new_size);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Not Empty - case c
+            List<int, Mallocator> li({0, 1, 2});
+            List<int, Mallocator> li_ans = {0, 1, 2, val, val};
+
+            const auto prev_size = li.Size();
+
+            auto it_pos = li.End();
+            auto it_ret = li.InsertBefore(it_pos, count, val);
+
+            const auto new_size = li.Size();
+
+            EXPECT_EQ(prev_size + count, new_size);
+
+            EXPECT_EQ(*it_ret, val);
+            EXPECT_EQ(*(++it_ret), val);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+    }
+}
+
+TEST(InsertBefore, __ConstIterator_t__initializer_list)
+{
+    std::initializer_list il  = {99, 100, 101};
+    auto                  ilb = il.begin();
+
+    {     // Nallocator
+        { // Empty
+            List<int, Nallocator> li;
+            List<int, Nallocator> li_ans(il);
+
+            auto prev_size = li.Size();
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, il);
+
+            auto new_size = li.Size();
+
+            EXPECT_EQ((prev_size + il.size()), new_size);
+
+            auto it_ans = li_ans.Begin();
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+
+            // 지우고 End에 대해 다시 넣어보기
+            li.Clear();
+            EXPECT_TRUE(li.Empty());
+            prev_size = li.Size();
+            it_pos    = li.End();
+            it_ret    = li.InsertBefore(it_pos, il);
+            new_size  = li.Size();
+            EXPECT_EQ((prev_size + il.size()), new_size);
+
+            it_ans = li_ans.Begin();
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Not Empty
+            List<int, Nallocator> li     = {0, 1, 2};
+            List<int, Nallocator> li_ans = {*(ilb), *(ilb + 1), *(ilb + 2),
+                                            0,      1,          2};
+            // case a
+            auto                  it_pos = li.Begin();
+
+            auto prev_size = li.Size();
+            auto it_ret    = li.InsertBefore(it_pos, il);
+            auto new_size  = li.Size();
+            EXPECT_EQ(prev_size + il.size(), new_size);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+            // case b
+            li     = {0, 1, 2};
+            li_ans = {0, *(ilb), *(ilb + 1), *(ilb + 2), 1, 2};
+            it_pos = ++li.Begin();
+
+            prev_size = li.Size();
+            it_ret    = li.InsertBefore(it_pos, il);
+            new_size  = li.Size();
+
+            EXPECT_EQ(prev_size + il.size(), new_size);
+
+            it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+
+            // case c
+
+            li     = {0, 1, 2};
+            li_ans = {0, 1, 2, *(ilb), *(ilb + 1), *(ilb + 2)};
+            it_pos = li.End();
+
+            prev_size = li.Size();
+            it_ret    = li.InsertBefore(it_pos, il);
+            new_size  = li.Size();
+
+            EXPECT_EQ(prev_size + il.size(), new_size);
+
+            it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+    }
+
+    {     // Mallocator
+        { // Empty
+            List<int, Mallocator> li;
+            List<int, Mallocator> li_ans(il);
+
+            auto prev_size = li.Size();
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.InsertBefore(it_pos, il);
+
+            auto new_size = li.Size();
+
+            EXPECT_EQ((prev_size + il.size()), new_size);
+
+            auto it_ans = li_ans.Begin();
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+
+            // 지우고 End에 대해 다시 넣어보기
+            li.Clear();
+            EXPECT_TRUE(li.Empty());
+            prev_size = li.Size();
+            it_pos    = li.End();
+            it_ret    = li.InsertBefore(it_pos, il);
+            new_size  = li.Size();
+            EXPECT_EQ((prev_size + il.size()), new_size);
+
+            it_ans = li_ans.Begin();
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Not Empty
+            List<int, Mallocator> li     = {0, 1, 2};
+            List<int, Mallocator> li_ans = {*(ilb), *(ilb + 1), *(ilb + 2),
+                                            0,      1,          2};
+            // case a
+            auto                  it_pos = li.Begin();
+
+            auto prev_size = li.Size();
+            auto it_ret    = li.InsertBefore(it_pos, il);
+            auto new_size  = li.Size();
+            EXPECT_EQ(prev_size + il.size(), new_size);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+            // case b
+            li     = {0, 1, 2};
+            li_ans = {0, *(ilb), *(ilb + 1), *(ilb + 2), 1, 2};
+            it_pos = ++li.Begin();
+
+            prev_size = li.Size();
+            it_ret    = li.InsertBefore(it_pos, il);
+            new_size  = li.Size();
+
+            EXPECT_EQ(prev_size + il.size(), new_size);
+
+            it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+
+            // case c
+
+            li     = {0, 1, 2};
+            li_ans = {0, 1, 2, *(ilb), *(ilb + 1), *(ilb + 2)};
+            it_pos = li.End();
+
+            prev_size = li.Size();
+            it_ret    = li.InsertBefore(it_pos, il);
+            new_size  = li.Size();
+
+            EXPECT_EQ(prev_size + il.size(), new_size);
+
+            it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+    }
+}
 
 RDT_END

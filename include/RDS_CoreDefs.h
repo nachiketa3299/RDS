@@ -9,23 +9,20 @@
 
 // clang-format off
 
-// clang-format off
-/// @brief 메인 네임스페이스(`rds`) 구간 시작 매크로
+/// @brief 메인 네임스페이스(\p rds) 구간 시작 매크로
 #define RDS_BEGIN namespace rds {
 
-/// @brief 메인 네임스페이스(`rds`) 구간 종료 매크로
+/// @brief 메인 네임스페이스(\p rds) 구간 종료 매크로
 #define RDS_END };
 
+/** @brief 태그 디스패칭 네임스페이스 스코프 매크로 */
 #define RDS_TAG_ tag::
 
-
 RDS_BEGIN
-
 // clang-format on
 // 32 bit
 using PointerDifference_t = int;
 // 64 bit
-
 RDS_END
 
 #define RDS_ZERO 0

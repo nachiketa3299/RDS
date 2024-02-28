@@ -10,10 +10,16 @@
 
 RDS_BEGIN
 
-template <class __IteratorTag_t, class __Value_t, class __Pointer_t,
-          class __Reference_t, class __Difference_t>
+// clang-format off
+template < class __IteratorTag_t
+         , class __Value_t
+         , class __Pointer_t
+         , class __Reference_t
+         , class __Difference_t>
 struct Iterator
 {
+    // clang-format on
+
     using IteratorTag_t = __IteratorTag_t;
     using Value_t       = __Value_t;
     using Pointer_t     = __Pointer_t;
