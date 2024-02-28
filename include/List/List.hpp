@@ -725,6 +725,8 @@ public:
 public:
     /** @brief 반복자의 위치 이전에 전달된 생성자 인자로 객체를 생성해 리스트에
      *  추가한다.
+     *  @tparam __CtorArgs_t 노드가 보유한 값의 자료형의 생성자에 전달할
+     *  인자들의 자료형
      *  @param[in] it_pos 삽입할 위치 이후 노드를 가리키는 반복자.
      *  @param[in] ctor_args 생성자에 전달할 인자 목록
      *  @return 새로 생성된 노드를 가리키는 반복자
@@ -764,6 +766,13 @@ public:
         return Iterator_t(this, new_node_ptr);
     }
 
+    /** @brief 리스트의 맨 앞에 전달된 생성자 인자로 객체를 생성해 추가한다.
+     *  @tparam __CtorArgs_t 노드가 보유한 값의 자료형의 생성자에 전달할
+     *  인자들의 자료형
+     *  @param[in] ctor_args 생성자에 전달할 인자 목록
+     *  @return 새로 생성된 노드를 가리키는 반복자. `Begin()`과 같다.
+     *  @note 비어 있는 리스트에서 이 연산을 수행해도 안전하다.
+     */
     template <class... __CtorArgs_t>
     auto EmplaceFront(__CtorArgs_t&&... ctor_args) -> Iterator_t
     {
@@ -771,6 +780,13 @@ public:
                              std::forward<__CtorArgs_t>(ctor_args)...);
     }
 
+    /** @brief 리스트의 맨 뒤에 전달된 생성자 인자로 객체를 생성해 추가한다.
+     *  @tparam __CtorArgs_t 노드가 보유한 값의 자료형의 생성자에 전달할
+     *  인자들의 자료형
+     *  @param[in] ctor_args 생성자에 전달할 인자 목록
+     *  @return 새로 생성된 노드를 가리키는 반복자. `End()`의 이전 위치이다.
+     *  @note 비어 있는 리스트에서 이 연산을 수행해도 안전하다.
+     */
     template <class... __CtorArgs_t>
     auto EmplaceBack(__CtorArgs_t&&... ctor_args) -> Iterator_t
     {

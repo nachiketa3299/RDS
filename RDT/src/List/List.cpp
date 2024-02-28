@@ -1718,6 +1718,11 @@ struct EmplaceDummy
         , b(b)
     {}
 
+    auto operator==(const EmplaceDummy& other) const -> bool
+    {
+        return a == other.a && b == other.b && c == other.c;
+    }
+
     int   a{};
     float b{};
     char  c{};
@@ -1804,6 +1809,134 @@ TEST(EmplaceBefore, __ConstIterator_t__CtorArgs_t)
         EXPECT_TRUE(++it_ret == li.End());
 
         EXPECT_EQ(li.Size(), 3);
+    }
+}
+
+TEST(EmplaceFront, __CtorArgs_t)
+{
+    EmplaceDummy d_0(999, 999.f, 'Z');
+    EmplaceDummy d_1(1'000, 1000.f, 'Y');
+    EmplaceDummy d_2(1'001, 1001.f);
+
+    { // Nallocator
+        List<EmplaceDummy, Nallocator> li;
+
+        auto it_ret = li.EmplaceFront(d_0.a, d_0.b, d_0.c);
+
+        EXPECT_TRUE(it_ret == li.Begin());
+        EXPECT_EQ(li.Size(), 1);
+        EXPECT_EQ(*li.Begin(), d_0);
+
+        it_ret = li.EmplaceFront(d_1.a, d_1.b, d_1.c);
+
+        EXPECT_TRUE(it_ret == li.Begin());
+        EXPECT_EQ(li.Size(), 2);
+        EXPECT_EQ(*li.Begin(), d_1);
+
+        it_ret = li.EmplaceFront(d_2.a, d_2.b);
+
+        EXPECT_TRUE(it_ret == li.Begin());
+        EXPECT_EQ(li.Size(), 3);
+        EXPECT_EQ(*li.Begin(), d_2);
+
+        auto it = li.Begin();
+        EXPECT_EQ(*it, d_2);
+        ++it;
+        EXPECT_EQ(*it, d_1);
+        ++it;
+        EXPECT_EQ(*it, d_0);
+    }
+    { // Mallocator
+        List<EmplaceDummy, Mallocator> li;
+
+        auto it_ret = li.EmplaceFront(d_0.a, d_0.b, d_0.c);
+
+        EXPECT_TRUE(it_ret == li.Begin());
+        EXPECT_EQ(li.Size(), 1);
+        EXPECT_EQ(*li.Begin(), d_0);
+
+        it_ret = li.EmplaceFront(d_1.a, d_1.b, d_1.c);
+
+        EXPECT_TRUE(it_ret == li.Begin());
+        EXPECT_EQ(li.Size(), 2);
+        EXPECT_EQ(*li.Begin(), d_1);
+
+        it_ret = li.EmplaceFront(d_2.a, d_2.b);
+
+        EXPECT_TRUE(it_ret == li.Begin());
+        EXPECT_EQ(li.Size(), 3);
+        EXPECT_EQ(*li.Begin(), d_2);
+
+        auto it = li.Begin();
+        EXPECT_EQ(*it, d_2);
+        ++it;
+        EXPECT_EQ(*it, d_1);
+        ++it;
+        EXPECT_EQ(*it, d_0);
+    }
+}
+
+TEST(EmplaceBack, __CtorArgs_t)
+{
+    auto d_0 = EmplaceDummy(999, 999.f, 'Z');
+    auto d_1 = EmplaceDummy(1'000, 1000.f, 'Y');
+    auto d_2 = EmplaceDummy(1'001, 1001.f);
+
+    { // Nallocator
+        List<EmplaceDummy, Nallocator> li;
+
+        auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
+
+        EXPECT_TRUE(it_ret == --li.End());
+        EXPECT_EQ(li.Size(), 1);
+        EXPECT_EQ(*(--li.End()), d_0);
+
+        it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
+
+        EXPECT_TRUE(it_ret == --li.End());
+        EXPECT_EQ(li.Size(), 2);
+        EXPECT_EQ(*(--li.End()), d_1);
+
+        it_ret = li.EmplaceBack(d_2.a, d_2.b);
+
+        EXPECT_TRUE(it_ret == --li.End());
+        EXPECT_EQ(li.Size(), 3);
+        EXPECT_EQ(*(--li.End()), d_2);
+
+        auto it = li.Begin();
+        EXPECT_EQ(*it, d_0);
+        ++it;
+        EXPECT_EQ(*it, d_1);
+        ++it;
+        EXPECT_EQ(*it, d_2);
+    }
+    { // Mallocator
+        List<EmplaceDummy, Mallocator> li;
+
+        auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
+
+        EXPECT_TRUE(it_ret == --li.End());
+        EXPECT_EQ(li.Size(), 1);
+        EXPECT_EQ(*(--li.End()), d_0);
+
+        it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
+
+        EXPECT_TRUE(it_ret == --li.End());
+        EXPECT_EQ(li.Size(), 2);
+        EXPECT_EQ(*(--li.End()), d_1);
+
+        it_ret = li.EmplaceBack(d_2.a, d_2.b);
+
+        EXPECT_TRUE(it_ret == --li.End());
+        EXPECT_EQ(li.Size(), 3);
+        EXPECT_EQ(*(--li.End()), d_2);
+
+        auto it = li.Begin();
+        EXPECT_EQ(*it, d_0);
+        ++it;
+        EXPECT_EQ(*it, d_1);
+        ++it;
+        EXPECT_EQ(*it, d_2);
     }
 }
 
