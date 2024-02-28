@@ -652,22 +652,57 @@ public:
 
     auto Resize() -> void;
 
+    /** @brief 인자로 전달된 리스트와 이 리스트의 내용을 서로 바꾼다.
+     *  @param[in] other 바꿀 대상이 되는 다른 리스트
+     *  @details 한쪽이 비어있는 경우에도 정상 작동한다.
+     */
     auto Swap(List& other) -> void
     {
-        auto* this_sn_prev = m_sentinel_node.prev;
-        auto* this_sn_next = m_sentinel_node.next;
+        /*
+        ------------------------------------------------------------------------
+        * Before Swap(List&)
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        - this:
+            [st]n->   <-p[At]n->   <-p[Bt]n->   <-p[st]
+        - other:
+            [so]n->   <-p[Ao]n->                <-p[so]
+        ------------------------------------------------------------------------
+        * After Swap(List&)
+        - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+        - this:
+            [st]n->> <<-p[Ao]n->>              <<-p[st]
+        - other:
+            [so]n->> <<-p[At]n->   <-p[Bt]n->> <<-p[so]
+        ------------------------------------------------------------------------
+         8 Links to be updated:
+        */
 
-        auto* temp_this_sn_prev = this_sn_prev;
-        auto* temp_this_sn_next = this_sn_next;
+        // 각각이 비어있는경우 상대의 센티넬 노드로 초기화 해줘야 말이 됨
+        auto* this_nodes_head_ptr =
+            !Empty() ? m_sentinel_node.next : &other.m_sentinel_node;
+        auto* this_nodes_tail_ptr =
+            !Empty() ? m_sentinel_node.prev : &other.m_sentinel_node;
 
-        auto* other_sn_prev = &other.m_sentinel_node.prev;
-        auto* other_sn_next = &other.m_sentinel_node.next;
+        auto other_nodes_head_ptr =
+            !other.Empty() ? other.m_sentinel_node.next : &m_sentinel_node;
+        auto other_nodes_tail_ptr =
+            !other.Empty() ? other.m_sentinel_node.prev : &m_sentinel_node;
 
-        this_sn_prev = other_sn_prev;
-        this_sn_next = other_sn_next;
+        // 8개의 링크를 업데이트 한다
+        other.m_sentinel_node.next = this_nodes_head_ptr;
+        other.m_sentinel_node.prev = this_nodes_tail_ptr;
+        this_nodes_head_ptr->prev  = &other.m_sentinel_node;
+        this_nodes_tail_ptr->next  = &other.m_sentinel_node;
 
-        other_sn_prev = temp_this_sn_prev;
-        other_sn_next = temp_this_sn_next;
+        m_sentinel_node.next       = other_nodes_head_ptr;
+        m_sentinel_node.prev       = other_nodes_tail_ptr;
+        other_nodes_head_ptr->prev = &m_sentinel_node;
+        other_nodes_tail_ptr->next = &m_sentinel_node;
+
+        // 크기도 바꿔준다
+        auto temp_size = m_size;
+        m_size         = other.m_size;
+        other.m_size   = temp_size;
     }
 
 public:

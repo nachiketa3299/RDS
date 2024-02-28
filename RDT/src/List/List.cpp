@@ -1355,7 +1355,7 @@ TEST(Erase, __PushBack)
 #ifndef NDEBUG
 // PopBack 에 대해 Assertion이 제대로 걸리는지 확인
 // 비어 있는 리스트에 대해 수행하였을 때 비정상 종료하는지 확인
-TEST(Erase, __PopBack__Assertion)
+TEST(PopBack, __void__Assertion)
 {
     { // Nallocator
         List<int, Nallocator> li;
@@ -1367,7 +1367,7 @@ TEST(Erase, __PopBack__Assertion)
     }
 }
 #endif
-TEST(Erase, __PopBack)
+TEST(PopBack, __void)
 {
     { // Nallocator
         List<int, Nallocator> li{99, 100};
@@ -1403,7 +1403,7 @@ TEST(Erase, __PopBack)
     }
 }
 
-TEST(Erase, __PushFront)
+TEST(PushFront, __void)
 {
     { // Nallocator
         List<int, Nallocator> li;
@@ -1456,7 +1456,7 @@ TEST(Erase, __PushFront)
 #ifndef NDEBUG
 // PopFront 에 대해 Assertion이 제대로 걸리는지 확인
 // 비어 있는 리스트에 대해 수행하였을 때 비정상 종료하는지 확인
-TEST(Erase, __PopFront__Assertion)
+TEST(PopFront, __void__Assertion)
 {
     { // Nallocator
         List<int, Nallocator> li;
@@ -1468,7 +1468,7 @@ TEST(Erase, __PopFront__Assertion)
     }
 }
 #endif
-TEST(Erase, __PopFront)
+TEST(PopFront, __void)
 {
     { // Nallocator
         List<int, Nallocator> li{99, 100};
@@ -1508,6 +1508,165 @@ TEST(Erase, __PopFront)
 
         EXPECT_EQ(sn->next, sn);
         EXPECT_EQ(sn->prev, sn);
+    }
+}
+
+TEST(Swap, __void)
+{
+    {     // Nallocator
+        { // 둘 다 Not empty
+            std::initializer_list il_a = {0, 1, 2};
+            std::initializer_list il_b = {99, 100};
+
+            List<int, Nallocator> li_a(il_a);
+            List<int, Nallocator> li_b(il_b);
+
+            auto past_a_size = li_a.Size();
+            auto past_b_size = li_b.Size();
+
+            li_a.Swap(li_b);
+
+            EXPECT_EQ(li_a.Size(), past_b_size);
+            EXPECT_EQ(li_b.Size(), past_a_size);
+
+            auto it_il_b = il_b.begin();
+            for (auto it = li_a.Begin(); it != li_a.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_b);
+                ++it_il_b;
+            }
+
+            auto it_il_a = il_a.begin();
+            for (auto it = li_b.Begin(); it != li_b.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_a);
+                ++it_il_a;
+            }
+        }
+        { // A 가 empty
+            std::initializer_list il_b = {99, 100};
+
+            List<int, Nallocator> li_a;
+            List<int, Nallocator> li_b(il_b);
+
+            auto past_a_size = li_a.Size();
+            auto past_b_size = li_b.Size();
+
+            li_a.Swap(li_b);
+
+            EXPECT_EQ(li_a.Size(), past_b_size);
+            EXPECT_EQ(li_b.Size(), past_a_size);
+
+            auto it_il_b = il_b.begin();
+            for (auto it = li_a.Begin(); it != li_a.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_b);
+                ++it_il_b;
+            }
+
+            EXPECT_TRUE(li_b.Empty());
+        }
+        { // B가 Empty
+            std::initializer_list il_a = {0, 1, 2};
+
+            List<int, Nallocator> li_a(il_a);
+            List<int, Nallocator> li_b;
+
+            auto past_a_size = li_a.Size();
+            auto past_b_size = li_b.Size();
+
+            li_a.Swap(li_b);
+
+            EXPECT_EQ(li_a.Size(), past_b_size);
+            EXPECT_EQ(li_b.Size(), past_a_size);
+
+            EXPECT_TRUE(li_a.Empty());
+
+            auto it_il_a = il_a.begin();
+            for (auto it = li_b.Begin(); it != li_b.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_a);
+                ++it_il_a;
+            }
+        }
+    }
+
+    {     // Mallocator
+        { // 둘 다 Not empty
+            std::initializer_list il_a = {0, 1, 2};
+            std::initializer_list il_b = {99, 100};
+
+            List<int, Mallocator> li_a(il_a);
+            List<int, Mallocator> li_b(il_b);
+
+            auto past_a_size = li_a.Size();
+            auto past_b_size = li_b.Size();
+
+            li_a.Swap(li_b);
+
+            EXPECT_EQ(li_a.Size(), past_b_size);
+            EXPECT_EQ(li_b.Size(), past_a_size);
+
+            auto it_il_b = il_b.begin();
+            for (auto it = li_a.Begin(); it != li_a.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_b);
+                ++it_il_b;
+            }
+
+            auto it_il_a = il_a.begin();
+            for (auto it = li_b.Begin(); it != li_b.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_a);
+                ++it_il_a;
+            }
+        }
+        { // A 가 empty
+            std::initializer_list il_b = {99, 100};
+
+            List<int, Mallocator> li_a;
+            List<int, Mallocator> li_b(il_b);
+
+            auto past_a_size = li_a.Size();
+            auto past_b_size = li_b.Size();
+
+            li_a.Swap(li_b);
+
+            EXPECT_EQ(li_a.Size(), past_b_size);
+            EXPECT_EQ(li_b.Size(), past_a_size);
+
+            auto it_il_b = il_b.begin();
+            for (auto it = li_a.Begin(); it != li_a.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_b);
+                ++it_il_b;
+            }
+
+            EXPECT_TRUE(li_b.Empty());
+        }
+        { // B가 Empty
+            std::initializer_list il_a = {0, 1, 2};
+
+            List<int, Mallocator> li_a(il_a);
+            List<int, Mallocator> li_b;
+
+            auto past_a_size = li_a.Size();
+            auto past_b_size = li_b.Size();
+
+            li_a.Swap(li_b);
+
+            EXPECT_EQ(li_a.Size(), past_b_size);
+            EXPECT_EQ(li_b.Size(), past_a_size);
+
+            EXPECT_TRUE(li_a.Empty());
+
+            auto it_il_a = il_a.begin();
+            for (auto it = li_b.Begin(); it != li_b.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_il_a);
+                ++it_il_a;
+            }
+        }
     }
 }
 
