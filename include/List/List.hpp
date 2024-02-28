@@ -356,7 +356,7 @@ public:
     /// @brief 리스트의 첫 번째 원소를 가리키는 상수 반복자를 반환한다.
     auto CBegin() const -> ConstIterator_t { return Begin(); }
 
-    /// @brief 리스트의 마지막 원소를 가리키는 상수 반복자를 반환하낟.
+    /// @brief 리스트의 마지막 원소를 가리키는 상수 반복자를 반환한다.
     auto CEnd() const -> ConstIterator_t { return End(); }
 
     /// @}
@@ -622,22 +622,32 @@ public:
         return Erase(it_pos, it_last);
     }
 
-    /// @brief 인자로 전달된 값을 리스트의 뒤에 추가한다.
-    /// @param[in] val 추가할 원소의 값
+    /** @brief 인자로 전달된 값을 리스트의 맨 뒤에 추가한다.
+     *  @param[in] val 추가할 원소의 값
+     *  @note `InsertBefore` 메서드를 내부에서 `CEnd`를 인자로 호출하므로, 항상
+     *  안전하게 수행된다.
+     */
     auto PushBack(const Value_t& val) -> void { InsertBefore(CEnd(), val); }
 
-    /// @brief 리스트의 끝에서 원소를 제거한다.
-    /// @warning 비어 있는 리스트에서 이 연산을 수행할 시 비정상 종료한다.
-    /// @test 비어 있는 리스트에서 이 연산을 수행할 시 비정상 종료하는지 확인.
-    auto PopBack() -> void { Erase(End().operator--()); }
+    /** @brief 리스트의 맨 뒤에서 원소를 제거한다.
+     *  @exception
+     *  - Debug 구성에서 내부에서 `End`의 이전 반복자를 만드는데, 리스트가
+     *    비어있는 경우 이 연산에서 비정상 종료한다. Release 구성에서는
+     *    Undefined Behavior.
+     */
+    auto PopBack() -> void { Erase(CEnd().operator--()); }
 
-    /// @brief 인자로 전달된 값을 리스트의 맨 앞에 추가한다.
-    /// @param[in] val 추가할 원소의 값
-    auto PushFront(const Value_t& val) -> void { InsertBefore(Begin(), val); }
+    /** @brief 인자로 전달된 값을 리스트의 맨 앞에 추가한다.
+     *  @param[in] val 추가할 원소의 값
+     *  @note 비어 있는 리스트에서 이 연산을 수행해도 안전하다.
+     */
+    auto PushFront(const Value_t& val) -> void { InsertBefore(CBegin(), val); }
 
-    /// @brief 리스트의 맨 앞에서 원소를 제거한다.
-    /// @warning 비어 있는 리스트에서 이 연산을 수행할 시 비정상 종료한다.
-    /// @test 비어 있는 리스트에서 이 연산을 수행할 시 비정상 종료하는지 확인.
+    /** @brief 리스트의 맨 앞에서 원소를 제거한다.
+     *  @exception
+     *  - Debug 구성에서 비어 있는 리스트에 대해 수행했을 때 비정상 종료한다.
+     *  - Release 구성에서는 Undefined Behavior.
+     */
     auto PopFront() -> void { Erase(CBegin()); }
 
     auto Resize() -> void;

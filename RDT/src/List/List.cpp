@@ -1310,4 +1310,205 @@ TEST(Erase, __ConstIterator_t)
     }
 }
 
+TEST(Erase, __PushBack)
+{
+    { // Nallocator
+        List<int, Nallocator> li;
+        List<int, Nallocator> li_ans{99, 100};
+
+        auto expect_size = li_ans.Size();
+
+        li.PushBack(99);
+        li.PushBack(100);
+
+        EXPECT_EQ(li.Size(), expect_size);
+        EXPECT_FALSE(li.Empty());
+
+        auto it_ans = li_ans.Begin();
+        for (auto it = li.Begin(); it != li.End(); ++it)
+        {
+            EXPECT_EQ(*it, *it_ans);
+            ++it_ans;
+        }
+    }
+    { // Mallocator
+        List<int, Mallocator> li;
+        List<int, Mallocator> li_ans{99, 100};
+
+        auto expect_size = li_ans.Size();
+
+        li.PushBack(99);
+        li.PushBack(100);
+
+        EXPECT_EQ(li.Size(), expect_size);
+        EXPECT_FALSE(li.Empty());
+
+        auto it_ans = li_ans.Begin();
+        for (auto it = li.Begin(); it != li.End(); ++it)
+        {
+            EXPECT_EQ(*it, *it_ans);
+            ++it_ans;
+        }
+    }
+}
+
+#ifndef NDEBUG
+// PopBack 에 대해 Assertion이 제대로 걸리는지 확인
+// 비어 있는 리스트에 대해 수행하였을 때 비정상 종료하는지 확인
+TEST(Erase, __PopBack__Assertion)
+{
+    { // Nallocator
+        List<int, Nallocator> li;
+        RDT_EXPECT_EXIT_FAILURE(li.PopBack(), "");
+    }
+    { // Mallocator
+        List<int, Mallocator> li;
+        RDT_EXPECT_EXIT_FAILURE(li.PopBack(), "");
+    }
+}
+#endif
+TEST(Erase, __PopBack)
+{
+    { // Nallocator
+        List<int, Nallocator> li{99, 100};
+        List<int, Nallocator> li_ans;
+
+        auto expect_size = li_ans.Size();
+
+        li.PopBack();
+
+        EXPECT_EQ(li.Size() - 1, expect_size);
+        EXPECT_EQ(*--li.CEnd(), 99);
+
+        li.PopBack();
+
+        EXPECT_EQ(li.Size(), expect_size);
+        EXPECT_TRUE(li.Empty());
+    }
+    { // Mallocator
+        List<int, Mallocator> li{99, 100};
+        List<int, Mallocator> li_ans;
+
+        auto expect_size = li_ans.Size();
+
+        li.PopBack();
+
+        EXPECT_EQ(li.Size() - 1, expect_size);
+        EXPECT_EQ(*--li.CEnd(), 99);
+
+        li.PopBack();
+
+        EXPECT_EQ(li.Size(), expect_size);
+        EXPECT_TRUE(li.Empty());
+    }
+}
+
+TEST(Erase, __PushFront)
+{
+    { // Nallocator
+        List<int, Nallocator> li;
+        List<int, Nallocator> li_ans{100, 99};
+
+        auto expect_size = li_ans.Size();
+
+        li.PushFront(99);
+        EXPECT_EQ(li.Size() + 1, expect_size);
+        EXPECT_EQ(*li.CBegin(), 99);
+
+        li.PushFront(100);
+        EXPECT_EQ(li.Size(), expect_size);
+        EXPECT_EQ(*li.CBegin(), 100);
+        EXPECT_EQ(*--li.CEnd(), 99);
+
+        auto it_ans = li_ans.Begin();
+
+        for (auto it = li.Begin(); it != li.End(); ++it)
+        {
+            EXPECT_EQ(*it, *it_ans);
+            ++it_ans;
+        }
+    }
+    { // Mallocator
+        List<int, Mallocator> li;
+        List<int, Mallocator> li_ans{100, 99};
+
+        auto expect_size = li_ans.Size();
+
+        li.PushFront(99);
+        EXPECT_EQ(li.Size() + 1, expect_size);
+        EXPECT_EQ(*li.CBegin(), 99);
+
+        li.PushFront(100);
+        EXPECT_EQ(li.Size(), expect_size);
+        EXPECT_EQ(*li.CBegin(), 100);
+        EXPECT_EQ(*--li.CEnd(), 99);
+
+        auto it_ans = li_ans.Begin();
+
+        for (auto it = li.Begin(); it != li.End(); ++it)
+        {
+            EXPECT_EQ(*it, *it_ans);
+            ++it_ans;
+        }
+    }
+}
+
+#ifndef NDEBUG
+// PopFront 에 대해 Assertion이 제대로 걸리는지 확인
+// 비어 있는 리스트에 대해 수행하였을 때 비정상 종료하는지 확인
+TEST(Erase, __PopFront__Assertion)
+{
+    { // Nallocator
+        List<int, Nallocator> li;
+        RDT_EXPECT_EXIT_FAILURE(li.PopFront(), "");
+    }
+    { // Mallocator
+        List<int, Mallocator> li;
+        RDT_EXPECT_EXIT_FAILURE(li.PopFront(), "");
+    }
+}
+#endif
+TEST(Erase, __PopFront)
+{
+    { // Nallocator
+        List<int, Nallocator> li{99, 100};
+        List<int, Nallocator> li_ans;
+
+        auto expect_size = li_ans.Size();
+
+        li.PopFront();
+        EXPECT_EQ(li.Size() - 1, expect_size);
+        EXPECT_EQ(*li.CBegin(), 100);
+        EXPECT_EQ(*--li.CEnd(), 100);
+        li.PopFront();
+        EXPECT_EQ(li.Size(), expect_size);
+
+        EXPECT_TRUE(li.Empty());
+        auto* sn = li.GetSentinelPointer();
+
+        EXPECT_EQ(sn->next, sn);
+        EXPECT_EQ(sn->prev, sn);
+    }
+
+    { // Mallocator
+        List<int, Mallocator> li{99, 100};
+        List<int, Mallocator> li_ans;
+
+        auto expect_size = li_ans.Size();
+
+        li.PopFront();
+        EXPECT_EQ(li.Size() - 1, expect_size);
+        EXPECT_EQ(*li.CBegin(), 100);
+        EXPECT_EQ(*--li.CEnd(), 100);
+        li.PopFront();
+        EXPECT_EQ(li.Size(), expect_size);
+
+        EXPECT_TRUE(li.Empty());
+        auto* sn = li.GetSentinelPointer();
+
+        EXPECT_EQ(sn->next, sn);
+        EXPECT_EQ(sn->prev, sn);
+    }
+}
+
 RDT_END
