@@ -143,7 +143,7 @@ public:
 
     /** @brief 복사 대입 연산자
      *  @param[in] other 복사하여 이 리스트에 대입할 다른 리스트
-     *  @return 대입된 이후의 이 리스트에 대한 참조
+     *  @return 연산 이후 이 리스트에 대한 참조
      *  @details 이 리스트의 모든 노드들을 `Clear`를 이용해 삭제하고, 다른
      *  리스트의 값을 순회하며 이 리스트에 `PushBack`으로 복사하여 넣는다.\n
      *  만일, `other`의 주소가 이 리스트와 같다면, 아무런 동작도 하지 않는다.
@@ -165,7 +165,7 @@ public:
 
     /** @brief 이동 대입 연산자
      *  @param[in] temp_other 이동하여 이 리스트에 대입할 다른 리스트
-     *  @return 대입된 이후의 이 리스트에 대한 참조
+     *  @return 연산 이후 이 리스트에 대한 참조
      *  @details 우선 이 리스트의 모든 노드들을 `Clear`를 이용해 삭제한다.
      */
     auto operator=(List&& temp_other) -> List&
@@ -214,6 +214,19 @@ public:
         // 크기도 이전시킴
         m_size = temp_other.m_size;
 
+        return *this;
+    }
+
+    /** @brief 초기화 리스트를 받는 대입 연산자
+     *  @param[in] ilist 이 리스트에 대입할 값들을 가지고 있는 초기화 리스트
+     *  @return 연산 이후의 이 리스트에 대한 참조
+     */
+    auto operator=(const std::initializer_list<Value_t>& ilist) -> List&
+    {
+        Clear();
+
+        for (const auto& e: ilist)
+            PushBack(e);
         return *this;
     }
 

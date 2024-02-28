@@ -347,6 +347,45 @@ TEST(Assignment, __Copy__Move)
     }
 }
 
+TEST(Assignment, __initializer_list)
+{
+    const std::initializer_list<int> il = {99, 100};
+
+    { // Nallocator
+        List<int, Nallocator> li = {0, 1, 2, 3, 4, 5};
+        List<int, Nallocator> li_ans(il);
+
+        li = il;
+
+        EXPECT_EQ(li.Size(), il.size());
+
+        auto it_ans = li_ans.Begin();
+
+        for (auto it = li.Begin(); it != li.End(); ++it)
+        {
+            EXPECT_EQ(*it, *it_ans);
+            ++it_ans;
+        }
+    }
+
+    { // Mallocator
+        List<int, Mallocator> li = {0, 1, 2, 3, 4, 5};
+        List<int, Mallocator> li_ans(il);
+
+        li = il;
+
+        EXPECT_EQ(li.Size(), il.size());
+
+        auto it_ans = li_ans.Begin();
+
+        for (auto it = li.Begin(); it != li.End(); ++it)
+        {
+            EXPECT_EQ(*it, *it_ans);
+            ++it_ans;
+        }
+    }
+}
+
 TEST(Capacity, __Size__Empty_default)
 {
     {
