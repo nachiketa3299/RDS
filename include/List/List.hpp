@@ -802,13 +802,13 @@ public:
 
     ///@}
 
-public: // Operations
     /// @{ @name Operations
-    auto Remove(const Value_t& value) -> Size_t
-    {
-        return RemoveIf([&value](const Value_t& val) { return val == value; });
-    }
-
+public:
+    /** @brief 조건에 맞는 리스트의 원소를 제거한다.
+     *  @tparam UnaryPredicate_t 조건자의 자료형
+     *  @param[in] unary_pred 조건자
+     *  @return 제거된 원소의 갯수
+     */
     template <class UnaryPredicate_t>
     auto RemoveIf(UnaryPredicate_t unary_pred) -> Size_t
     {
@@ -826,6 +826,15 @@ public: // Operations
         }
 
         return remove_count;
+    }
+
+    /** @brief 리스트에서 특정 값을 가지는 원소를 제거한다.
+     *  @param[in] value 제거할 원소의 값
+     *  @return 제거된 원소의 갯수
+     */
+    inline auto Remove(const Value_t& value) -> Size_t
+    {
+        return RemoveIf([&value](const Value_t& val) { return val == value; });
     }
 
 public:
@@ -864,13 +873,13 @@ public:
         other.m_size -= other_range_node_count;
     }
 
-    auto Splice(ConstIterator_t this_it_pos, List& other,
-                ConstIterator_t other_it_pos) -> void
+    inline auto Splice(ConstIterator_t this_it_pos, List& other,
+                       ConstIterator_t other_it_pos) -> void
     {
         Splice(this_it_pos, other, other_it_pos, other.CEnd());
     }
 
-    auto Splice(ConstIterator_t this_it_pos, List& other) -> void
+    inline auto Splice(ConstIterator_t this_it_pos, List& other) -> void
     {
         Splice(this_it_pos, other, other.CBegin(), other.CEnd());
     }
