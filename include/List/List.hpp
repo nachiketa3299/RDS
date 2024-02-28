@@ -524,37 +524,27 @@ public:
         return Iterator_t(this, it_pos.GetDataPointer());
     }
 
-    /// @brief 인자로 전달된 반복자가 가리키는 위치에 있는 원소를 제거한다.
-    /// @param[in] it_pos 삭제할 위치를 가리키는 반복자. 정확히 이 위치에 있는
-    /// 원소가 삭제된다.
-    /// @test @ref List_Erase_gtest.cpp 에서 테스트한다.\n
-    /// (1) 비어 있는 리스트에서 시작, 끝 반복자를 통해 Erase 메서드를 호출하는
-    /// 경우 비정상 종료함을 확인\n (2) 비어 있지 않은 리스트에서 센티널 노드
-    /// 위치의 반복자를 통해 Erase 메서드를 호출하는 경우 비정상 종료함을 확인\n
-    /// (3) 호환되지 않는 리스트의 반복자로 Erase 메서드를 호출하는 경우 비정상
-    /// 종료
-    auto Erase(ConstIterator_t it_pos) -> Iterator_t
-    {
-        auto it_last = it_pos;
-        it_last.operator++();
-        return Erase(it_pos, it_last);
-    }
-
-    /// @brief 반복자로 주어진 범위의 원소들을 제거한다. 제거되는 범위는
-    /// `[it_first, it_last)` 이다.
-    /// @param it_first 제거할 원소들의 시작 위치를 가리키는 반복자
-    /// @param it_last 제거할 원소들의 끝 위치를 가리키는 반복자
-    /// @return 제거된 범위의 다음 위치를 가리키는 반복자
-    /// @warning `it_first` 와 `it_last`가 유효하지 않은 범위라면, Undefined
-    /// Behavior 이다.\n 예를 들어, `it_last`가 `it_first` 보다 이전을 가리키는
-    /// 경우가 그렇다.
-    /// @details
-    /// - `it_first` 는 역참조 가능해야 하고, `it_last`는 유효해야 한다. 그렇지
-    /// 않으면 비정상 종료한다.\n
-    /// - `it_first`와 `it_last`가 리스트와 호환되지 않는 경우 비정상
-    /// 종료한다.\n
-    /// - `it_first`와 `it_last`가 같은 경우, 아무런 동작을 하지 않고
-    /// `it_last`를 반환한다.
+    /** @brief 반복자로 주어진 범위의 원소들을 제거한다. 제거되는 범위는
+     *  `[it_first, it_last)` 이다.
+     *  @param[in] it_fisrt 제거 범위의 시작 위치를 가리키는 반복자
+     *  @param[out] it_last 제거 범위의 끝 위치를 가리키는 반복자
+     *  @return 제거된 범위의 다음 위치를 가리키는 반복자
+     *  @note
+     *  - 호출 후 제거 범위에 속한 원소를 가리키는 반복자가 아니라면 무효화되지
+     * 않는다.\n
+     *  - `it_first == it_last`인 경우 아무 동작도 하지 않고 `it_last`와 동일한
+     *    반복자를 반환한다.\n
+     *  - 리스트가 비어 있는 경우 주의할 것
+     *  @exception
+     *  - 올바르지 않은 범위에 대한 반복자 쌍으로 호출되는 경우 Undefined
+     * Behavior,
+     *  - Debug 구성에서 범위를 나타내는 반복자 쌍이 이 리스트와 호환되지 않는
+     *    경우 비정상 종료. Release 구성에서는 Undefined Behavior.
+     *  - Debug 구성에서 `it_first`가 역참조 불가능하거나 `it_last`가 유효하지
+     *    않으면 비정상 종료. Release 구성에서는 Undefined Behavior.
+    /// @todo 삭제 순회 중에 센티넬 노드를 만날 가능성을 완전히 배제할 수 없다는
+    점
+     */
     auto Erase(ConstIterator_t it_first, ConstIterator_t it_last) -> Iterator_t
     {
         // it_first 가 역참조 불가능하다는 것은 센티넬 노드임을 포함
@@ -570,14 +560,14 @@ public:
             return Iterator_t(this, it_last.GetDataPointer());
 
         /*
-        ----------------------------------------------------------------------------
+        ------------------------------------------------------------------------
          * Before Erase(it_first, it_last)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         - - range_start(it_first) ↓
          ... ←p[B]n→ ←p[X]n→ ←p[X]n→ ←p[X]n→ ←p[A]n→ ...
                 ↑                               ↑
            range_before                    range_after(it_last)
-        ----------------------------------------------------------------------------
+        ------------------------------------------------------------------------
          * After Erase(it_first, it_last)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         - -
@@ -586,7 +576,7 @@ public:
            range_before                    range_after(it_last)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
         - - 2 links to be updated:
-        ----------------------------------------------------------------------------
+        ------------------------------------------------------------------------
         */
 
         // 상수 반복자로부터 노드 포인터를 받아와서 const를 떼버린다!
@@ -600,10 +590,7 @@ public:
         range_before_ptr->next = range_after_ptr;
         range_after_ptr->prev  = range_before_ptr;
 
-        // 삭제 범위를 순회하며 노드 삭제
-        /// @todo 순회 중에 End() 노드를 만나는 경우 비정상 종료하도록 수정하는
-        /// 것이 어떨까?
-        /// @todo Edge case 에 대해서 조금 더 생각해 보아야 한다.
+        // 삭제 범위 순회하며 노드 삭제
         const auto* p = range_start_ptr;
         while (p != range_after_ptr)
         {
@@ -615,6 +602,24 @@ public:
         }
 
         return Iterator_t(this, range_after_ptr);
+    }
+
+    /** @brief 인자로 전달된 반복자가 가리키는 위치에 있는 원소를 제거한다.
+     *  @param[in] it_pos 삭제할 원소의 위치를 가리키는 반복자
+     *  @return 삭제된 원소의 다음 위치를 가리키는 반복자
+     *  @details
+     *  `it_pos`의 다음 반복자로 범위를 만든 후 `Erase(ConstIterator_t,
+     *  ConstIterator_t)` 를 내부에서 호출한다.
+     *  @exception
+     *  - Debug 구성에서 `it_pos`의 다음 반복자를 만들 때, `it_pos`가 더이상
+     *  증가시킬 수 없는 반복자라면 비정상 종료한다. Release 구성에서는
+     *  Undefined Behavior.
+     */
+    auto Erase(ConstIterator_t it_pos) -> Iterator_t
+    {
+        auto it_last = it_pos;
+        it_last.operator++();
+        return Erase(it_pos, it_last);
     }
 
     /// @brief 인자로 전달된 값을 리스트의 뒤에 추가한다.

@@ -464,7 +464,7 @@ TEST(Clear, __default)
 // Assertion이 제대로 걸리는지 확인
 // (1) 유효하지 않은 반복자에 대해 종료하는지
 // (2) 호환되지 않는 반복자에 대해 종료하는지
-TEST(InsertBefore, __Constiterator_t__Size_t__const_Value_t_Assertion)
+TEST(InsertBefore, __Constiterator_t__Size_t__const_Value_t__Assertion)
 {
     { // Nallocator
         List<int, Nallocator> li;
@@ -494,7 +494,7 @@ TEST(InsertBefore, __Constiterator_t__Size_t__const_Value_t_Assertion)
 #else
 #endif
 
-TEST(InsertBefore, __Constiterator_t__Size_t__const_Value_t)
+TEST(InsertBefore, __ConstIterator_t__Size_t__const_Value_t)
 {
     const std::size_t count = 2;
     const int         val   = 99;
@@ -902,6 +902,404 @@ TEST(InsertBefore, __ConstIterator_t__initializer_list)
             EXPECT_EQ(prev_size + il.size(), new_size);
 
             it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+    }
+}
+
+#ifndef NDEBUG
+// Erase 에 대해 Assertion이 제대로 걸리는지 확인
+// (1) it_first 가 역참조 불가능한 경우 (End)
+// (2) it_last 가 유효하지 않은 경우
+// (3) it_fist 와 it_last가 Erase가 호출된 리스트와 호환되지 않는 경우
+TEST(Erase, __ConstIterator_t__ConstIterator_t__Assertion)
+{
+    {
+        List<int, Nallocator> li   = {0, 1, 2};
+        List<int, Nallocator> li_a = {0, 1, 2};
+
+        auto it_noderef = li.End();
+        auto it_invalid = List<int, Nallocator>::Iterator_t(&li, nullptr);
+
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(it_noderef, li.Begin()), "");
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(li.Begin(), it_invalid), "");
+
+        auto it_ab = li_a.Begin();
+        auto it_ae = li_a.End();
+
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(li.Begin(), it_ae), "");
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(it_ab, li.End()), "");
+    }
+
+    {
+        List<int, Mallocator> li   = {0, 1, 2};
+        List<int, Mallocator> li_a = {0, 1, 2};
+
+        auto it_noderef = li.End();
+        auto it_invalid = List<int, Mallocator>::Iterator_t(&li, nullptr);
+
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(it_noderef, li.Begin()), "");
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(li.Begin(), it_invalid), "");
+
+        auto it_ab = li_a.Begin();
+        auto it_ae = li_a.End();
+
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(li.Begin(), it_ae), "");
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(it_ab, li.End()), "");
+    }
+}
+#endif
+
+TEST(Erase, __ConstIterator_t__ConstIterator_t)
+{
+    {     // Nallocator
+        { // Fast return
+            List<int, Nallocator> li{0, 1, 2};
+
+            auto it_first = li.Begin();
+            auto it_last  = li.Begin();
+            auto it_ret   = li.Erase(it_first, it_last);
+
+            EXPECT_TRUE(it_first == it_ret);
+            EXPECT_TRUE(it_last == it_ret);
+        }
+        {     // Normal Case
+            { // Begin 부터 시작해서 한 칸 지우기
+                List<int, Nallocator> li{0, 1, 2, 3};
+                List<int, Nallocator> li_ans{1, 2, 3};
+
+                auto expect_size = li_ans.Size();
+
+                auto it_first = li.Begin();
+                auto it_last  = ++li.Begin();
+
+                auto it_ret = li.Erase(it_first, it_last); // li{1, 2, 3}
+                EXPECT_TRUE(it_ret == li.Begin());
+
+                EXPECT_EQ(li.Size(), expect_size);
+
+                auto it_ans = li_ans.Begin();
+                for (auto it = li.Begin(); it != li.End(); ++it)
+                {
+                    EXPECT_EQ(*it, *it_ans);
+                    ++it_ans;
+                }
+            }
+            { // Begin 부터 시작해서 두 칸 지우기
+                List<int, Nallocator> li{0, 1, 2, 3};
+                List<int, Nallocator> li_ans{2, 3};
+
+                auto expect_size = li_ans.Size();
+
+                auto it_first = li.Begin();
+                auto it_last  = ++(++li.Begin());
+
+                auto it_ret = li.Erase(it_first, it_last);
+                EXPECT_TRUE(it_ret == li.Begin());
+
+                EXPECT_EQ(li.Size(), expect_size);
+
+                auto it_ans = li_ans.Begin();
+                for (auto it = li.Begin(); it != li.End(); ++it)
+                {
+                    EXPECT_EQ(*it, *it_ans);
+                    ++it_ans;
+                }
+            }
+            { // Begin 부터 시작해서 전체 지우기
+                List<int, Nallocator> li{0, 1, 2, 3};
+                List<int, Nallocator> li_ans{};
+
+                auto expect_size = li_ans.Size();
+                auto it_first    = li.Begin();
+                auto it_last     = li.End();
+
+                auto it_ret = li.Erase(it_first, it_last);
+                EXPECT_TRUE(it_ret == li.End());
+                EXPECT_TRUE(it_ret == li.Begin());
+
+                EXPECT_EQ(li.Size(), expect_size);
+                EXPECT_TRUE(li.Empty());
+                EXPECT_EQ(li.Size(), 0);
+
+                auto* sn_ptr = li.GetSentinelPointer();
+                EXPECT_EQ(sn_ptr, sn_ptr->next);
+                EXPECT_EQ(sn_ptr, sn_ptr->prev);
+            }
+            { // Begin 이후 시작해서 중간 지우기
+                List<int, Nallocator> li{0, 1, 2, 3};
+                List<int, Nallocator> li_ans{0, 3};
+
+                auto expect_size = li_ans.Size();
+
+                auto it_first = ++li.Begin();
+                auto it_last  = ++(++(++li.Begin()));
+                auto it_ret   = li.Erase(it_first, it_last);
+
+                EXPECT_TRUE(it_ret == --(li.End()));
+                EXPECT_TRUE(it_ret == it_last);
+
+                EXPECT_EQ(li.Size(), expect_size);
+
+                auto it_ans = li_ans.Begin();
+                for (auto it = li.Begin(); it != li.End(); ++it)
+                {
+                    EXPECT_EQ(*it, *it_ans);
+                    ++it_ans;
+                }
+            }
+        }
+    }
+
+    {     // Mallocator
+        { // Fast return
+            List<int, Mallocator> li{0, 1, 2};
+
+            auto it_first = li.Begin();
+            auto it_last  = li.Begin();
+            auto it_ret   = li.Erase(it_first, it_last);
+
+            EXPECT_TRUE(it_first == it_ret);
+            EXPECT_TRUE(it_last == it_ret);
+        }
+        {     // Normal Case
+            { // Begin 부터 시작해서 한 칸 지우기
+                List<int, Mallocator> li{0, 1, 2, 3};
+                List<int, Mallocator> li_ans{1, 2, 3};
+
+                auto expect_size = li_ans.Size();
+
+                auto it_first = li.Begin();
+                auto it_last  = ++li.Begin();
+
+                auto it_ret = li.Erase(it_first, it_last); // li{1, 2, 3}
+                EXPECT_TRUE(it_ret == li.Begin());
+
+                EXPECT_EQ(li.Size(), expect_size);
+
+                auto it_ans = li_ans.Begin();
+                for (auto it = li.Begin(); it != li.End(); ++it)
+                {
+                    EXPECT_EQ(*it, *it_ans);
+                    ++it_ans;
+                }
+            }
+            { // Begin 부터 시작해서 두 칸 지우기
+                List<int, Mallocator> li{0, 1, 2, 3};
+                List<int, Mallocator> li_ans{2, 3};
+
+                auto expect_size = li_ans.Size();
+
+                auto it_first = li.Begin();
+                auto it_last  = ++(++li.Begin());
+
+                auto it_ret = li.Erase(it_first, it_last);
+                EXPECT_TRUE(it_ret == li.Begin());
+
+                EXPECT_EQ(li.Size(), expect_size);
+
+                auto it_ans = li_ans.Begin();
+                for (auto it = li.Begin(); it != li.End(); ++it)
+                {
+                    EXPECT_EQ(*it, *it_ans);
+                    ++it_ans;
+                }
+            }
+            { // Begin 부터 시작해서 전체 지우기
+                List<int, Mallocator> li{0, 1, 2, 3};
+                List<int, Mallocator> li_ans{};
+
+                auto expect_size = li_ans.Size();
+                auto it_first    = li.Begin();
+                auto it_last     = li.End();
+
+                auto it_ret = li.Erase(it_first, it_last);
+                EXPECT_TRUE(it_ret == li.End());
+                EXPECT_TRUE(it_ret == li.Begin());
+
+                EXPECT_EQ(li.Size(), expect_size);
+                EXPECT_TRUE(li.Empty());
+                EXPECT_EQ(li.Size(), 0);
+
+                auto* sn_ptr = li.GetSentinelPointer();
+                EXPECT_EQ(sn_ptr, sn_ptr->next);
+                EXPECT_EQ(sn_ptr, sn_ptr->prev);
+            }
+            { // Begin 이후 시작해서 중간 지우기
+                List<int, Mallocator> li{0, 1, 2, 3};
+                List<int, Mallocator> li_ans{0, 3};
+
+                auto expect_size = li_ans.Size();
+
+                auto it_first = ++li.Begin();
+                auto it_last  = ++(++(++li.Begin()));
+                auto it_ret   = li.Erase(it_first, it_last);
+
+                EXPECT_TRUE(it_ret == --(li.End()));
+                EXPECT_TRUE(it_ret == it_last);
+
+                EXPECT_EQ(li.Size(), expect_size);
+
+                auto it_ans = li_ans.Begin();
+                for (auto it = li.Begin(); it != li.End(); ++it)
+                {
+                    EXPECT_EQ(*it, *it_ans);
+                    ++it_ans;
+                }
+            }
+        }
+    }
+}
+
+#ifndef NDEBUG
+/// 하나의 위치를 받는 Erase 에 대해 Assertion이 제대로 걸리는지 확인
+/// 더이상 증가시킬 수 없는 반복자에 대해서 종료하는지 확인
+TEST(Erase, __ConstIterator_t__Assertion)
+{
+    { // Nallocator
+        List<int, Nallocator> li{0, 1};
+
+        auto it_pos = li.End();
+
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(it_pos), "");
+    }
+    { // Mallocator
+        List<int, Mallocator> li{0, 1};
+
+        auto it_pos = li.End();
+
+        RDT_EXPECT_EXIT_FAILURE(li.Erase(it_pos), "");
+    }
+}
+#endif
+TEST(Erase, __ConstIterator_t)
+{
+    {     // Nallocator
+        { // Begin 에서 하나
+            List<int, Nallocator> li{0, 1, 2};
+            List<int, Nallocator> li_ans{1, 2};
+
+            auto expect_size = li_ans.Size();
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.Erase(it_pos);
+
+            EXPECT_TRUE(it_ret == li.Begin());
+            EXPECT_EQ(li.Size(), expect_size);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Begin 다음에 하나
+            List<int, Nallocator> li{0, 1, 2};
+            List<int, Nallocator> li_ans{0, 2};
+
+            auto expect_size = li_ans.Size();
+
+            auto it_pos = ++li.Begin();
+            auto it_ret = li.Erase(it_pos);
+
+            EXPECT_TRUE(it_ret == --li.End());
+            EXPECT_EQ(li.Size(), expect_size);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // 마지막 전
+            List<int, Nallocator> li{0, 1, 2};
+            List<int, Nallocator> li_ans{0, 1};
+
+            auto expect_size = li_ans.Size();
+
+            auto it_pos = --li.End();
+            auto it_ret = li.Erase(it_pos);
+
+            EXPECT_TRUE(it_ret == li.End());
+            EXPECT_EQ(li.Size(), expect_size);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+    }
+
+    {     // Mallocator
+        { // Begin 에서 하나
+            List<int, Mallocator> li{0, 1, 2};
+            List<int, Mallocator> li_ans{1, 2};
+
+            auto expect_size = li_ans.Size();
+
+            auto it_pos = li.Begin();
+            auto it_ret = li.Erase(it_pos);
+
+            EXPECT_TRUE(it_ret == li.Begin());
+            EXPECT_EQ(li.Size(), expect_size);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // Begin 다음에 하나
+            List<int, Mallocator> li{0, 1, 2};
+            List<int, Mallocator> li_ans{0, 2};
+
+            auto expect_size = li_ans.Size();
+
+            auto it_pos = ++li.Begin();
+            auto it_ret = li.Erase(it_pos);
+
+            EXPECT_TRUE(it_ret == --li.End());
+            EXPECT_EQ(li.Size(), expect_size);
+
+            auto it_ans = li_ans.Begin();
+
+            for (auto it = li.Begin(); it != li.End(); ++it)
+            {
+                EXPECT_EQ(*it, *it_ans);
+                ++it_ans;
+            }
+        }
+
+        { // 마지막 전
+            List<int, Mallocator> li{0, 1, 2};
+            List<int, Mallocator> li_ans{0, 1};
+
+            auto expect_size = li_ans.Size();
+
+            auto it_pos = --li.End();
+            auto it_ret = li.Erase(it_pos);
+
+            EXPECT_TRUE(it_ret == li.End());
+            EXPECT_EQ(li.Size(), expect_size);
+
+            auto it_ans = li_ans.Begin();
 
             for (auto it = li.Begin(); it != li.End(); ++it)
             {
