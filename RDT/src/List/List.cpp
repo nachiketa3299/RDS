@@ -120,21 +120,54 @@ TEST(NodeManagement, __default)
 {
     const int node_val = 99;
 
-    auto* node_ptr = List<int, Nallocator>::CreateNode(node_val);
-    EXPECT_EQ(node_ptr->val, node_val);
-    EXPECT_EQ(node_ptr->next, nullptr);
-    EXPECT_EQ(node_ptr->prev, nullptr);
+    // clang-format off
+    struct DummyType 
+    {
+        DummyType() = default;
+        DummyType(int a, float b): a(a), b(b) {}
+        explicit DummyType(int a): a(a) {}
+        int a{};
+        float b{};
+    };
 
-    List<int, Nallocator>::DeleteNode(node_ptr);
+    // clang-format on
+    { // Nallocator
+        auto* node_ptr = List<int, Nallocator>::CreateNode(node_val);
+        EXPECT_EQ(node_ptr->val, node_val);
+        EXPECT_EQ(node_ptr->next, nullptr);
+        EXPECT_EQ(node_ptr->prev, nullptr);
 
-    /// @todo 시발 Nallocator 로 생성한걸 Mallocator 로 없애도 왜 되는거지 이거
-    /// 메모리 누수 있나 확인하려면 우주적 시간이 걸릴듯
-    node_ptr = List<int, Mallocator>::CreateNode(node_val);
-    EXPECT_EQ(node_ptr->val, node_val);
-    EXPECT_EQ(node_ptr->next, nullptr);
-    EXPECT_EQ(node_ptr->prev, nullptr);
-    // List<int, Nallocator>::DeleteNode(node_ptr);
-    List<int, Mallocator>::DeleteNode(node_ptr);
+        List<int, Nallocator>::DeleteNode(node_ptr);
+
+        auto d = DummyType(1);
+
+        auto* dnode_ptr = List<DummyType, Nallocator>::CreateNode(d.a);
+
+        EXPECT_EQ(dnode_ptr->val.a, d.a);
+        EXPECT_EQ(dnode_ptr->val.b, d.b);
+
+        List<DummyType, Nallocator>::DeleteNode(dnode_ptr);
+    }
+
+    { // Mallocator
+        /// @todo 시발 Nallocator 로 생성한걸 Mallocator 로 없애도 왜 되는거지
+        /// 이거 메모리 누수 있나 확인하려면 우주적 시간이 걸릴듯
+        auto* node_ptr = List<int, Mallocator>::CreateNode(node_val);
+        EXPECT_EQ(node_ptr->val, node_val);
+        EXPECT_EQ(node_ptr->next, nullptr);
+        EXPECT_EQ(node_ptr->prev, nullptr);
+        // List<int, Nallocator>::DeleteNode(node_ptr);
+        List<int, Mallocator>::DeleteNode(node_ptr);
+
+        auto d = DummyType(1);
+
+        auto* dnode_ptr = List<DummyType, Mallocator>::CreateNode(d.a);
+
+        EXPECT_EQ(dnode_ptr->val.a, d.a);
+        EXPECT_EQ(dnode_ptr->val.b, d.b);
+
+        List<DummyType, Mallocator>::DeleteNode(dnode_ptr);
+    }
 }
 
 using ValueType = int;
@@ -1667,6 +1700,110 @@ TEST(Swap, __void)
                 ++it_il_a;
             }
         }
+    }
+}
+
+struct EmplaceDummy
+{
+    EmplaceDummy() = default;
+
+    EmplaceDummy(int a, float b, char c)
+        : a(a)
+        , b(b)
+        , c(c)
+    {}
+
+    EmplaceDummy(int a, float b)
+        : a(a)
+        , b(b)
+    {}
+
+    int   a{};
+    float b{};
+    char  c{};
+};
+
+#ifndef NDEBUG
+TEST(EmplaceBefore, __ConstIterator_t__CtorArgs_t__Assertion)
+{
+    {     // Nallocator
+        { // Invalid Case
+            List<EmplaceDummy, Nallocator> li;
+
+            auto it_invalid =
+                List<EmplaceDummy, Nallocator>::Iterator_t(&li, nullptr);
+
+            RDT_EXPECT_EXIT_FAILURE(li.EmplaceBefore(it_invalid, 1, 1.0f, 'a'),
+                                    "");
+            RDT_EXPECT_EXIT_FAILURE(li.EmplaceBefore(it_invalid, 1, 1.0f), "");
+        }
+        { // Not Compatible Case
+            List<EmplaceDummy, Nallocator> li;
+            List<EmplaceDummy, Nallocator> li_a{EmplaceDummy()};
+
+            auto it_incompatible = li_a.Begin();
+
+            RDT_EXPECT_EXIT_FAILURE(
+                li.EmplaceBefore(it_incompatible, 1, 1.0f, 'a'), "");
+
+            RDT_EXPECT_EXIT_FAILURE(li.EmplaceBefore(it_incompatible, 1, 1.0f),
+                                    "");
+        }
+    }
+    {     // Mallocator
+        { // Invalid Case
+            List<EmplaceDummy, Mallocator> li;
+
+            auto it_invalid =
+                List<EmplaceDummy, Mallocator>::Iterator_t(&li, nullptr);
+
+            RDT_EXPECT_EXIT_FAILURE(li.EmplaceBefore(it_invalid, 1, 1.0f, 'a'),
+                                    "");
+            RDT_EXPECT_EXIT_FAILURE(li.EmplaceBefore(it_invalid, 1, 1.0f), "");
+        }
+        { // Not Compatible Case
+            List<EmplaceDummy, Mallocator> li;
+            List<EmplaceDummy, Mallocator> li_a{EmplaceDummy()};
+
+            auto it_incompatible = li_a.Begin();
+
+            RDT_EXPECT_EXIT_FAILURE(
+                li.EmplaceBefore(it_incompatible, 1, 1.0f, 'a'), "");
+
+            RDT_EXPECT_EXIT_FAILURE(li.EmplaceBefore(it_incompatible, 1, 1.0f),
+                                    "");
+        }
+    }
+}
+#endif
+
+TEST(EmplaceBefore, __ConstIterator_t__CtorArgs_t)
+{
+    auto d_0 = EmplaceDummy(999, 999.f, 'Z');
+    auto d_1 = EmplaceDummy(1'000, 1000.f, 'Y');
+    auto d_2 = EmplaceDummy(1'001, 1001.f);
+
+    { // Nallocator
+
+        List<EmplaceDummy, Nallocator> li;
+        auto it_ret = li.EmplaceBefore(li.Begin(), d_0.a, d_0.b, d_0.c);
+        EXPECT_TRUE(it_ret == li.Begin());
+        it_ret = li.EmplaceBefore(++it_ret, d_1.a, d_1.b, d_1.c);
+        it_ret = li.EmplaceBefore(++it_ret, d_2.a, d_2.b);
+        EXPECT_TRUE(++it_ret == li.End());
+
+        EXPECT_EQ(li.Size(), 3);
+    }
+    { // Mallocator
+
+        List<EmplaceDummy, Mallocator> li;
+        auto it_ret = li.EmplaceBefore(li.Begin(), d_0.a, d_0.b, d_0.c);
+        EXPECT_TRUE(it_ret == li.Begin());
+        it_ret = li.EmplaceBefore(++it_ret, d_1.a, d_1.b, d_1.c);
+        it_ret = li.EmplaceBefore(++it_ret, d_2.a, d_2.b);
+        EXPECT_TRUE(++it_ret == li.End());
+
+        EXPECT_EQ(li.Size(), 3);
     }
 }
 

@@ -250,15 +250,32 @@ private:
     }
 
 public:
-    /**
-     * @brief 새로운 노드를 생성하고 그 노드의 주소를 반환한다.
-     * @param[in] val 새로 생성될 노드에 들어갈 값
-     * @return 새로 생성된 노드의 주소
+    /** @brief 새로운 노드를 생성하고 그 노드의 주소를 반환한다.
+      * @param[in] val 새로 생성될 노드에 들어갈 값
+      * @return 새로 생성된 노드의 주소
+    ///@todo  Node_D의 복사 생성자를 호출하는지 확인해야함
      */
     static auto CreateNode(const Value_t& val) -> Node_D_t*
     {
         Node_D_t* ptr = Allocator_Trait<Allocator_t>::Allocate(1);
         Allocator_Trait<Allocator_t>::Construct(ptr, 1, val);
+
+        return ptr;
+    }
+
+    /** @copybrief CreateNode(const Value_t&)
+     *  @tparam __CtorArgs_t 노드가 보유한 값의 자료형의 생성자에 전달할
+     * 인자들의 자료형 목록
+     *  @param[in] ctor_args 노드가 보유한 값의 자료형의 생성자에 전달할 인자들
+     *  @return 새로 생성된 노드의 주소
+     *  @note `Node_D(__CtorArgs_t&&...)` 생성자를 호출한다.
+     */
+    template <class... __CtorArgs_t>
+    static auto CreateNode(__CtorArgs_t&&... ctor_args) -> Node_D_t*
+    {
+        Node_D_t* ptr = Allocator_Trait<Allocator_t>::Allocate(1);
+        Allocator_Trait<Allocator_t>::Construct(
+            ptr, 1, std::forward<__CtorArgs_t>(ctor_args)...);
 
         return ptr;
     }
@@ -706,13 +723,29 @@ public:
     }
 
 public:
-    template <class... CtorArgs_t>
-    auto EmplaceBefore(ConstIterator_t it_pos, CtorArgs_t&&... ctor_args)
+    /** @brief 반복자의 위치 이전에 전달된 생성자 인자로 객체를 생성해 리스트에
+     *  추가한다.
+     *  @param[in] it_pos 삽입할 위치 이후 노드를 가리키는 반복자.
+     *  @param[in] ctor_args 생성자에 전달할 인자 목록
+     *  @return 새로 생성된 노드를 가리키는 반복자
+     *  @note 호출 후 기존의 반복자들이 무효화되지 않으며, `it_pos`가 역참조
+     가능할 필요는 없다.
+     *  @exception
+     *  - Debug 구성에서 유효하지 않거나 호환되지 않는 반복자로 호출되는 경우
+     *    비정상 종료한다.
+     *  - Release 구성에서 유효하지 않거나 호환되지 않는 반복자로 호출되는 경우
+     *    Undefined Behavior 이다.
+     ///@todo Release 구성에서 예외를 던지도록 구현하는 것이 나을 수도 있다.
+     */
+    template <class... __CtorArgs_t>
+    auto EmplaceBefore(ConstIterator_t it_pos, __CtorArgs_t&&... ctor_args)
         -> Iterator_t
     {
-        Node_D_t* new_node_ptr = Allocator_Trait<Allocator_t>::Allocate(1);
-        Allocator_Trait<Allocator_t>::Construct(
-            new_node_ptr, 1, std::forward<CtorArgs_t>(ctor_args)...);
+        RDS_Assert(it_pos.IsValid() && "Invalid iterator.");
+        RDS_Assert(it_pos.IsCompatible(*this) && "List is not compatible.");
+
+        Node_D_t* new_node_ptr =
+            CreateNode(std::forward<__CtorArgs_t>(ctor_args)...);
 
         auto* ins_node_ptr = const_cast<Node_D_t*>(it_pos.GetDataPointer());
 
@@ -731,16 +764,17 @@ public:
         return Iterator_t(this, new_node_ptr);
     }
 
-    template <class... CtorArgs_t>
-    auto EmplaceFront(CtorArgs_t&&... ctor_args) -> Iterator_t
+    template <class... __CtorArgs_t>
+    auto EmplaceFront(__CtorArgs_t&&... ctor_args) -> Iterator_t
     {
-        return EmplaceBefore(CBegin(), std::forward<CtorArgs_t>(ctor_args)...);
+        return EmplaceBefore(CBegin(),
+                             std::forward<__CtorArgs_t>(ctor_args)...);
     }
 
-    template <class... CtorArgs_t>
-    auto EmplaceBack(CtorArgs_t&&... ctor_args) -> Iterator_t
+    template <class... __CtorArgs_t>
+    auto EmplaceBack(__CtorArgs_t&&... ctor_args) -> Iterator_t
     {
-        return EmplaceBefore(CEnd(), std::forward<CtorArgs_t>(ctor_args)...);
+        return EmplaceBefore(CEnd(), std::forward<__CtorArgs_t>(ctor_args)...);
     }
 
     ///@}
