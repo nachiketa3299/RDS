@@ -238,7 +238,7 @@ public:
 
     /// @{  @name Node Management
     ///     @details 노드의 생성과 삭제는 리스트의 할당자에 의해 수행된다.
-    ///     @warning `Emplace` 계열 메서드와 `Splice` 계열 메서드는 노드의
+    ///     @warning `Emplace` 계열 메서드와 `SpliceAndInsertBefore` 계열 메서드는 노드의
     ///     갯수가 바뀜에도 불구하고 아래 메서드들이 관여하지 않으므로 주의한다.
 private:
     /** @brief 센티넬 노드의 두 링크를 자기 자신을 가리키도록 초기화한다.
@@ -352,35 +352,54 @@ public:
 
     /// @{ @name Iterators
 public:
-    /// @brief 리스트의 첫 번째 원소를 가리키는 상수 반복자를 반환한다.
+    /** @brief 첫 번째 원소를 가리키는 반복자를 반환한다.
+     *  @return 첫 번째 원소를 가리키는 반복자
+     *  @exception
+     *  비어 있는 리스트에 대해서도 호출할 수 있지만, 이렇게 얻어진 반복자는
+     *  역참조 하면 안된다. 역참조시 Debug 구성에서는 비정상 종료하며, Release
+     *  구성에서는 Undefined Behavior 이다.
+     */
     auto Begin() const -> ConstIterator_t
     {
         return ConstIterator_t(this, m_sentinel_node.next);
     }
 
-    /// @brief 리스트의 첫 번째 원소를 가리키는 반복자를 반환한다.
+    /** @copydoc Begin() const
+     *
+     */
     auto Begin() -> Iterator_t
     {
         return Iterator_t(this, m_sentinel_node.next);
     }
 
-    /// @brief 리스트의 마지막 원소를 가리키는 상수 반복자를 반환한다.
+    /** @brief 마지막 원소를 가리키는 반복자를 반환한다.
+     *  @return 마지막 원소를 가리키는 반복자
+     *  @exception
+     *  역참조 하면 안된다. Debug 구성에서는 비정상 종료하며, Release 구성에서는
+     *  Undefined Behavior 이다.
+     */
     auto End() const -> ConstIterator_t
     {
         return ConstIterator_t(this, std::addressof(m_sentinel_node));
     }
 
-    /// @brief 리스트의 마지막 원소를 가리키는 반복자를 반환한다.
+    /** @copydoc End() const
+     *
+     */
     auto End() -> Iterator_t
     {
         return Iterator_t(this, std::addressof(m_sentinel_node));
     }
 
 public:
-    /// @brief 리스트의 첫 번째 원소를 가리키는 상수 반복자를 반환한다.
+    /** @brief 첫 번째 원소를 가리키는 상수 반복자를 반환한다.
+     *  @return 첫 번째 원소를 가리키는 상수 반복자
+     */
     auto CBegin() const -> ConstIterator_t { return Begin(); }
 
-    /// @brief 리스트의 마지막 원소를 가리키는 상수 반복자를 반환한다.
+    /** @brief 마지막 원소를 가리키는 상수 반복자를 반환한다.
+     *  @return 마지막 원소를 가리키는 상수 반복자
+     */
     auto CEnd() const -> ConstIterator_t { return End(); }
 
     /// @}
@@ -587,15 +606,16 @@ public:
         ------------------------------------------------------------------------
          * Before Erase(it_first, it_last)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        - - range_start(it_first) ↓
+                   range_start(it_first)
+                        ↓
          ... ←p[B]n→ ←p[X]n→ ←p[X]n→ ←p[X]n→ ←p[A]n→ ...
                 ↑                               ↑
            range_before                    range_after(it_last)
         ------------------------------------------------------------------------
          * After Erase(it_first, it_last)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-        - -
-         ... ←p[B]n============> <============p[A]n→ ...
+
+         ... ←p[B]n->>                     <<-p[A]n→ ...
                 ↑                               ↑
            range_before                    range_after(it_last)
         - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
@@ -838,17 +858,96 @@ public:
     }
 
 public:
-    auto Splice(ConstIterator_t this_it_pos, List& other,
+    /** @brief 다른 리스트의 범위 내 원소를 잘라내어, 이 리스트의 특정 위치에
+     *  삽입한다.
+     *  @param[in] this_it_pos 삽입할 이 리스트의 위치
+     *  @param[in] other 원소들을 잘라낼 다른 리스트
+     *  @param[in] other_it_first 다른 리스트에서 잘라낼 원소들의 시작 위치
+     *  @param[in] other_it_lasg 다른 리스트에서 잘라낼 원소들의 마지막 위치
+     *  @details
+     *  잘리는 범위는 `[other_it_first, other_it_last)` 이다.\n
+     *  크기 변경 연산이 포함되어 있고, 이때문에 O(1)이 아니다. 복잡도는
+     * `[other_it_first, other_it_last)`사이 원소의 갯수에 선형으로 비례한다.
+     *  @exception
+     *  다른 리스트가 비어 있는 경우 정상적으로 범위를 전달할 방법이 없다.
+     *  실수로 `Begin()` 과 `End()` 로 전달한다고 했을 때, Debug 구성에서는
+     *  비정상 종료하며, Release 구성에서는 Undefined Behavior 이므로 주의한다.
+     */
+    auto SpliceAndInsertBefore(ConstIterator_t this_it_pos, List& other,
                 ConstIterator_t other_it_first, ConstIterator_t other_it_last)
         -> void
     {
+        // 1) this_it_pos 검사
+        // - 유효해야함
+        // - 이 리스트와 호환되어야 함
+        RDS_Assert(this_it_pos.IsValid() && "Invalid iterator.");
+        RDS_Assert(this_it_pos.IsCompatible(*this) &&
+                   "List is not compatible.");
+        // 2) other_it_first 검사
+        // - 다른 리스트와 호환되어야 함
+        // - 역참조 가능해야 함
+        RDS_Assert(other_it_first.IsCompatible(other) &&
+                   "List is not compatible.");
+        RDS_Assert(other_it_first.IsDereferencible() && "Start of range is not "
+                                                        "dereferencible.");
+        // 3) other_it_last 검사
+        // - 유효해야함
+        // - 다른 리스트와 호환되어야 함
+        RDS_Assert(other_it_last.IsValid() && "End of range is not valid.");
+        RDS_Assert(other_it_last.IsCompatible(other) &&
+                   "List is not compatible.");
+        // clang-format off
+/*
+--------------------------------------------------------------------------------
+* Before SpliceAndInsertBefore(ConstIterator_t, List&, ConstIterator_t, ConstIterator_t)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+this:
+                       this_it_pos
+                           ↓
+[st]n->   <-p[At]n->   <-p[Bt]n->   <-p[st]
+              ↑            ↑
+         range_before range_after
+other:
+            it_first                  it_last
+              ↓                         ↓
+[so]n->   <-p[Ao]n->   <-p[Bo]n->   <-p[Co]n->   <-p[so]
+ ↑            ↑            ↑            ↑
+ |       range_start  range_end         |
+range_before                       range_after
+--------------------------------------------------------------------------------
+* After SpliceAndInsertBefore(ConstIterator_t, List&, ConstIterator_t, ConstIterator_t)
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+this:
+                                                 this_it_pos
+                                                     ↓
+[st]n->   <-p[At]n->> <<-p[Ao]n->   <-p[Bo]n->> <<-p[Bt]n->   <-p[st]
+              ↑                                      ↑
+         range_before                           range_after
+other:
+
+
+[so]n->>              <<-p[Co]n->   <-p[so]
+ ↑                         ↑
+ |                         |
+range_before          range_after
+--------------------------------------------------------------------------------
+*/
+        // clang-format on
+
+        // 잘라낼 범위가 비어있으면 아무런 동작도 하지 않는다.
+        if (other_it_first == other_it_last)
+            return;
+
+        // 범위 설정
         auto* other_range_start_ptr =
             const_cast<Node_D_t*>(other_it_first.GetDataPointer());
         auto* other_range_before_ptr = other_range_start_ptr->prev;
+
         auto* other_range_after_ptr =
             const_cast<Node_D_t*>(other_it_last.GetDataPointer());
         auto* other_range_end_ptr = other_range_after_ptr->prev;
 
+        // 이 부분 때문에 O(1) 이 아니다.
         Size_t other_range_node_count{0};
         for (auto it = other_range_start_ptr; it != other_range_after_ptr;
              it      = it->next)
@@ -869,19 +968,20 @@ public:
         this_range_after_ptr->prev = other_range_end_ptr;
         other_range_end_ptr->next  = this_range_after_ptr;
 
+        // 크기 업데이트
         m_size       += other_range_node_count;
         other.m_size -= other_range_node_count;
     }
 
-    inline auto Splice(ConstIterator_t this_it_pos, List& other,
+    inline auto SpliceAndInsertBefore(ConstIterator_t this_it_pos, List& other,
                        ConstIterator_t other_it_pos) -> void
     {
-        Splice(this_it_pos, other, other_it_pos, other.CEnd());
+        SpliceAndInsertBefore(this_it_pos, other, other_it_pos, other.CEnd());
     }
 
-    inline auto Splice(ConstIterator_t this_it_pos, List& other) -> void
+    inline auto SpliceAndInsertBefore(ConstIterator_t this_it_pos, List& other) -> void
     {
-        Splice(this_it_pos, other, other.CBegin(), other.CEnd());
+        SpliceAndInsertBefore(this_it_pos, other, other.CBegin(), other.CEnd());
     }
 
 public:
