@@ -791,4 +791,36 @@ TEST(SpliceAndInsertBefore, __ConstIterator_t__List_ref)
     }
 }
 
+/** @brief Reverse() */
+TEST(Reverse, __void)
+{
+    initializer_list<int> il = {1, 2, 3};
+
+    {     // Nallocator
+        { // 비어있음
+            List<int, Nallocator> li;
+            li.Reverse();
+            // 이거 뭐 테스트할게 없네...
+        }
+        { // 원소가 하나
+            List<int, Nallocator> li{int{}};
+            li.Reverse();
+
+            EXPECT_EQ(*li.Begin(), int{});
+        }
+        { // 원소가 둘 이상
+            List<int, Nallocator> li(il);
+            List<int, Nallocator> li_ans{3, 2, 1};
+
+            li.Reverse();
+
+            auto ans_it = li_ans.Begin();
+            for (auto it = li.Begin(); it != li.End(); ++it, ++ans_it)
+            {
+                EXPECT_EQ(*it, *ans_it);
+            }
+        }
+    }
+}
+
 RDT_END

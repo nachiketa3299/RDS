@@ -1018,6 +1018,9 @@ range_before          range_after
 public:
     auto Merge() -> void;
 
+    /** @brief 리스트의 원소의 체결방식을 역순으로 바꾼다.
+     *  @details 리스트의 크기가 2 미만이면 아무런 동작도 하지 않는다.
+     */
     auto Reverse() -> void
     {
         if (m_size < 2)
