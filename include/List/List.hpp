@@ -1057,7 +1057,7 @@ public:
 
     // TODO Unique 계열 함수 구현
     template <class __BinaryPredicate_t>
-    auto Unique(__BinaryPredicate_t pred) ->현현Size_t;
+    auto Unique(__BinaryPredicate_t pred) ->Size_t;
     auto Unique() -> Size_t;
     /// @}
 

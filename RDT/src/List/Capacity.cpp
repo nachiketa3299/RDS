@@ -89,66 +89,66 @@ TEST(Clear, __default)
     }
 }
 
-{
-    auto d_0 = EmplaceType(999, 999.f, 'Z');
-    auto d_1 = EmplaceType(1'000, 1000.f, 'Y');
-    auto d_2 = EmplaceType(1'001, 1001.f);
+// {
+//     auto d_0 = EmplaceType(999, 999.f, 'Z');
+//     auto d_1 = EmplaceType(1'000, 1000.f, 'Y');
+//     auto d_2 = EmplaceType(1'001, 1001.f);
 
-    { // Nallocator
-        List<EmplaceType, Nallocator> li;
+//     { // Nallocator
+//         List<EmplaceType, Nallocator> li;
 
-        auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
+//         auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
 
-        EXPECT_TRUE(it_ret == --li.End());
-        EXPECT_EQ(li.Size(), 1);
-        EXPECT_EQ(*(--li.End()), d_0);
+//         EXPECT_TRUE(it_ret == --li.End());
+//         EXPECT_EQ(li.Size(), 1);
+//         EXPECT_EQ(*(--li.End()), d_0);
 
-        it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
+//         it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
 
-        EXPECT_TRUE(it_ret == --li.End());
-        EXPECT_EQ(li.Size(), 2);
-        EXPECT_EQ(*(--li.End()), d_1);
+//         EXPECT_TRUE(it_ret == --li.End());
+//         EXPECT_EQ(li.Size(), 2);
+//         EXPECT_EQ(*(--li.End()), d_1);
 
-        it_ret = li.EmplaceBack(d_2.a, d_2.b);
+//         it_ret = li.EmplaceBack(d_2.a, d_2.b);
 
-        EXPECT_TRUE(it_ret == --li.End());
-        EXPECT_EQ(li.Size(), 3);
-        EXPECT_EQ(*(--li.End()), d_2);
+//         EXPECT_TRUE(it_ret == --li.End());
+//         EXPECT_EQ(li.Size(), 3);
+//         EXPECT_EQ(*(--li.End()), d_2);
 
-        auto it = li.Begin();
-        EXPECT_EQ(*it, d_0);
-        ++it;
-        EXPECT_EQ(*it, d_1);
-        ++it;
-        EXPECT_EQ(*it, d_2);
-    }
-    { // Mallocator
-        List<EmplaceType, Mallocator> li;
+//         auto it = li.Begin();
+//         EXPECT_EQ(*it, d_0);
+//         ++it;
+//         EXPECT_EQ(*it, d_1);
+//         ++it;
+//         EXPECT_EQ(*it, d_2);
+//     }
+//     { // Mallocator
+//         List<EmplaceType, Mallocator> li;
 
-        auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
+//         auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
 
-        EXPECT_TRUE(it_ret == --li.End());
-        EXPECT_EQ(li.Size(), 1);
-        EXPECT_EQ(*(--li.End()), d_0);
+//         EXPECT_TRUE(it_ret == --li.End());
+//         EXPECT_EQ(li.Size(), 1);
+//         EXPECT_EQ(*(--li.End()), d_0);
 
-        it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
+//         it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
 
-        EXPECT_TRUE(it_ret == --li.End());
-        EXPECT_EQ(li.Size(), 2);
-        EXPECT_EQ(*(--li.End()), d_1);
+//         EXPECT_TRUE(it_ret == --li.End());
+//         EXPECT_EQ(li.Size(), 2);
+//         EXPECT_EQ(*(--li.End()), d_1);
 
-        it_ret = li.EmplaceBack(d_2.a, d_2.b);
+//         it_ret = li.EmplaceBack(d_2.a, d_2.b);
 
-        EXPECT_TRUE(it_ret == --li.End());
-        EXPECT_EQ(li.Size(), 3);
-        EXPECT_EQ(*(--li.End()), d_2);
+//         EXPECT_TRUE(it_ret == --li.End());
+//         EXPECT_EQ(li.Size(), 3);
+//         EXPECT_EQ(*(--li.End()), d_2);
 
-        auto it = li.Begin();
-        EXPECT_EQ(*it, d_0);
-        ++it;
-        EXPECT_EQ(*it, d_1);
-        ++it;
-        EXPECT_EQ(*it, d_2);
-    }
-}
+//         auto it = li.Begin();
+//         EXPECT_EQ(*it, d_0);
+//         ++it;
+//         EXPECT_EQ(*it, d_1);
+//         ++it;
+//         EXPECT_EQ(*it, d_2);
+//     }
+// }
 RDT_END
