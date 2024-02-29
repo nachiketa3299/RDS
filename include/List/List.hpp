@@ -1016,7 +1016,18 @@ range_before          range_after
     }
 
 public:
-    auto Merge() -> void;
+    template <class __Compare_t>
+    auto Sort(__Compare_t comp) -> void;
+    /** @brief 정렬된 리스트끼리 병합하여 정렬된 리스트를 만든다.
+    TODO Sort 구현하고 나서 구현할 것
+    */
+
+    template <class __Compare_t>
+    auto Merge(List& other, __Compare_t comp) -> void;
+    template <class __Compare_t>
+    auto Merge(List&& other, __Compare_t comp) -> void;
+    auto Merge(List& other) -> void;
+    auto Merge(List&& other) -> void;
 
     /** @brief 리스트의 원소의 체결방식을 역순으로 바꾼다.
      *  @details 리스트의 크기가 2 미만이면 아무런 동작도 하지 않는다.
@@ -1044,8 +1055,10 @@ public:
         m_sentinel_node.prev = curr_node_ptr;
     }
 
-    auto Unique() -> void;
-    auto Sort() -> void;
+    // TODO Unique 계열 함수 구현
+    template <class __BinaryPredicate_t>
+    auto Unique(__BinaryPredicate_t pred) ->현현Size_t;
+    auto Unique() -> Size_t;
     /// @}
 
 public: // Comparators
