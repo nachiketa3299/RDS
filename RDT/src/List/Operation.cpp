@@ -97,12 +97,12 @@ TEST(Remove, __void)
 /** @brief SpliceAndInsertBefore(ConstIterator_t, List&, ConstIterator_t,
  * ConstIterator_t) Assertion
  * 다음의 경우 비정상 종료하는지 확인
- * - this_it_pos 가 유효하지 않음
- * - this_it_pos 가 호출한 리스트와 호환되지 않음.
+ * - this_it_pos가 유효하지 않음
+ * - this_it_pos가 호출한 리스트와 호환되지 않음.
  * - other_it_first가 다른 리스트와 호환되지 않음.
- * - other_it_first 가 역참조가 불가능
- * - other_it_last 가 유효하지 않음
- * - other_it_last 가 다른 리스트와 호환되지 않음
+ * - other_it_first가 역참조가 불가능
+ * - other_it_last가 유효하지 않음
+ * - other_it_last가 다른 리스트와 호환되지 않음
  */
 TEST(SpliceAndInsertBefore,
      __ConstIterator_t__List_ref__ConstIterator_t__ConstIterator_t__Assertion)
@@ -382,6 +382,411 @@ TEST(SpliceAndInsertBefore,
             {
                 EXPECT_EQ(*it, *this_it);
             }
+        }
+    }
+}
+
+#ifndef NDEBUG
+/** @brief SpliceAndInsertBefore(ConstIterator_t, List&, ConstIterator_t)
+ * Assertion
+ * 다음의 경우 비정상 종료하는지 확지
+ * - this_it_pos가 유효하지 않음
+ * - this_it_pos가 호출한 리스트와 호환되지 않음.
+ * - other_it_first가 다른 리스트와 호환되지 않음
+ * - other_it_first가 유효하지 않음
+ * */
+TEST(SpliceAndInsertBefore,
+     __ConstIterator_t__List_ref__ConstIterator_t__Assertion)
+{
+    initializer_list<int> il = {1, 2, 3};
+    {     // Nallocator
+        { // this_it_pos 가 유효하지 않은 경우
+            List<int, Nallocator>             this_li;
+            List<int, Nallocator>             other_li(il);
+            List<int, Nallocator>::Iterator_t invaid_this_it_pos(&this_li,
+                                                                 nullptr);
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(invaid_this_it_pos, other_li,
+                                               other_li.Begin())),
+                "");
+        }
+        { // this_it_pos 가 호환되지 않는 경우
+            List<int, Nallocator> this_li(il);
+            List<int, Nallocator> other_li(il);
+
+            auto incompatible_this_it = other_li.Begin();
+
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(incompatible_this_it, other_li,
+                                               other_li.Begin())),
+                "");
+        }
+        { // other_it_first 가 다른 리스트와 호환되지 않음
+
+            List<int, Nallocator> this_li(il);
+            List<int, Nallocator> other_li(il);
+
+            auto incompatible_other_it_pos = this_li.Begin();
+
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(this_li.Begin(), other_li,
+                                               incompatible_other_it_pos)),
+                "");
+        }
+        { // other_it_first 가 유효하지 않음
+            List<int, Nallocator> this_li(il);
+            List<int, Nallocator> other_li(il);
+
+            auto invalid_other_it_pos =
+                List<int, Nallocator>::Iterator_t(&other_li, nullptr);
+
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(this_li.Begin(), other_li,
+                                               invalid_other_it_pos)),
+                "");
+        }
+    }
+
+    {     // Mallocator
+        { // this_it_pos 가 유효하지 않은 경우
+            List<int, Mallocator>             this_li;
+            List<int, Mallocator>             other_li(il);
+            List<int, Mallocator>::Iterator_t invaid_this_it_pos(&this_li,
+                                                                 nullptr);
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(invaid_this_it_pos, other_li,
+                                               other_li.Begin())),
+                "");
+        }
+        { // this_it_pos 가 호환되지 않는 경우
+            List<int, Mallocator> this_li(il);
+            List<int, Mallocator> other_li(il);
+
+            auto incompatible_this_it = other_li.Begin();
+
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(incompatible_this_it, other_li,
+                                               other_li.Begin())),
+                "");
+        }
+        { // other_it_first 가 다른 리스트와 호환되지 않음
+
+            List<int, Mallocator> this_li(il);
+            List<int, Mallocator> other_li(il);
+
+            auto incompatible_other_it_pos = this_li.Begin();
+
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(this_li.Begin(), other_li,
+                                               incompatible_other_it_pos)),
+                "");
+        }
+        { // other_it_first 가 유효하지 않음
+            List<int, Mallocator> this_li(il);
+            List<int, Mallocator> other_li(il);
+
+            auto invalid_other_it_pos =
+                List<int, Mallocator>::Iterator_t(&other_li, nullptr);
+
+            RDT_EXPECT_EXIT_FAILURE(
+                (this_li.SpliceAndInsertBefore(this_li.Begin(), other_li,
+                                               invalid_other_it_pos)),
+                "");
+        }
+    }
+}
+#endif
+
+/** @brief SpliceAndInsertBefore(ConstIterator_t, List&, ConstIterator_t)
+ */
+TEST(SpliceAndInsertBefore, __ConstIterator_t__List_ref__ConstIterator_t)
+{
+    initializer_list<int> il_a = {99, 100, 101};
+    initializer_list<int> il_b = {1, 2, 3};
+    {     // Nallocator
+        { // This 가 비어있고, Other는 비어있지 않음
+            List<int, Nallocator> this_li;
+            List<int, Nallocator> other_li(il_a);
+
+            List<int, Nallocator> this_li_result{100, 101};
+
+            EXPECT_TRUE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(this_li.Begin(), other_li,
+                                          ++other_li.Begin());
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+
+            auto this_it_result = this_li_result.Begin();
+
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+        }
+        { // This 가 비어있지 않고, Other는 비어있지 않음
+            List<int, Nallocator> this_li(il_a);
+            List<int, Nallocator> other_li(il_b);
+
+            List<int, Nallocator> this_li_result{99, 2, 3, 100, 101};
+            List<int, Nallocator> other_li_result{1};
+
+            EXPECT_FALSE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(++this_li.Begin(), other_li,
+                                          ++other_li.Begin());
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+            EXPECT_EQ(other_li.Size(), other_li_result.Size());
+
+            auto this_it_result  = this_li_result.Begin();
+            auto other_it_result = other_li_result.Begin();
+
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+
+            for (auto it = other_li.Begin(); it != other_li.End();
+                 ++it, ++other_it_result)
+            {
+                EXPECT_EQ(*it, *other_it_result);
+            }
+        }
+        { // This 가 비어있고, Other도 비어있음 -> 이 경우는 항상 비정상 종료
+        }
+        { // This 가 비어있지 않고, Other도 비어있음 -> 이 경우는 항상 비정상
+          // 종료
+        }
+    }
+
+    {     // Mallocator
+        { // This 가 비어있고, Other는 비어있지 않음
+            List<int, Mallocator> this_li;
+            List<int, Mallocator> other_li(il_a);
+
+            List<int, Mallocator> this_li_result{100, 101};
+
+            EXPECT_TRUE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(this_li.Begin(), other_li,
+                                          ++other_li.Begin());
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+
+            auto this_it_result = this_li_result.Begin();
+
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+        }
+        { // This 가 비어있지 않고, Other는 비어있지 않음
+            List<int, Mallocator> this_li(il_a);
+            List<int, Mallocator> other_li(il_b);
+
+            List<int, Mallocator> this_li_result{99, 2, 3, 100, 101};
+            List<int, Mallocator> other_li_result{1};
+
+            EXPECT_FALSE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(++this_li.Begin(), other_li,
+                                          ++other_li.Begin());
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+            EXPECT_EQ(other_li.Size(), other_li_result.Size());
+
+            auto this_it_result  = this_li_result.Begin();
+            auto other_it_result = other_li_result.Begin();
+
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+
+            for (auto it = other_li.Begin(); it != other_li.End();
+                 ++it, ++other_it_result)
+            {
+                EXPECT_EQ(*it, *other_it_result);
+            }
+        }
+        { // This 가 비어있고, Other도 비어있음 -> 이 경우는 항상 비정상 종료
+        }
+        { // This 가 비어있지 않고, Other도 비어있음 -> 이 경우는 항상 비정상
+          // 종료
+        }
+    }
+}
+
+#ifndef NDEBUG
+/** @brief SpliceAndInsertBefore(ConstIterator_t, List&) Assertion
+ * 다음의 경우 비정상 종료하는지 확인
+ * - other 가 비어있는 경우
+ */
+TEST(SpliceAndInsertBefore, __ConstIterator_t__List_ref__Assertion)
+{
+    { // Nallocator
+        List<int, Nallocator> this_li;
+        List<int, Nallocator> other_li;
+
+        RDT_EXPECT_EXIT_FAILURE(
+            (this_li.SpliceAndInsertBefore(this_li.Begin(), other_li)), "");
+    }
+
+    { // Mallocator
+        List<int, Mallocator> this_li;
+        List<int, Mallocator> other_li;
+
+        RDT_EXPECT_EXIT_FAILURE(
+            (this_li.SpliceAndInsertBefore(this_li.Begin(), other_li)), "");
+    }
+}
+#endif
+
+/** @brief SpliceAndInsertBefore(ConstIterator_t, List&)*/
+TEST(SpliceAndInsertBefore, __ConstIterator_t__List_ref)
+{
+    initializer_list<int> il_a = {99, 100, 101};
+    initializer_list<int> il_b = {1, 2};
+    {     // Nallocator
+        { // This 가 비어있고, Other 는 비어있지 않음
+            List<int, Nallocator> this_li;
+            List<int, Nallocator> other_li(il_a);
+
+            List<int, Nallocator> this_li_result(il_a);
+            List<int, Nallocator> other_li_result;
+
+            EXPECT_TRUE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(this_li.Begin(), other_li);
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+            EXPECT_EQ(other_li.Size(), other_li_result.Size());
+
+            auto this_it_result = this_li_result.Begin();
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+
+            auto other_it_result = other_li_result.Begin();
+            for (auto it = other_li.Begin(); it != other_li.End();
+                 ++it, ++other_it_result)
+            {
+                EXPECT_EQ(*it, *other_it_result);
+            }
+        }
+
+        { // This 가 비어있지 않고, Other 는 비어있지 않음
+            List<int, Nallocator> this_li(il_a);
+            List<int, Nallocator> other_li(il_b);
+
+            List<int, Nallocator> this_li_result{99, 100, 1, 2, 101};
+            List<int, Nallocator> other_li_result;
+
+            EXPECT_FALSE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(--this_li.End(), other_li);
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+            EXPECT_EQ(other_li.Size(), other_li_result.Size());
+
+            auto this_it_result = this_li_result.Begin();
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+
+            auto other_it_result = other_li_result.Begin();
+            for (auto it = other_li.Begin(); it != other_li.End();
+                 ++it, ++other_it_result)
+            {
+                EXPECT_EQ(*it, *other_it_result);
+            }
+        }
+
+        { // This 가 비어있고, Other 는 비어있음 -> 항상 비정상 종료
+        }
+        { // This 가 비어있지 않고, Other 는 비어있음 -> 항상 비정상 종료
+        }
+    }
+
+    {     // Mallocator
+        { // This 가 비어있고, Other 는 비어있지 않음
+            List<int, Mallocator> this_li;
+            List<int, Mallocator> other_li(il_a);
+
+            List<int, Mallocator> this_li_result(il_a);
+            List<int, Mallocator> other_li_result;
+
+            EXPECT_TRUE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(this_li.Begin(), other_li);
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+            EXPECT_EQ(other_li.Size(), other_li_result.Size());
+
+            auto this_it_result = this_li_result.Begin();
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+
+            auto other_it_result = other_li_result.Begin();
+            for (auto it = other_li.Begin(); it != other_li.End();
+                 ++it, ++other_it_result)
+            {
+                EXPECT_EQ(*it, *other_it_result);
+            }
+        }
+
+        { // This 가 비어있지 않고, Other 는 비어있지 않음
+            List<int, Mallocator> this_li(il_a);
+            List<int, Mallocator> other_li(il_b);
+
+            List<int, Mallocator> this_li_result{99, 100, 1, 2, 101};
+            List<int, Mallocator> other_li_result;
+
+            EXPECT_FALSE(this_li.Empty());
+            EXPECT_FALSE(other_li.Empty());
+
+            this_li.SpliceAndInsertBefore(--this_li.End(), other_li);
+
+            EXPECT_EQ(this_li.Size(), this_li_result.Size());
+            EXPECT_EQ(other_li.Size(), other_li_result.Size());
+
+            auto this_it_result = this_li_result.Begin();
+            for (auto it = this_li.Begin(); it != this_li.End();
+                 ++it, ++this_it_result)
+            {
+                EXPECT_EQ(*it, *this_it_result);
+            }
+
+            auto other_it_result = other_li_result.Begin();
+            for (auto it = other_li.Begin(); it != other_li.End();
+                 ++it, ++other_it_result)
+            {
+                EXPECT_EQ(*it, *other_it_result);
+            }
+        }
+
+        { // This 가 비어있고, Other 는 비어있음 -> 항상 비정상 종료
+        }
+        { // This 가 비어있지 않고, Other 는 비어있음 -> 항상 비정상 종료
         }
     }
 }

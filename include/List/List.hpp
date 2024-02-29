@@ -238,8 +238,9 @@ public:
 
     /// @{  @name Node Management
     ///     @details 노드의 생성과 삭제는 리스트의 할당자에 의해 수행된다.
-    ///     @warning `Emplace` 계열 메서드와 `SpliceAndInsertBefore` 계열 메서드는 노드의
-    ///     갯수가 바뀜에도 불구하고 아래 메서드들이 관여하지 않으므로 주의한다.
+    ///     @warning `Emplace` 계열 메서드와 `SpliceAndInsertBefore` 계열
+    ///     메서드는 노드의 갯수가 바뀜에도 불구하고 아래 메서드들이 관여하지
+    ///     않으므로 주의한다.
 private:
     /** @brief 센티넬 노드의 두 링크를 자기 자신을 가리키도록 초기화한다.
      */
@@ -858,24 +859,31 @@ public:
     }
 
 public:
-    /** @brief 다른 리스트의 범위 내 원소를 잘라내어, 이 리스트의 특정 위치에
-     *  삽입한다.
+    /** @brief 다른 리스트의 범위 내 원소들을 잘라내어, 이 리스트의 특정 위치에
+     *  이전에 삽입한다.
      *  @param[in] this_it_pos 삽입할 이 리스트의 위치
      *  @param[in] other 원소들을 잘라낼 다른 리스트
      *  @param[in] other_it_first 다른 리스트에서 잘라낼 원소들의 시작 위치
-     *  @param[in] other_it_lasg 다른 리스트에서 잘라낼 원소들의 마지막 위치
+     *  @param[in] other_it_last 다른 리스트에서 잘라낼 원소들의 마지막 위치
      *  @details
      *  잘리는 범위는 `[other_it_first, other_it_last)` 이다.\n
      *  크기 변경 연산이 포함되어 있고, 이때문에 O(1)이 아니다. 복잡도는
-     * `[other_it_first, other_it_last)`사이 원소의 갯수에 선형으로 비례한다.
+     * `[other_it_first, other_it_last)`사이 원소의 갯수에 선형으로 비례한다.\n
+     *  반복자들은 다음과 같은 조건을 만족해야 한다.
+     *  - `this_it_pos`는 유효해야 한다.
+     *  - `this_it_pos`가 이 리스트와 호환되어야 한다.
+     *  - `other_it_first`는 `other`와 호환되어야 한다.
+     *  - `other_it_first`는 역참조 가능해야 한다.
+     *  - `other_it_last`는 유효해야 한다.
+     *  - `other_it_last`는 `other`와 호환되어야 한다.
      *  @exception
      *  다른 리스트가 비어 있는 경우 정상적으로 범위를 전달할 방법이 없다.
      *  실수로 `Begin()` 과 `End()` 로 전달한다고 했을 때, Debug 구성에서는
      *  비정상 종료하며, Release 구성에서는 Undefined Behavior 이므로 주의한다.
      */
     auto SpliceAndInsertBefore(ConstIterator_t this_it_pos, List& other,
-                ConstIterator_t other_it_first, ConstIterator_t other_it_last)
-        -> void
+                               ConstIterator_t other_it_first,
+                               ConstIterator_t other_it_last) -> void
     {
         // 1) this_it_pos 검사
         // - 유효해야함
@@ -973,13 +981,36 @@ range_before          range_after
         other.m_size -= other_range_node_count;
     }
 
+    /** @brief 다른 리스트의 특정 위치부터 그 다음까지의 원소들을 잘라내어, 이
+     * 리스트의 특정 위치 이전에 삽입한다.
+     *  @param[in] this_it_pos 삽입할 이 리스트의 위치
+     *  @param[in] other 원소들을 잘라낼 다른 리스트
+     *  @param[in] other_it_pos 다른 리스트에서 잘라낼 원소들의 시작 위치
+     *  @details
+     *  잘리는 범위는 `[other_it_pos, other.End())` 이다.
+     *  @exception
+     *  내부에서 `SpliceAndInsertBefore` 를 호출하기 때문에 예외 조건은
+     *  `other_it_last`를 빼면 동일하다.
+     */
     inline auto SpliceAndInsertBefore(ConstIterator_t this_it_pos, List& other,
-                       ConstIterator_t other_it_pos) -> void
+                                      ConstIterator_t other_it_pos) -> void
     {
         SpliceAndInsertBefore(this_it_pos, other, other_it_pos, other.CEnd());
     }
 
-    inline auto SpliceAndInsertBefore(ConstIterator_t this_it_pos, List& other) -> void
+    /** @brief 다른 리스트의 모든 원소들을 잘라내어, 이 리스트의 특정 위치
+     * 이전에 삽입한다.
+     *  @param[in] this_it_pos 삽입할 이 리스트의 위치
+     *  @param[in] other 모든 원소들을 잘라낼 다른 리스트
+     *  @details
+     *  잘리는 범위는 `[other.Begin(), other.End())` 이다.
+     *  @exception
+     *  내부에서 `SpliceAndInsertBefore` 를 호출한다.
+     *  `other` 가 비어있는 경우 Debug 구성에서 비정상 종료하고, Release
+     *   구성에서 Undefined Behavior이므로 주의한다.
+     */
+    inline auto SpliceAndInsertBefore(ConstIterator_t this_it_pos, List& other)
+        -> void
     {
         SpliceAndInsertBefore(this_it_pos, other, other.CBegin(), other.CEnd());
     }
