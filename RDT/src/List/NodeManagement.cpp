@@ -28,6 +28,7 @@ struct DummyType
 
 using namespace node_management_test;
 
+/** 아래 두 테스트는 DeleteNode(const Node_D_t*)에 대한 테스트까지 포함 */
 /** @brief CreateNode(const Value_t&) -> Node_D* */
 TEST(NodeManagement, CreateNode__const_Value_t_ref)
 {
