@@ -13,7 +13,6 @@ RDS_BEGIN
 /** @brief `List` 컨테이너에 대한 상수 반복자 템플릿 클래스
  *  @tparam __List_t 이 상수 반복자가 가리킬 리스트에 대한 자료형
  *  @note 양방향 반복자이다.
- *
  */
 // clang-format off
 template <class __List_t>
@@ -22,14 +21,13 @@ class List_ConstIterator
                      , typename __List_t::Value_t
                      , typename __List_t::Pointer_t
                      , typename __List_t::Reference_t
-                     , typename __List_t::Difference_t 
-                     >
+                     , typename __List_t::Difference_t>
 {
 public:
     using Node_D_t = typename __List_t::Node_D_t;
 
-/// @{ @name Iterator Traits
-public: // Iterators
+    /// @{ @name Iterator Traits
+public:
     using Iterator_t = Iterator< RDS_TAG_ BidirectionalIterator
                                , typename __List_t::Value_t
                                , typename __List_t::Pointer_t

@@ -26,5 +26,7 @@ rdt_add_test(List Capacity)
 rdt_add_test(List Modifier)
 rdt_add_test(List Operation)
 
+rdt_add_test(Iterator Iterator)
+
 # rdt_add_test(MemoryManagement Mallocator_Fundamental_Types)
 # rdt_add_test(MemoryManagement Allocator_Trait_Mallocator_Fundamental_Types)
