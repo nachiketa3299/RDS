@@ -9,146 +9,58 @@ RDT_BEGIN
 using namespace rds;
 using namespace std;
 
-using ValueType = int;
+/**
+ * 다른 테스트에서 이미 Capacity에 관한 테스트를 수행하므로, 여기에서는
+ * 기본적인 테스트만 수행한다.
+ */
 
-using NListType                      = List<ValueType, Nallocator>;
-using MListType                      = List<ValueType, Mallocator>;
-const initializer_list<ValueType> il = {ValueType{0}, ValueType{1}};
-
-TEST(Capacity, __Size__Empty_default)
+/** @brief Size() const -> Size_t */
+TEST(Size, __void)
 {
-    {
-        NListType li;
-        EXPECT_EQ(li.Size(), 0);
-        EXPECT_TRUE(li.Empty());
-        li = NListType(il);
-        EXPECT_EQ(li.Size(), il.size());
-        EXPECT_FALSE(li.Empty());
-    }
-    {
-        MListType li;
-        EXPECT_EQ(li.Size(), 0);
-        EXPECT_TRUE(li.Empty());
-        li = MListType(il);
-        EXPECT_EQ(li.Size(), il.size());
-        EXPECT_FALSE(li.Empty());
-    }
-}
-
-TEST(Clear, __default)
-{
-    {
-        const initializer_list<int> il   = {0, 1, 2};
-        const size_t                size = il.size();
-
-        {     // Nallocator
-            { // case a : 비어있지 않았던 경우
-                List<int, Nallocator> li(il);
-                li.Clear();
-
-                EXPECT_NE(li.Size(), size);
-                EXPECT_TRUE(li.Empty());
-                auto* sn = li.GetSentinelPointer();
-                EXPECT_EQ(sn->next, sn);
-                EXPECT_EQ(sn->prev, sn);
-            }
-
-            { // case b : 비어 있었던 경우
-                List<int, Nallocator> li;
-                li.Clear();
-
-                EXPECT_TRUE(li.Empty());
-                auto* sn = li.GetSentinelPointer();
-                EXPECT_EQ(sn->next, sn);
-                EXPECT_EQ(sn->prev, sn);
-            }
+    { // Nallocator
+        const size_t          size = 10;
+        initializer_list<int> il   = {1, 2, 3};
+        { // Default Empty Size
+            List<int, Nallocator> li;
+            EXPECT_EQ(li.Size(), 0);
         }
-
-        {     // Mallocator
-            { // case a : 비어있지 않았던 경우
-                List<int, Mallocator> li(il);
-                li.Clear();
-
-                EXPECT_NE(li.Size(), size);
-                EXPECT_TRUE(li.Empty());
-                auto* sn = li.GetSentinelPointer();
-                EXPECT_EQ(sn->next, sn);
-                EXPECT_EQ(sn->prev, sn);
-            }
-
-            { // case b : 비어 있었던 경우
-                List<int, Mallocator> li;
-                li.Clear();
-
-                EXPECT_TRUE(li.Empty());
-                auto* sn = li.GetSentinelPointer();
-                EXPECT_EQ(sn->next, sn);
-                EXPECT_EQ(sn->prev, sn);
-            }
+        { // Size initialization
+            List<int, Nallocator> li(size);
+            List<int, Nallocator> li_a(size, 10);
+            EXPECT_EQ(li.Size(), size);
+            EXPECT_EQ(li_a.Size(), 10);
+        }
+        { // init_list
+            List<int, Nallocator> li(il);
+            EXPECT_EQ(li.Size(), il.size());
         }
     }
 }
 
-// {
-//     auto d_0 = EmplaceType(999, 999.f, 'Z');
-//     auto d_1 = EmplaceType(1'000, 1000.f, 'Y');
-//     auto d_2 = EmplaceType(1'001, 1001.f);
+/** @brief Empty() const -> bool */
+TEST(Empty, __void)
+{
+    initializer_list<int> il = {1, 2, 3};
+    {     // Nallocator
+        { // 비어 있었던 경우
+            List<int, Nallocator> li;
+            EXPECT_TRUE(li.Empty());
+        }
+        { // 비어 있지 않았던 경우
+            List<int, Nallocator> li(il);
+            EXPECT_FALSE(li.Empty());
+        }
+    }
+    {     // Mallocator
+        { // 비어 있었던 경우
+            List<int, Mallocator> li;
+            EXPECT_TRUE(li.Empty());
+        }
+        { // 비어 있지 않았던 경우
+            List<int, Mallocator> li(il);
+            EXPECT_FALSE(li.Empty());
+        }
+    }
+}
 
-//     { // Nallocator
-//         List<EmplaceType, Nallocator> li;
-
-//         auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
-
-//         EXPECT_TRUE(it_ret == --li.End());
-//         EXPECT_EQ(li.Size(), 1);
-//         EXPECT_EQ(*(--li.End()), d_0);
-
-//         it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
-
-//         EXPECT_TRUE(it_ret == --li.End());
-//         EXPECT_EQ(li.Size(), 2);
-//         EXPECT_EQ(*(--li.End()), d_1);
-
-//         it_ret = li.EmplaceBack(d_2.a, d_2.b);
-
-//         EXPECT_TRUE(it_ret == --li.End());
-//         EXPECT_EQ(li.Size(), 3);
-//         EXPECT_EQ(*(--li.End()), d_2);
-
-//         auto it = li.Begin();
-//         EXPECT_EQ(*it, d_0);
-//         ++it;
-//         EXPECT_EQ(*it, d_1);
-//         ++it;
-//         EXPECT_EQ(*it, d_2);
-//     }
-//     { // Mallocator
-//         List<EmplaceType, Mallocator> li;
-
-//         auto it_ret = li.EmplaceBack(d_0.a, d_0.b, d_0.c);
-
-//         EXPECT_TRUE(it_ret == --li.End());
-//         EXPECT_EQ(li.Size(), 1);
-//         EXPECT_EQ(*(--li.End()), d_0);
-
-//         it_ret = li.EmplaceBack(d_1.a, d_1.b, d_1.c);
-
-//         EXPECT_TRUE(it_ret == --li.End());
-//         EXPECT_EQ(li.Size(), 2);
-//         EXPECT_EQ(*(--li.End()), d_1);
-
-//         it_ret = li.EmplaceBack(d_2.a, d_2.b);
-
-//         EXPECT_TRUE(it_ret == --li.End());
-//         EXPECT_EQ(li.Size(), 3);
-//         EXPECT_EQ(*(--li.End()), d_2);
-
-//         auto it = li.Begin();
-//         EXPECT_EQ(*it, d_0);
-//         ++it;
-//         EXPECT_EQ(*it, d_1);
-//         ++it;
-//         EXPECT_EQ(*it, d_2);
-//     }
-// }
 RDT_END

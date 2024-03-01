@@ -1476,4 +1476,59 @@ TEST(EmplaceBack, __CtorArgs_t)
     }
 }
 
+/** @brief Clear() -> void */
+TEST(Clear, __void)
+{
+    {
+        const initializer_list<int> il   = {0, 1, 2};
+        const size_t                size = il.size();
+
+        {     // Nallocator
+            { // 비어 있지 않았던 경우
+                List<int, Nallocator> li(il);
+                li.Clear();
+
+                EXPECT_NE(li.Size(), size);
+                EXPECT_TRUE(li.Empty());
+                auto* sn = li.GetSentinelPointer();
+                EXPECT_EQ(sn->next, sn);
+                EXPECT_EQ(sn->prev, sn);
+            }
+
+            { // 비어 있었던 경우
+                List<int, Nallocator> li;
+                li.Clear();
+
+                EXPECT_TRUE(li.Empty());
+                auto* sn = li.GetSentinelPointer();
+                EXPECT_EQ(sn->next, sn);
+                EXPECT_EQ(sn->prev, sn);
+            }
+        }
+
+        {     // Mallocator
+            { // 비어 있지 않았던 경우
+                List<int, Mallocator> li(il);
+                li.Clear();
+
+                EXPECT_NE(li.Size(), size);
+                EXPECT_TRUE(li.Empty());
+                auto* sn = li.GetSentinelPointer();
+                EXPECT_EQ(sn->next, sn);
+                EXPECT_EQ(sn->prev, sn);
+            }
+
+            { // 비어 있었던 경우
+                List<int, Mallocator> li;
+                li.Clear();
+
+                EXPECT_TRUE(li.Empty());
+                auto* sn = li.GetSentinelPointer();
+                EXPECT_EQ(sn->next, sn);
+                EXPECT_EQ(sn->prev, sn);
+            }
+        }
+    }
+}
+
 RDT_END
