@@ -8,8 +8,8 @@
 
 #include <type_traits>
 
-RDS_BEGIN
-
+namespace rds
+{
 // clang-format off
 template < class __IteratorTag_t
          , class __Value_t
@@ -37,18 +37,7 @@ struct IteratorTraits
     using Difference_t  = typename __Iterator_t::Difference_t;
 };
 
-RDS_END
-
-// clang-format off
-#define RDS_Declare_IteratorTag_t(IteratorTypeName, MinimumIteratorTag)        \
-    using IteratorTag_t =                                                      \
-        typename rds::IteratorTraits<IteratorTypeName>::IteratorTag_t;         \
-    static_assert(std::is_base_of_v<MinimumIteratorTag, IteratorTag_t>);
-// clang-format on
-
-RDS_BEGIN
-
-/// TODO 컨테이너별로 테스트 할 것
+// TODO 컨테이너별로 테스트 할 것
 
 /** @brief 두 반복자 사이의 거리를 구한다
  *  @tparam __Iterator_t 반복자의 자료형
@@ -56,16 +45,18 @@ RDS_BEGIN
  *  @param[in] last 마지막 요소를 가리키는 반복자
  *  @return 두 반복자 사이의 거리
  *  @details
- *  기본적으로 `first` 부터 `last` 까지 몇 홉 거리인지 계산한다.
+ *  `first` 부터 `last` 까지 몇 홉 거리인지 계산한다.
+ *
+ *  ### Complexity
  *  - 입력 반복자인 경우, 복잡도는 두 반복자의 거리에 선형으로 비례한다.
  *  - 임의 접근 반복자인 경우, 복잡도는 상수 시간에 비례한다. 또한, 거리의 값이
  *    음수가 될 수도 있다.
- *  > [!warning]
- *  > - 입력 반복자를 사용할 경우, `first` → `last` 경로가 존재하지 않는 경우
- *  >   Undefined Behavior 이다.
- *  > - 임의 접근 반복자를 사용하는 경우, `first` → `last` 경로가 존재하지
- *  >   않거나 `last` → `first` 경로가 존재하지 않는 경우, Undefined
- *  >   Behavior이다.
+ *
+ *  @warning - 입력 반복자를 사용할 경우, `first` → `last` 경로가 존재하지 않는
+ 경우 정의되지 않은 행동이다.
+ *  @warning - 임의 접근 반복자를 사용하는 경우, `first` → `last` 경로가
+ 존재하지 않거나 `last` → `first` 경로가 존재하지 않는 경우, 정의되지 않은
+ 행동이다.
  */
 template <class __InputIterator_t>
 auto DistanceBetween(__InputIterator_t first, __InputIterator_t last) ->
@@ -186,7 +177,6 @@ Previous(__BidirectionalIterator_t                                        it,
     return it;
 }
 
-RDS_END
+} // namespace rds
 
-// @todo 언젠가 C++ Concepts를 이용해 구현하고 싶다.
 #endif // RDS_ITERATOR_HPP
