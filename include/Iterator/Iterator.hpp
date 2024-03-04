@@ -1,15 +1,23 @@
-/// @file Iterator.hpp
+// TODO 컨테이너별로 테스트 할 것
 
 #ifndef RDS_ITERATOR_HPP
 #define RDS_ITERATOR_HPP
 
-#include "RDS_CoreDefs.h"
-#include "RDS_Tags.h"
+#include <type_traits> // is_base_of_v
 
-#include <type_traits>
+#include "RDS_Tags.h"
 
 namespace rds
 {
+
+/** @brief 모든 반복자의 기본 구조체
+ *  @tparam __IteratorTag_t 반복자의 태그
+ *  @tparam __Value_t 반복자가 가리키는 값의 자료형
+ *  @tparam __Pointer_t 반복자의 포인터 자료형
+ *  @tparam __Reference_t 반복자의 참조 자료형
+ *  @tparam __Difference_t 반복자의 차이값 자료형
+ *  @details 컨테이너의 모든 반복자들은 이 구조체를 상속해야 한다.
+ */
 // clang-format off
 template < class __IteratorTag_t
          , class __Value_t
@@ -27,6 +35,9 @@ struct Iterator
     using Difference_t  = __Difference_t;
 };
 
+/** @brief 반복자에 대한 특성을 추출하는 인터페이스
+ *  @tparam __Iterator_t 반복자의 자료형
+ */
 template <class __Iterator_t>
 struct IteratorTraits
 {
@@ -36,8 +47,6 @@ struct IteratorTraits
     using Reference_t   = typename __Iterator_t::Reference_t;
     using Difference_t  = typename __Iterator_t::Difference_t;
 };
-
-// TODO 컨테이너별로 테스트 할 것
 
 /** @brief 두 반복자 사이의 거리를 구한다
  *  @tparam __Iterator_t 반복자의 자료형
@@ -64,10 +73,9 @@ auto DistanceBetween(__InputIterator_t first, __InputIterator_t last) ->
 {
     using This_IteratorTag_t =
         typename IteratorTraits<__InputIterator_t>::IteratorTag_t;
-    static_assert(
-        std::is_base_of_v<RDS_TAG_ InputIterator, This_IteratorTag_t>);
+    static_assert(std::is_base_of_v<tag::InputIterator, This_IteratorTag_t>);
 
-    if constexpr (std::is_base_of_v<RDS_TAG_ RandomAccessIterator,
+    if constexpr (std::is_base_of_v<tag::RandomAccessIterator,
                                     This_IteratorTag_t>)
         return last - first;
     else
@@ -102,14 +110,13 @@ auto Advance(__InputIterator_t& it, __Distance_t n) -> void
 {
     using This_IteratorTag_t =
         typename IteratorTraits<__InputIterator_t>::IteratorTag_t;
-    static_assert(
-        std::is_base_of_v<RDS_TAG_ InputIterator, This_IteratorTag_t>);
+    static_assert(std::is_base_of_v<tag::InputIterator, This_IteratorTag_t>);
 
     // 반복자 종류에 따라서 이게 음수일수도, 양수일 수도 있다.
     auto distance = typename IteratorTraits<__InputIterator_t>::Difference_t(n);
 
     // 임의 접근 반복자 이상인 경우 그냥 더하면 상수 시간에 끝
-    if constexpr (std::is_base_of_v<RDS_TAG_ RandomAccessIterator,
+    if constexpr (std::is_base_of_v<tag::RandomAccessIterator,
                                     This_IteratorTag_t>)
     {
         it.operator+=(distance);
@@ -124,7 +131,7 @@ auto Advance(__InputIterator_t& it, __Distance_t n) -> void
             it.operator++();
         }
 
-        if constexpr (std::is_base_of_v<RDS_TAG_ BidirectionalIterator,
+        if constexpr (std::is_base_of_v<tag::BidirectionalIterator,
                                         This_IteratorTag_t>)
         {
             // 대상: 임의 접근 반복자 미만, distance가 음수인 경우

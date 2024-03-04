@@ -1,5 +1,5 @@
 /// @file Allocator_Trait_Mallocator_Fundamental_Types.cpp
-/// 기본 자료형에 대해 Mallocator 를 사용하는 Allocator_Trait 클래스의 테스트 코드
+/// 기본 자료형에 대해 Mallocator 를 사용하는 AllocatorTraits 클래스의 테스트 코드
 
 #include <gtest/gtest.h>
 
@@ -19,21 +19,21 @@ TYPED_TEST_SUITE_P(tfAllocator_Trait_Mallocator_Test);
 TYPED_TEST_P(tfAllocator_Trait_Mallocator_Test, Allocator_Trait_Fundamental_Types)
 {
     static constexpr std::size_t count = 10;
-    auto* ptr = rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Allocate(count);
+    auto* ptr = rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Allocate(count);
 
-    rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Construct(ptr, count);
+    rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Construct(ptr, count);
     EXPECT_EQ(*ptr, TypeParam{});
-    rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Deconstruct(ptr, count);
+    rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Deconstruct(ptr, count);
 
-    rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Construct(ptr, count, 0);
+    rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Construct(ptr, count, 0);
     EXPECT_EQ(*ptr, TypeParam{0});
-    rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Deconstruct(ptr, count);
+    rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Deconstruct(ptr, count);
 
-    rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Construct(ptr, count, 1);
+    rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Construct(ptr, count, 1);
     EXPECT_EQ(*ptr, TypeParam{1});
-    rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Deconstruct(ptr, count);
+    rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Deconstruct(ptr, count);
 
-    rds::Allocator_Trait<rds::Mallocator<TypeParam>>::Deallocate(ptr);
+    rds::AllocatorTraits<rds::Mallocator<TypeParam>>::Deallocate(ptr);
 }
 
 REGISTER_TYPED_TEST_SUITE_P(tfAllocator_Trait_Mallocator_Test,

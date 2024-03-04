@@ -1,23 +1,24 @@
-/// @file List_ConstIterator.hpp
-
 #ifndef RDS_LIST_CONSTITERATOR_HPP
 #define RDS_LIST_CONSTITERATOR_HPP
 
 #include "RDS_CoreDefs.h"
 
+#include <memory> // std::pointer_traits
+
 #include "Assertion.h"
 #include "Iterator.hpp"
 
-RDS_BEGIN
+namespace rds
+{
 
-/** @brief `List` 컨테이너에 대한 상수 반복자 템플릿 클래스
+/** @brief \ref List 컨테이너에 대한 상수 반복자 템플릿 클래스
  *  @tparam __List_t 이 상수 반복자가 가리킬 리스트에 대한 자료형
  *  @note 양방향 반복자이다.
  */
 // clang-format off
 template <class __List_t>
 class List_ConstIterator
-    : public Iterator< RDS_TAG_ BidirectionalIterator
+    : public Iterator< tag::BidirectionalIterator
                      , typename __List_t::Value_t
                      , typename __List_t::Pointer_t
                      , typename __List_t::Reference_t
@@ -28,7 +29,7 @@ public:
 
     /// @{ @name Iterator Traits
 public:
-    using Iterator_t = Iterator< RDS_TAG_ BidirectionalIterator
+    using Iterator_t = Iterator< tag::BidirectionalIterator
                                , typename __List_t::Value_t
                                , typename __List_t::Pointer_t
                                , typename __List_t::Reference_t
@@ -40,27 +41,30 @@ public:
     using Reference_t   = typename Iterator_t::Reference_t;
     using Difference_t  = typename Iterator_t::Difference_t;
 
-    /// @}
+    /// @} // Iterator Traits
 
 public:
     /** @brief 기본 생성자 */
     List_ConstIterator()                                    = default;
     /** @brief 기본 복사 생성자 */
     List_ConstIterator(const List_ConstIterator<__List_t>&) = default;
+    /** @brief 기본 이동 생성자 */
+    List_ConstIterator(List_ConstIterator<__List_t>&&)      = default;
     /** @brief 기본 복사 대입 연산자 */
     auto operator=(const List_ConstIterator<__List_t>&)
-        -> List_ConstIterator<__List_t>&               = default;
-    /** @brief 기본 이동 생성자 */
-    List_ConstIterator(List_ConstIterator<__List_t>&&) = default;
+        -> List_ConstIterator<__List_t>& = default;
     /** @brief 기본 이동 대입 연산자 */
     auto operator=(List_ConstIterator<__List_t>&&)
         -> List_ConstIterator<__List_t>& = default;
     /** @brief 기본 소멸자 */
     ~List_ConstIterator()                = default;
 
-    /** @brief 리스트 내 노드 위치와 리스트 자체에 대한 포인터를 받는 생성자
-     * @param cont_ptr 이 상수 반복자가 가리키는 리스트 자체에 대한 포인터
-     * @param node_pos_ptr 이 상수 반복자가 가리키는 리스트의 노드에 대한 포인터
+    /** @brief 리스트에 대한 포인터와 노드의 위치를 받는 생성자
+     *  @param cont_ptr 이 반복자가 가리키는 리스트에 대한 포인터
+     *  @param node_pos_ptr 이 반복자가 가리키는 노드에 대한 포인터
+     *
+     *  @warning 리스트에 속하지 않은 노드를 전달하는 경우 정의되지 않은
+     *  행동이다.
      */
     explicit List_ConstIterator(const __List_t* cont_ptr,
                                 const Node_D_t* node_pos_ptr)
@@ -68,15 +72,14 @@ public:
         , m_data_ptr(node_pos_ptr)
     {}
 
+    /// @{ @name Input & Output Iterator Operations
 public:
-    /**
-     * @brief 이 상수 반복자가 가리키는 리스트 노드내 값에 대한 상수 참조를
-     * 반환한다.
-     * @exception
-     * - Debug 구성에서 이 반복자가 역참조가 불가능한 경우 비정상 종료한다. \n
-     * - Release 구성에서는 Undefined Behavior이다.
-   /// @todo 역참조가 불가능한 경우에 대해 Release 구성에서 예외를 던지게 한다면
-     * 더 좋을 것 같다.
+    // TODO 역참조가 불가능한 경우 Release 구성에서 예외를 던지게 한다면 더 좋을
+    // 것 같다.
+    /** @brief 이 반복자가 가리키는 노드의 값에 대한 참조를 반환한다.
+     *
+     *  @warning Debug 구성에서 이 반복자가 역참조가 불가능한 경우 비정상
+     *  종료하고, Release 구성에서는 정의되지 않은 행동이다.
      */
     auto operator*() const -> const Value_t&
     {
@@ -85,26 +88,52 @@ public:
         return m_data_ptr->val;
     }
 
-    /** @brief 이 상수 반복자가 가리키는 리스트 노드내 값에 대한 상수 포인터수를
-     * 반환한다.
-     *  @return 이 상수 반복자가 가리키는 리스트 노드내 값에 대한 상수 포인터
+    /** @brief 이 반복자가 가리키는 노드의 값에 대한 포인터를 반환한다.
+     *  @return 이 반복자가 가리키는 노드의 값에 대한 포인터
      */
     auto operator->() const -> const Value_t*
     {
-        /// @todo 여기서 무슨 일이 일어나고 있는지 정확히 설명할 수 있어야
-        /// 합니다.
+        // TODO 그냥 포인터를 반환하도록 하는 것이 나을듯?
         return std::pointer_traits<
             const typename __List_t::Value_t*>::pointer_to(operator*());
     }
 
+    // TODO 유효하지 않은 반복자에 대한 동등성 비교 테스트할 것
+    /** @brief 두 반복자의 동등성을 비교한다.
+     *  @param[in] other 비교할 반복자
+     *  @return 두 반복자가 같은 경우 `true`, 그렇지 않으면 `false`
+     *  @details
+     *  두 반복자의 동등성은 다음과 같이 정의한다.
+     *  - 두 반복자가 같은 리스트를 가리키고 있다.
+     *  - 두 반복자가 같은 노드를 가리키고 있다.
+     */
+    auto operator==(const List_ConstIterator<__List_t>& other) const -> bool
+    {
+        return IsCompatible(*other.m_cont_ptr) &&
+               (m_data_ptr == other.m_data_ptr);
+    }
+
+    /** @brief 두 반복자가 비동등성을 비교한다.
+     *  @param[in] other 비교할 반복자
+     *  @return 두 반복자가 다른 경우 `true`, 그렇지 않으면 `false`
+     *  @see \ref operator==
+     */
+    auto operator!=(const List_ConstIterator<__List_t>& other) const -> bool
+    {
+        return !(operator==(other));
+    }
+
+    /// @} // Input & Output Ierator Operations
+
     /// @{ @name Forward Iterator Operations
 public:
+    // TODO Release 구성에서 예외를 던지게 한다면 더 좋을 것 같다.
     /** @brief 이 반복자가 가리키는 위치를 하나 증가시킨다.
      *  @return 연산 후 이 반복자에 대한 참조
      *  @details 현재 노드가 센티넬 노드가 아닌 경우에만 연산을 수행한다.
-     *  @exception Debug 구성에서 현재 노드가 센티넬 노드인 경우 비정상
-     *  종료한다. Release 구성에서는 Undefined Behavior이다.
-    /// @todo Release 구성에서 예외를 던지게 한다면 더 좋을 것 같다.
+     *
+     *  @warning Debug 구성에서 현재 노드가 센티넬 노드인 경우 비정상  종료하고,
+     *  Release 구성에서는 정의되지 않은 행동이다.
      */
     auto operator++() -> List_ConstIterator&
     {
@@ -115,9 +144,8 @@ public:
         return *this;
     }
 
-    /** @copybrief `operator++()`
+    /** @overload
      *  @return 연산 전 이 반복자에 대한 사본
-     *  @details `operator++()`를 내부에서 호출한다.
      */
     auto operator++(int) -> List_ConstIterator
     {
@@ -127,14 +155,14 @@ public:
     }
 
     /// @} // Forward Iterator Operations
-    /// @{ @name Bidirectional Iterator Operation
+
+    /// @{ @name Bidirectional Iterator Operations
 
     /** @brief 이 반복자가 가리키는 위치를 하나 감소시킨다.
      *  @return 연산 후 이 반복자에 대한 참조
-     *  @exception
-     *  반복자가 가리키는 노드의 이전 노드가 센티넬 노드인 경우, \n
-     *  - Debug 구성에서는 비정상 종료한다. \n
-     *  - Release 구성에서는 Undefined Behavior이다.
+     *
+     *  @warning 현재 노드의 이전 노드가 센티넬 노드인 경우, Debug 구성에서는
+     *  비정상 종료하고, Release 구성에서는 정의되지 않은 행동이다.
      */
     auto operator--() -> List_ConstIterator&
     {
@@ -146,9 +174,8 @@ public:
         return *this;
     }
 
-    /** @copybrief `operator--()`
+    /** @overload
      *  @return 연산 전 이 반복자에 대한 사본
-     *  @details `operator--()`를 내부에서 호출한다.
      */
     auto operator--(int) -> List_ConstIterator
     {
@@ -157,47 +184,19 @@ public:
         return temp;
     }
 
-    /// @} // Bidirectional Iterator Operation
+    /// @} // Bidirectional Iterator Operations
+
+    /// @{ @name Helper Methods
 
 public:
-    /** @brief 두 반복자가 같은지 비교한다.
-     *  @param[in] other 비교할 반복자
-     *  @return 두 반복자가 같은 경우 `true`, 그렇지 않으면 `false`
-     *  @details
-     *  두 반복자의 동등성은 다음의 두 조건을 만족할 때 성립한다.\n
-     *  - 두 반복자가 같은 리스트를 가리키고 있다. \n
-     *  - 두 반복자가 같은 노드를 가리키고 있다.
-     *  @exception
-    /// @todo 유효성 여부에 대해서 다시 알아볼 필요가 있다. 기존 설명은 노드와
-    반복자에 대한 주소가 모두 `nullptr`이면 같은 것으로 취급한다고 작성하였는데,
-    실제로 그런지 확인해 볼 필요가 있다.
-     */
-    auto operator==(const List_ConstIterator<__List_t>& other) const -> bool
-    {
-        return IsCompatible(*other.m_cont_ptr) &&
-               (m_data_ptr == other.m_data_ptr);
-    }
-
-    /** @brief 두 반복자가 다른지 비교한다.
-     *  @param[in] other 비교할 반복자
-     *  @return 두 반복자가 다른 경우 `true`, 그렇지 않으면 `false`
-     *  @details `operator==()`의 반대 결과를 반환한다.
-     */
-    auto operator!=(const List_ConstIterator<__List_t>& other) const -> bool
-    {
-        return !(operator==(other));
-    }
-
-    // 반복자가 역참조 가능한 경우, 유효하다.
-public: // Helper Functions
     /** @brief 반복자가 유효한지 확인한다.
      *  @details
-     *  반복자가 유효하려면 다음의 두 조건을 만족해야 한다.\n
-     *  - 이 반복자가 가리키는 리스트에 대한 포인터가 `nullptr`이 아니다. \n
-     *  - 이 반복자가 가리키는 리스트 내 노드에 대한 포인터가 `nullptr`이
-     *  아니다.
-     *  @note 단순히 `nullptr` 체크만 수행한다. 만일 실제로 리스트에 속한 노드의
-     *  주소를 가지고 있는게 아니더라도, 유효한 것으로 간주하므로 주의한다.
+     *  유효한 반복자에 대한 정의는 아래와 같다.
+     *  - 리스트에 대한 포인터가 `nullptr`이 아니다.
+     *  - 노드에 대한 포인터가 `nullptr`이 아니다.
+     *
+     *  @note 단순한 `nullptr` 체크만 수행한다. 실제로 리스트에 속한 노드를
+     *  가리키고 있는 것이 아니더라도, 유효한 것으로 간주하므로 주의한다.
      */
     auto IsValid() const -> bool
     {
@@ -207,11 +206,13 @@ public: // Helper Functions
     /** @brief 반복자가 가리키는 위치를 역참조할 수 있는지 확인한다.
      *  @brief 역참조가 가능하면 `true`, 그렇지 않으면 `false`
      *  @details
-     *  역참조가 가능하려면 다음의 두 조건을 만족해야 한다.\n
-     *  - 반복자가 유효해야 한다. \n
-     *  - 반복자가 리스트의 센티넬 노드를 가리키고 있지 않아야 한다.
-     *  @note `IsValid`를 포함하는 검사이므로, 역참조 가능한 반복자라면, 유효한
-     *  반복자이다.
+     *  역참조가 가능한 반복자의 정의는 아래와 같다.
+     *  - 반복자가 유효해야 한다.
+     *  - 반복자가 가리키는 위치가 리스트의 끝이 아니어야 한다. (센티널 노드가
+     *    아니어야 한다.)
+     *
+     *  @note \ref IsValid 를 포함하는 검사이므로, 역참조 가능한 반복자라면,
+     *  유효한 반복자이다.
      */
     auto IsDereferencible() const -> bool
     {
@@ -220,24 +221,31 @@ public: // Helper Functions
         return m_data_ptr != m_cont_ptr->GetSentinelPointer();
     }
 
-    /** @brief 리스트와 반복자의 호환성 여부를 확인한다.
+    /** @brief 주어진 리스트와 반복자가 호환되는지 확인한다.
      *  @param[in] list 호환성을 확인할 리스트
      *  @return 호환이 되면 `true`, 그렇지 않으면 `false`
      *  @details
-     *  리스트와 반복자가 호환되려면 다음을 만족해야 한다.\n
-     *  - 리스트에 대한 포인터에 저장된 값이 전달된 리스트의 주소값과 같아야
-     *  한다.
+     *  리스트와 반복자가 호환되려면 다음을 만족해야 한다.
+     *  - 리스트에 대한 포인터가 전달된 리스트의 주소값과 같아야 한다.
      */
     auto IsCompatible(const __List_t& list) const -> bool
     {
         return m_cont_ptr == &list;
     }
 
-public: // Data Access
-    /** @brief 반복자가 가리키는 노드에 대한 상수 포인터를 반환한다.
-     *  @return 반복자가 가리키는 노드에 대한 상수 포인터
+    /// @} // Helper Methods
+
+    /// @{ @name Data Access
+public:
+    /** @brief 이 반복자가 가리키는 컨테이너의 원소에 대한 상수 포인터를
+     *  반환한다.
+     *  @return 이 반복자가 가리키는 컨테이너의 원소에 대한 상수 포인터
+     *
+     *  @note 이 포인터는 반복자가 가리키는 노드에 대한 포인터이다.
      */
     auto GetDataPointer() const -> const Node_D_t* { return m_data_ptr; }
+
+    /// @} // Data Access
 
 protected:
     /** @brief 반복자가 가리키는 리스트에 대한 상수 포인터 */
@@ -246,6 +254,6 @@ protected:
     const Node_D_t* m_data_ptr{nullptr};
 };
 
-RDS_END
+} // namespace rds
 
 #endif // RDS_LIST_CONSTITERATOR_HPP

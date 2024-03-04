@@ -3,34 +3,26 @@ set(RDS_SRCS
     # === Assertion
     src/Assertion/Assertion.cpp
 
-    # === TypeTraits
-    include/TypeTraits/TypeTraits.hpp
-
-    # === FVectors
-    src/FVector2/FVector2.cpp
-    src/FVector3/FVector3.cpp
-
     # === Array
     include/Array/Array.hpp
     include/Array/Array_ConstIterator.hpp
     include/Array/Array_Iterator.hpp
 
-    # Memory Management
-    include/Allocator/Allocator_Trait.hpp
+    # === Memory Management
+    include/Allocator/AllocatorTraits.hpp
     include/Allocator/Mallocator.hpp
     include/Allocator/Nallocator.hpp
 
-    # include/Allocator/Allocator.hpp
-    # include/Arena/Arena.hpp
+    # === Node
+    include/Node/Node_D.hpp
+    include/Node/Node_s.hpp
 
     # === List
-    include/Node_D/Node_D.hpp
     include/List/List.hpp
     include/List/List_ConstIterator.hpp
     include/List/List_Iterator.hpp
 
     # === ForwardList
-    include/Node_S/Node_S.hpp
     include/ForwardList/ForwardList.hpp
     include/ForwardList/ForwardList_ConstIterator.hpp
     include/ForwardList/ForwardList_Iterator.hpp
@@ -47,8 +39,6 @@ set(RDS_SRCS
 set(RDS_INC_PRIVATE
     src/
     src/Assertion/
-    src/FVector2/
-    src/FVector3/
 )
 
 set(RDS_INC_PUBLIC
@@ -56,19 +46,11 @@ set(RDS_INC_PUBLIC
 
     include/Assertion/
 
-    include/TypeTraits/
-
     include/Array/
-
-    include/FVector2/
-    include/FVector3/
 
     include/Allocator/
 
-    include/Arena/
-
-    include/Node_D/
-    include/Node_S/
+    include/Node/
 
     include/List/
 

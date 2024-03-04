@@ -1,165 +1,176 @@
-/// @file Array_Iterator.hpp
-
 #ifndef RDS_ARRAY_ITERATOR_HPP
 #define RDS_ARRAY_ITERATOR_HPP
 
-#include "RDS_CoreDefs.h"
-
 #include "Array_ConstIterator.hpp"
 
-RDS_BEGIN
-
-/// @brief \ref Array 컨테이너에 대한 반복자 템플릿 클래스
-/// @tparam Array_t 이 상수 반복자가 가리킬 배열 자료형
-template <typename Array_t>
-class Array_Iterator: public Array_ConstIterator<Array_t>
+namespace rds
 {
-public: // Base Template Class
-    using Super = Array_ConstIterator<Array_t>;
 
-public: // Type Alias
-    /// @brief 이 반복자가 가리키는 배열 원소의 자료형
-    using Val_t  = typename Array_t::Val_t;
-    /// @brief 이 반복자가 가리키는 배열 크기의 자료형
-    using Size_t = typename Array_t::Size_t;
-    /// @brief 이 반복자가 가리키는 배열 원소의 차이값의 자료형
-    using Diff_t = typename Array_t::Diff_t;
+/** @brief \ref Array 컨테이너에 대한 반복자 템플릿 클래스
+ *  @tparam __Array_t 이 반복자가 가리킬 배열 자료형
+ *  @see \ref Array_ConstIterator
+ */
+template <class __Array_t>
+class Array_Iterator: public Array_ConstIterator<__Array_t>
+{
+public:
+    /** @brief 이 반복자의 기초 클래스 */
+    using Super_t = Array_ConstIterator<__Array_t>;
+    using Size_t  = typename Super_t::Size_t;
 
-public: // Default CDtors
-    /// @brief 기본 생성자
+    /// @{ @name Iterator Traits
+
+public:
+    using Value_t      = typename Super_t::Value_t;
+    using Pointer_t    = typename Super_t::Pointer_t;
+    using Reference_t  = typename Super_t::Reference_t;
+    using Difference_t = typename Super_t::Difference_t;
+
+    /// @} // Iterator Traits
+
+public:
+    /** @brief 기본 생성자 */
     Array_Iterator()                      = default;
-    /// @brief 기본 복사 생성자
+    /** @brief 기본 복사 생성자 */
     Array_Iterator(const Array_Iterator&) = default;
-    /// @brief 기본 소멸자
+    /** @brief 기본 소멸자 */
     ~Array_Iterator()                     = default;
 
-public: // Custom Ctors
-    /// @brief 배열 자체에 대한 포인터와 배열 내 원소에 대한 인덱스를 받는
-    /// 생성자
-    /// @param cont_ptr 배열 자체에 대한 포인터
-    /// @param index 배열 내 원소에 대한 인덱스
-    Array_Iterator(const Array_t* cont_ptr, Size_t index);
+    /** @brief 배열에 대한 포인터와 원소에 대한 인덱스를 받는 생성자
+     *  @param cont_ptr 반복자가 가리키는 배열에 대한 포인터
+     *  @param index 반복자가 가리키는 원소에 대한 인덱스
+     *
+     *  @warning 인덱스가 배열의 범위를 벗어나는 경우 정의되지 않은 행동이다.
+     */
+    explicit Array_Iterator(const __Array_t* cont_ptr, Size_t index)
+        : Super_t(cont_ptr, index)
+    {}
 
-public: // IO Iterator
-    /// @brief 이 반복자가 가리키는 배열 원소에 대한 lvalue 참조를 반환한다.
-    auto operator*() const -> Val_t&;
-    /// @brief 이 반복자가 가리키는 배열 원소에 대한 포인터를 반환한다.
-    auto operator->() const -> Val_t*;
+    /// @{ @name Input & Output Iterator Operations
 
-public: // Forward Iterator
-    /// @brief 이 반복자가 가리키는 배열 원소를 다음 원소로 바꾼다.
-    auto operator++() -> Array_Iterator&;
-    /// @brief 이 반복자가 가리키는 배열 원소를 다음 원소로 바꾼다.
-    auto operator++(int) -> Array_Iterator;
+public:
+    /** @copydoc Array_ConstIterator::operator*()
+     *
+     */
+    auto operator*() const -> Value_t&
+    {
+        return const_cast<Value_t&>(Super_t::operator*());
+    }
 
-public: // Bidirectional Iterator
-    /// @brief 이 반복자가 가리키는 배열 원소를 이전 원소로 바꾼다.
-    auto operator--() -> Array_Iterator&;
-    /// @brief 이 반복자가 가리키는 배열 원소를 이전 원소로 바꾼다.
-    auto operator--(int) -> Array_Iterator;
+    /** @copydoc Array_ConstIterator::operator->()
+     *
+     */
+    auto operator->() const -> Value_t*
+    {
+        return const_cast<Value_t*>(Super_t::operator->());
+    }
 
-public: // Random Access Iterator
-    auto operator+=(const Diff_t offset) -> Array_Iterator&;
-    auto operator+(const Diff_t offset) const -> Array_Iterator;
-    auto operator-=(const Diff_t offset) -> Array_Iterator&;
-    auto operator-(const Diff_t offset) -> Array_Iterator;
+    /// @} // Input & Output Iterator Operations
 
-public: // Data Access
-    /// @brief 이 반복자가 가리키는 배열 원소에 대한 포인터를 반환한다.
-    auto GetDataPointer() const -> Val_t*;
+    /// @{ @name Forward Iterator Operations
+
+public:
+    /** @copydoc Array_ConstIterator::operator++()
+     *
+     */
+    auto operator++() -> Array_Iterator&
+    {
+        Super_t::operator++();
+        return *this;
+    }
+
+    /** @copydoc Array_ConstIterator::operator++(int)
+     *
+     */
+    auto operator++(int) -> Array_Iterator
+    {
+        const auto temp = *this;
+        Super_t::operator++();
+        return temp;
+    }
+
+    /// @} // Forward Iterator Operations
+
+    /// @{ @name Bidirectional Iterator Operations
+
+public:
+    /** @copydoc Array_ConstIterator::operator--()
+     *
+     */
+    auto operator--() -> Array_Iterator&
+    {
+        Super_t::operator--();
+        return *this;
+    }
+
+    /** @copydoc Array_ConstIterator::operator--(int)
+     *
+     */
+    auto operator--(int) -> Array_Iterator
+    {
+        const auto temp = *this;
+        Super_t::operator--();
+        return temp;
+    }
+
+    /// @} // Bidirectional Iterator Operations
+
+    /// @{ @name Random Access Iterator Operations
+
+public: 
+    /** @copydoc Array_ConstIterator::operator+=
+     *
+     */
+    auto operator+=(const Difference_t offset) -> Array_Iterator&
+    {
+        Super_t::operator+=(offset);
+        return *this;
+    }
+
+    /** @copydoc Array_ConstIterator::operator+
+     *
+     */
+    auto operator+(const Difference_t offset) const -> Array_Iterator
+    {
+        auto temp = *this;
+        return temp.operator+=(offset);
+    }
+
+    /** @copydoc Array_ConstIterator::operator-=
+     *
+     */
+    auto operator-=(const Difference_t offset) -> Array_Iterator&
+    {
+        Super_t::operator-=(offset);
+        return *this;
+    }
+
+    /** @copydoc Array_ConstIterator::operator-
+     *
+     */
+    auto operator-(const Difference_t offset) -> Array_Iterator
+    {
+        auto temp = *this;
+        return temp.operator-=(offset);
+    }
+
+    /// @} // Random Access Iterator Operations
+
+    /// @{ @name Data Access
+
+public: 
+    /** @brief 이 반복자가 가리키는 컨테이너의 원소에 대한 포인터를
+     *  반환한다.
+     *  @return 이 반복자가 가리키는 컨테이너의 원소에 대한 포인터
+     */
+    auto GetDataPointer() const -> Value_t*
+    {
+        return const_cast<Value_t*>(Super_t::GetDataPointer());
+    }
+
+    /// @} // Data Access
 };
 
-RDS_END
-
-// IMPELEMENTATIONS //
-
-RDS_BEGIN
-
-template <typename Array_t>
-Array_Iterator<Array_t>::Array_Iterator(const Array_t* cont_ptr, Size_t index)
-    : Super(cont_ptr, index)
-{}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator*() const -> Val_t&
-{
-    return const_cast<Val_t&>(Super::operator*());
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator->() const -> Val_t*
-{
-    return const_cast<Val_t*>(Super::operator->());
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator++() -> Array_Iterator&
-{
-    Super::operator++();
-    return *this;
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator++(int) -> Array_Iterator
-{
-    const auto temp = *this;
-    Super::operator++();
-    return temp;
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator--() -> Array_Iterator&
-{
-    Super::operator--();
-    return *this;
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator--(int) -> Array_Iterator
-{
-    const auto temp = *this;
-    Super::operator--();
-    return temp;
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator+=(const Diff_t offset)
-    -> Array_Iterator&
-{
-    Super::operator+=(offset);
-    return *this;
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator+(const Diff_t offset) const
-    -> Array_Iterator
-{
-    auto temp = *this;
-    return temp.operator+=(offset);
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator-=(const Diff_t offset)
-    -> Array_Iterator&
-{
-    Super::operator-=(offset);
-    return *this;
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::operator-(const Diff_t offset)
-    -> Array_Iterator
-{
-    auto temp = *this;
-    return temp.operator-=(offset);
-}
-
-template <typename Array_t>
-inline auto Array_Iterator<Array_t>::GetDataPointer() const -> Val_t*
-{
-    return const_cast<Val_t*>(Super::GetDataPointer());
-}
-
-RDS_END
+} // namespace rds
 
 #endif // RDS_ARRAY_ITERATOR_HPP

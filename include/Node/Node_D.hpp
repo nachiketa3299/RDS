@@ -1,11 +1,12 @@
-/// @file Node_D.hpp
-
 #ifndef RDS_NODE_D_HPP
 #define RDS_NODE_D_HPP
 
+#include <utility> // std::forward
+
 #include "RDS_CoreDefs.h"
 
-RDS_BEGIN
+namespace rds
+{
 
 /** @brief 두 개의 링크를 가지는 노드 구조체
  *  @tparam __T_t 노드가 가지는 값에 대한 자료형
@@ -71,6 +72,6 @@ public:
     Node_D* prev{nullptr};
 };
 
-RDS_END
+} // namespace rds
 
 #endif // RDS_NODE_D_HPP

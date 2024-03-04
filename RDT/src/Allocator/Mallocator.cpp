@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "Allocator_Trait.hpp"
+#include "AllocatorTraits.hpp"
 #include "Mallocator.hpp"
 #include "RDT_CoreDefs.h"
 
