@@ -29,4 +29,5 @@ macro(rdt_add_test DIR_NAME FILE_NAME)
         PRIVATE ${RDS_INC_PRIVATE} ${RDS_INC_PUBLIC} ${RDT_INC}
     )
     gtest_discover_tests(${RDT_TARGET})
+    add_test(test_all ${RDT_TARGET}) # ctest -R test_all 로 테스트 실행
 endmacro()
