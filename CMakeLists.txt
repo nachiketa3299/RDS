@@ -21,5 +21,9 @@ target_include_directories(${PROJECT_NAME}
     PRIVATE ${RDS_INC_PRIVATE}
 )
 
-# 테스트 프로그램 빌드
-add_subdirectory(RDT)
+option(RDS_TEST "RDS 테스트 프로그램 빌드" ON)
+
+if(RDS_TEST)
+    # 테스트 프로그램 빌드
+    add_subdirectory(RDT)
+endif()

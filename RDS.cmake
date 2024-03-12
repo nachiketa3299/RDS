@@ -39,11 +39,15 @@ set(RDS_SRCS
     include/Tuple/Tuple.hpp
     include/TypeList/TypeList.hpp
     include/Pair/Pair.hpp
+
+    # === FVector
+    src/FVector/FVector3.cpp
 )
 
 set(RDS_INC_PRIVATE
     src/
     src/Assertion/
+    src/FVector/
 )
 
 set(RDS_INC_PUBLIC
@@ -65,4 +69,6 @@ set(RDS_INC_PUBLIC
     include /Tuple/
     include/TypeList/
     include/Pair/
+
+    include/FVector/
 )
