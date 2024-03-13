@@ -4,6 +4,7 @@
 #include "RDS_CoreDefs.h"
 
 #include "AllocatorTraits.hpp"
+#include "Iterator.hpp"
 
 #include "Vector_Iterator.hpp"
 
@@ -19,7 +20,7 @@ template <class __T_t, template <class> class __Alloc_t = Nallocator>
 class Vector
 {
 public:
-    using Allocator_t = __Alloc_t;
+    using Allocator_t = __Alloc_t<__T_t>;
     using Size_t      = std::size_t;
 
 public:
@@ -55,7 +56,7 @@ public:
      * @param[in] size 생성할 벡터의 크기
      * @param[in] init_val 생성할 벡터의 초기값.
      */
-    Vector(Size_t size, const Value_t& init_val)
+    Vector(Size_t size, const Value_t& init_val = Value_t())
         : m_size(size)
         , m_capacity(size)
     {
@@ -80,13 +81,40 @@ public:
      *  @param[in] ilist 초기화 리스트
      *  @return 연산 이후 이 벡터에 대한 참조
      */
-    auto operator=(const std::initializer_list<Value_t>& ilist) -> Vector&;
+    auto operator=(const std::initializer_list<Value_t>& ilist) -> Vector& {}
 
-    template <class __InputIterator_t>
-    auto Assign(__InputIterator_t it_first, __InputIterator_t it_last)
-        -> void;                                           // TODO
-    auto Assign(Size_t count, const Value_t& val) -> void; // TODO
-    auto Assign(const std::initializer_list<Value_t>& ilist) -> void;
+    // template <class __InputIterator_t>
+    // auto Assign(__InputIterator_t it_first, __InputIterator_t it_last) ->
+    // void
+    // {
+    //     AllocatorTraits<Allocator_t>::Deconstruct(m_ptr, m_capacity);
+    //     AllocatorTraits<Allocator_t>::Deallocate(m_ptr);
+
+    //     const auto count = DistanceBetween(it_first, it_last);
+
+    //     m_ptr = AllocatorTraits<Allocator_t>::Allocate(count);
+
+    //     for (Size_t i = 0; i < count; ++i)
+    //         m_ptr[i] = *it_first++;
+    // }
+
+    auto Assign(Size_t count, const Value_t& val) -> void
+    {
+        AllocatorTraits<Allocator_t>::Deconstruct(m_ptr, m_capacity);
+        AllocatorTraits<Allocator_t>::Deallocate(m_ptr);
+
+        AllocatorTraits<Allocator_t>::Allocate(count);
+        AllocatorTraits<Allocator_t>::Construct(m_ptr, count, val);
+
+        m_capacity = count;
+        m_size     = count;
+    }
+
+    auto Assign(const std::initializer_list<Value_t>& ilist) -> void
+    {
+        AllocatorTraits<Allocator_t>::Deconstruct(m_ptr, m_capacity);
+        AllocatorTraits<Allocator_t>::Deallocate(m_ptr);
+    }
 
     /// @{  @name Access
 
@@ -164,12 +192,12 @@ public:
     /** @brief 첫 번째 원소를 가리키는 반복자를 반환한다.
      *  @return 첫 번째 원소를 가리키는 반복자
      */
-    auto Begin() const -> ConstIterator_t { return ConstIterator(this, 0); }
+    auto Begin() const -> ConstIterator_t { return ConstIterator_t(this, 0); }
 
     /** @copydoc Begin() const
      *
      */
-    auto Begin() -> Iterator_t { return Iterator(this, 0); }
+    auto Begin() -> Iterator_t { return Iterator_t(this, 0); }
 
     /** @brief 끝을 가리키는 반복자를 반환한다.
      *  @return 끝을 가리키는 반복자
@@ -177,22 +205,28 @@ public:
      *  역참조 하면 안된다. Debug 구성에서는 비정상 종료하며, Release 구성에서는
      *  Undefined Behavior 이다.
      */
-    auto End() const -> ConstIterator_t { return ConstIterator(this, m_size); }
+    auto End() const -> ConstIterator_t
+    {
+        return ConstIterator_t(this, m_size);
+    }
 
     /** @copydoc End() const
      *
      */
-    auto End() -> Iterator_t { return Iterator(this, m_size); }
+    auto End() -> Iterator_t { return Iterator_t(this, m_size); }
 
     /** @brief 첫 번째 원소를 가리키는 상수 반복자를 반환한다.
      *  @return 첫 번째 원소를 가리키는 상수 반복자
      */
-    auto CBegin() const -> ConstIterator_t { return ConstIterator(this, 0); }
+    auto CBegin() const -> ConstIterator_t { return ConstIterator_t(this, 0); }
 
     /** @brief 끝을 가리키는 상수 반복자를 반환한다.
      *  @return 끝을 가리키는 상수 반복자
      */
-    auto CEnd() const -> ConstIterator_t { return ConstIterator(this, m_size); }
+    auto CEnd() const -> ConstIterator_t
+    {
+        return ConstIterator_t(this, m_size);
+    }
 
     /// @} // Iterators
 
@@ -295,7 +329,7 @@ public:
     /** @overload
      *  @brief 반복자가 가리키는 위치 이전에 새 원소를 하나 삽입한다.
      */
-    auto InsertBefore(ConstIterator_t it_pos, const Value_t&) -> Iterator_t
+    auto InsertBefore(ConstIterator_t it_pos, const Value_t& val) -> Iterator_t
     {
         return InsertBefore(it_pos, 1, val);
     }
@@ -303,7 +337,7 @@ public:
     /** @overload
      *  @brief 반복자가 가리키는 위치 이전에 새 원소를 하나 삽입한다.
      */
-    auto InsertBefore(ConstIterator_t it_pos, Valut_t&& val)
+    auto InsertBefore(ConstIterator_t it_pos, Value_t&& val)
         -> Iterator_t; // TODO
 
     /** @overload
@@ -412,7 +446,7 @@ public:
      * 초기화된다.
      *
      */
-    auto Resize(Size_T count, const Value_t& val) -> void; // TODO
+    auto Resize(Size_t count, const Value_t& val) -> void; // TODO
 
     /// @} // Modifiers
 

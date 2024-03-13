@@ -195,19 +195,12 @@ public:
      *  @param[in] init_val 생성할 리스트의 초기값.
      *  @details `size` 가 0이면, `init_val`에 상관없이 아무 동작도 하지 않는다.
      */
-    List(Size_t size, const Value_t& init_val)
+    List(Size_t size, const Value_t& init_val = Value_t())
         : List()
     {
         for (Size_t i = 0; i < size; ++i)
             PushBack(init_val);
     }
-
-    /** @brief 리스트의 초기 크기를 지정하는 생성자.
-     *  @details 전달된 크기만큼의 리스트를 생성하며, 각 원소는 기본 초기화된다.
-     */
-    List(Size_t size)
-        : List(size, Value_t())
-    {}
 
     /** @brief 초기화 리스트를 받는 생성자
      *  @param[in] ilist 초기화 리스트

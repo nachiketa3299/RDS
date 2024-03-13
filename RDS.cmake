@@ -1,74 +1,53 @@
 set(RDS_SRCS
 
     # === Assertion
-    src/Assertion/Assertion.cpp
-
-    # === Array
-    include/Array/Array.hpp
-    include/Array/Array_ConstIterator.hpp
-    include/Array/Array_Iterator.hpp
+    src/Assertion.cpp
 
     # === Memory Management
-    include/Allocator/AllocatorTraits.hpp
-    include/Allocator/Mallocator.hpp
-    include/Allocator/Nallocator.hpp
+    include/AllocatorTraits.hpp
+    include/Mallocator.hpp
+    include/Nallocator.hpp
 
-    # === Node
-    include/Node/Node_D.hpp
-    include/Node/Node_s.hpp
+    # === Array
+    include/Array.hpp
+    include/Array_ConstIterator.hpp
+    include/Array_Iterator.hpp
 
     # === List
-    include/List/List.hpp
-    include/List/List_ConstIterator.hpp
-    include/List/List_Iterator.hpp
+    include/Node_D.hpp
+    include/List.hpp
+    include/List_ConstIterator.hpp
+    include/List_Iterator.hpp
 
     # === ForwardList
-    include/ForwardList/ForwardList.hpp
-    include/ForwardList/ForwardList_ConstIterator.hpp
-    include/ForwardList/ForwardList_Iterator.hpp
+    include/Node_S.hpp
+    include/ForwardList.hpp
+    include/ForwardList_ConstIterator.hpp
+    include/ForwardList_Iterator.hpp
 
     # === Vector
-    include/Vector/Vector.hpp
-    include/Vector/Vector_ConstIterator.hpp
-    include/Vector/Vector_Iterator.hpp
+    include/Vector.hpp
+    include/Vector_ConstIterator.hpp
+    include/Vector_Iterator.hpp
 
     # === Iterator
-    include/Iterator/Iterator.hpp
+    include/Iterator.hpp
 
-    # === Tuple
-    include/Tuple/Tuple.hpp
-    include/TypeList/TypeList.hpp
-    include/Pair/Pair.hpp
+    # === Tuple & Pair
+    include/Tuple.hpp
+    include/TypeList.hpp
+    include/Pair.hpp
 
     # === FVector
-    src/FVector/FVector3.cpp
+    src/FVector3.cpp
+
+    # === Algorithm
+    include/Algorithm.hpp
+
+    # === Functional
+    include/Functional.hpp
 )
 
-set(RDS_INC_PRIVATE
-    src/
-    src/Assertion/
-    src/FVector/
-)
+set(RDS_INC_PRIVATE src/)
 
-set(RDS_INC_PUBLIC
-    include/
-
-    include/Assertion/
-
-    include/Array/
-
-    include/Allocator/
-
-    include/Node/
-
-    include/List/
-
-    include/Vector/
-    include/Iterator/
-
-    include /Tuple/
-    include/TypeList/
-    include/Pair/
-
-    include/FVector/
-)
+set(RDS_INC_PUBLIC include/)

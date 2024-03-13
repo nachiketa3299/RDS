@@ -83,7 +83,7 @@ public:
     /** @copydoc Vector_ConstIterator::operator++(int)
      *
      */
-    auto operator++(int) -> Vector_Iterator&
+    auto operator++(int) -> Vector_Iterator
     {
         const auto temp = *this;
         Super_t::operator++();
@@ -107,7 +107,7 @@ public:
     /** @copydoc Vector_ConstIterator::operator--(int)
      *
      */
-    auto operator--(int) -> Vector_Iterator&
+    auto operator--(int) -> Vector_Iterator
     {
         const auto temp = *this;
         Super_t::operator--();

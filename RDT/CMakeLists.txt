@@ -28,6 +28,12 @@ rdt_add_test(List Operation)
 
 rdt_add_test(Iterator Iterator)
 
+rdt_add_test(Vector Ctor)
+rdt_add_test(Vector Access)
+
+rdt_add_test(Algorithm MinMax)
+rdt_add_test(Algorithm Fill)
+
 # rdt_add_test(Tuple Basic)
 
 # rdt_add_test(MemoryManagement Mallocator_Fundamental_Types)

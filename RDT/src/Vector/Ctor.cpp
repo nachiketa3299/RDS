@@ -2,6 +2,7 @@
 
 #include "RDT_CoreDefs.h"
 #include <gtest/gtest.h>
+#include <vector>
 
 #include "Vector.hpp"
 
@@ -45,6 +46,13 @@ TEST(Vector_Reserve, NonConst)
     EXPECT_EQ(vec.Capacity(), 5);
 }
 
+TEST(Vector_Assign, basic)
+{
+    Vector<int> vec{0, 1, 2, 3};
+    vec.Assign(5, 3);
 
+    std::vector<int> stdvec{0, 1, 2, 3};
+    stdvec.assign(5, 3);
+}
 
 RDT_END
