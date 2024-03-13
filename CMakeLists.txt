@@ -23,7 +23,7 @@ include(RDS.cmake)
 add_library(${PROJECT_NAME} STATIC ${RDS_SRCS})
 
 # 타겟의 포함 경로 설정 (RDS_INC_PUBLIC, RDS_INC_PRIVATE)
-target_include_directories(${PROJECT_NAME} PUBLIC ${RDS_INC_PUBLIC} PRIVATE ${RDS_INC_PRIVATE})
+target_include_directories(${PROJECT_NAME} PUBLIC ./include/ PRIVATE ./include/RDS/ PRIVATE ./include/src/)
 
 # 옵션: 테스트 프로그램 빌드 여부
 if(NOT DEFINED RDS_BUILD_TEST)
