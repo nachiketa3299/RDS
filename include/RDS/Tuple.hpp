@@ -21,4 +21,4 @@ class Tuple<>
 
 } // namespace rds
 
-#endif RDS_TUPLE_HPP
+#endif // RDS_TUPLE_HPP
