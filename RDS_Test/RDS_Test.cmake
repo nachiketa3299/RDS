@@ -1,0 +1,10 @@
+SET(rdt_source_dir ${PROJECT_SOURCE_DIR}/src)
+
+MACRO(rdt_add_test_target _file_name)
+	SET(target_name ${_file_name})
+	SET(full_file_name "${rdt_source_dir}/${_file_name}.cpp")
+	MESSAGE(STATUS "${rdt_log_prefix} 테스트 파일 ${full_file_name}을 타겟 ${target_name}으로 추가.")
+	ADD_EXECUTABLE(${target_name} ${full_file_name})
+	TARGET_LINK_LIBRARIES(${target_name} RDS)
+	TARGET_INCLUDE_DIRECTORIES(${target_name} PRIVATE ${rds_public_include_dir})
+ENDMACRO()

@@ -28,8 +28,8 @@ public:
     using Size_t = std::size_t;
 
 public:
-    using Iterator_t      = Array_Iterator_t<Array>;
-    using ConstIterator_t = Array_ConstIterator_t<Array>;
+    using Iterator_t      = Array_Iterator<Array>;
+    using ConstIterator_t = Array_ConstIterator<Array>;
 
 public:
     /** @brief 기본 생성자 */

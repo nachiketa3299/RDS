@@ -2,32 +2,33 @@
 
 [![wakatime](https://wakatime.com/badge/github/nachiketa3299/RDS.svg)](https://wakatime.com/badge/github/nachiketa3299/RDS)
 
-## Tools
+## 사용된 도구들
 
-- Text Editor 
-    - **Visual Studio Code**
-- Build Automation 
-    - **CMake (3.27.0)**
-        - **_Main_: RDS 라이브러리**
-            - [/CMakeList.txt](/CMakeLists.txt) <sub>기본 RDS 라이브러리 빌드 설정</sub>
-            - [/RDS.cmake](/RDS.cmake) <sub>빌드 설정 위한 변수 및 매크로 정의</sub>
-        - **_Sub_: RDS_GTest 테스트**
-            - [/test/CMakeList.txt](/test/CMakeLists.txt)<sub>라이브러리 GTest 용 프로젝트</sub>
-            - [/test/RDS_Gtest.cmake](/test/RDS_Gtest.cmake)<sub>테스트 프로젝트 빌드 설정 위한 변수 및 매크로 정의</sub>
-- Compilers
-    - MSVC 
-        - Visual Studio 2019 Community Release
-    - MSYS g++
-    - Clang
-- Static Analysis
-    - **Clang-tidy**
-- Test
-    - **Google Test**
-- Formatting
-    - **clang-format**
-- Documentation
-    - **Doxygen**
-- Special Thanks to *Zenburn* & *VsCodeVim*
+- 텍스트 에디터
+    - Visual Studio Code
+- 빌드 자동화 도구
+    - CMake (3.27.0)
+- 환경
+    - Windows 11 Pro(x64)<sup>Intel(R) Core(TM) i7-8750H CPU @ 2.20GHz 2.20 GHz, 16GB RAM</sup>
+- 컴파일러
+    - [ ] MSVC 
+        - Visual Studio 2022 Community Release (x64)
+            - 알 수 없는 오류로 Configure가 되지 않음
+        - Visual Studio 2019 Community Release (x64)
+            - PC 포맷 후 2019 설치가 날아가서 현재는 잠정 중단
+    - [X] MSYS g++
+        - 문제 없이 컴파일
+    - [ ] Clang
+- 정적 분석 도구
+    - Clang-tidy
+        - 쓰다가 잠정 중단
+- 테스트
+    - Google Test
+- 포매팅
+    - clang-format
+        - 쓰다가 잠정 중단
+- 문서화
+    - Doxygen
 
 # *RDS* <sup><i>outlines</i></sup>
 
