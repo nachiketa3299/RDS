@@ -1,25 +1,28 @@
-# @date 2024-04-22
-# Project Settings
-
 CMAKE_MINIMUM_REQUIRED(VERSION 3.27)
 PROJECT(RDS VERSION 0.1.2 LANGUAGES CXX)
-SET(PROJECT_DESCRIPTION "C++ Data Structures Library written by RZN")
+SET(PROJECT_DESCRIPTION "C++를 사용한 자료구조와 알고리즘 라이브러리")
 SET(CMAKE_CXX_STANDARD 23)
 
-# Set list variables for `[rds_hpp_source_list;rds_cpp_source_list] = rds_source_list`
-# also set `rds_private_hpp_include_dir` and `rds_private_cpp_include_dir`
-INCLUDE(RDS.cmake)
+SET(rds_public_include_dir ${PROJECT_SOURCE_DIR}/include)
+SET(rds_private_include_dir ${PROJECT_SOURCE_DIR}/src)
+
+# SET(rds_sources Assertion.cpp FVector3.cpp)
+SET(rds_template_sources array.h vector.h allocator.h heap.h)
+
+LIST(TRANSFORM rds_sources PREPEND ${rds_private_include_dir}/)
+LIST(TRANSFORM rds_template_sources PREPEND ${rds_public_include_dir}/RDS/)
+
+SET(rds_all_sources ${rds_sources} ${rds_template_sources})
 
 # RDS 스태틱 라이브러리를 생성한다.
-ADD_LIBRARY(${PROJECT_NAME} STATIC ${rds_source_list})
+ADD_LIBRARY(${PROJECT_NAME} STATIC ${rds_all_sources})
+SET_TARGET_PROPERTIES(${PROJECT_NAME} PROPERTIES LINKER_LANGUAGE CXX)
 
 # 외부에서 이 라이브러리를 사용할 때 인클루드 경로. 예) #include "RDS/Array.hpp"
-SET(rds_public_include_dir ${PROJECT_SOURCE_DIR}/include)
 TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PUBLIC ${rds_public_include_dir})
 
 # 내부 인클루드 경로
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${rds_private_hpp_include_dir})
-TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${rds_private_cpp_include_dir})
+TARGET_INCLUDE_DIRECTORIES(${PROJECT_NAME} PRIVATE ${rds_private_include_dir})
 
 OPTION(rds_enable_gtest "Enable GTest" OFF)
 OPTION(rds_enable_test "Enable Test" ON)
@@ -33,7 +36,7 @@ IF(PROJECT_IS_TOP_LEVEL)
     ENDIF()
 
     IF(rds_enable_test)
-        MESSAGE(STATUS "${rds_log_prefix} 설정에 따라 테스트 프로그램을 추가합니다.")
+        MESSAGE(STATUS "${rds_log_prefix} 설정에 따라 기본 테스트 프로그램을 추가합니다.")
         ADD_SUBDIRECTORY(RDS_Test)
     ENDIF()
 ENDIF()
