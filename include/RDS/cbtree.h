@@ -109,7 +109,7 @@ template <class U>
 void println(cbtree<U> const& t) { /* no impl */ }
 
 #ifdef _MSC_VER
-#include <format>
+#include <format> // gcc 에는 구현 안 되어있음 =.=
 
 template <>
 void println(cbtree<int> const& t) {
