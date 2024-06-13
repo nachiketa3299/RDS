@@ -7,7 +7,7 @@ SET(rds_public_include_dir ${PROJECT_SOURCE_DIR}/include)
 SET(rds_private_include_dir ${PROJECT_SOURCE_DIR}/src)
 
 # SET(rds_sources Assertion.cpp FVector3.cpp)
-SET(rds_template_sources array.h vector.h allocator.h heap.h)
+SET(rds_template_sources array.h vector.h allocator.h heap.h cbtree.h)
 
 LIST(TRANSFORM rds_sources PREPEND ${rds_private_include_dir}/)
 LIST(TRANSFORM rds_template_sources PREPEND ${rds_public_include_dir}/RDS/)
